@@ -8,5 +8,4 @@ ApplicationWindow {
     LumixCamera {
         anchors.fill: parent
     }
-
 }

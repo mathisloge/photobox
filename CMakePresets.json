@@ -1,0 +1,91 @@
+{
+    "version": 6,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 26,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "default",
+            "hidden": true,
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "CMAKE_EXPORT_COMPILE_COMMANDS": true
+            }
+        },
+        {
+            "name": "developer",
+            "inherits": "default",
+            "installDir": "${sourceDir}/dist",
+            "displayName": "Developer Config",
+            "description": "The developer configuration",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "QT_QML_DEBUG": true
+            }
+        },
+        {
+            "name": "ci",
+            "displayName": "CI configuration",
+            "inherits": "default",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "developer",
+            "configurePreset": "developer"
+        },
+        {
+            "name": "ci",
+            "configurePreset": "ci"
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "ci",
+            "configurePreset": "ci",
+            "output": {
+                "outputOnFailure": true
+            },
+            "execution": {
+                "noTestsAction": "ignore",
+                "stopOnFailure": true
+            }
+        }
+    ],
+    "packagePresets": [
+        {
+            "name": "ci",
+            "configurePreset": "ci",
+            "generators": ["RPM"]
+        }
+    ],
+    "workflowPresets": [
+        {
+            "name": "ci",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "ci"
+                },
+                {
+                    "type": "build",
+                    "name": "ci"
+                },
+                {
+                    "type": "test",
+                    "name": "ci"
+                },
+                {
+                    "type": "package",
+                    "name": "ci"
+                }
+            ]
+        }
+    ]
+}

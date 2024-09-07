@@ -3,7 +3,7 @@ import QtQuick.Controls
 import QtMultimedia
 
 Rectangle {
-    CameraNetwork{
+    CameraNetwork {
         id: network
     }
     MediaPlayer {
@@ -20,7 +20,7 @@ Rectangle {
 
     Text {
         anchors.centerIn: parent
-        text: player.error + " " + player.errorString + "hasVideo"+player.hasVideo + "Battery:" + network.state.batteryRemaining + "%"
+        text: player.error + " " + player.errorString + "hasVideo" + player.hasVideo + "Battery:" + network.state.batteryRemaining + "%"
     }
 
     Button {
@@ -28,12 +28,12 @@ Rectangle {
         anchors.top: parent.top
         text: player.playing ? "stop" : "play"
         onClicked: {
-            if(player.playing) {
-                player.stop()
+            if (player.playing) {
+                player.stop();
             } else {
-                player.position = 0
-                player.source = "udp://@:5111?overrun_nonfatal=1&fifo_size=10000000"
-                player.play()
+                player.position = 0;
+                player.source = "udp://@:5111?overrun_nonfatal=1&fifo_size=10000000";
+                player.play();
             }
         }
     }
@@ -42,7 +42,7 @@ Rectangle {
         anchors.top: btnPlay.bottom
         text: "Start"
         onClicked: {
-            network.startStream()
+            network.startStream();
         }
     }
 }
