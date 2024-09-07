@@ -5,7 +5,11 @@ using namespace Qt::Literals::StringLiterals;
 
 namespace {
 int parseFractionToInt(const QString &fraction);
+QString camMode() { return "http://192.168.54.1/cam.cgi?mode=%1"_L1; }
+QString camModeValue() {
+  return "http://192.168.54.1/cam.cgi?mode=%1&value=%2"_L1;
 }
+} // namespace
 namespace pbox {
 CameraNetwork::CameraNetwork(QObject *parent) : QObject{parent} {
   network_manager_.setAutoDeleteReplies(true);
@@ -15,22 +19,36 @@ CameraNetwork::CameraNetwork(QObject *parent) : QObject{parent} {
           &CameraNetwork::parseNetworkReply);
 
   heartbeat_timer_.setInterval(std::chrono::seconds{5});
-  connect(&heartbeat_timer_, &QTimer::timeout, this, [this]() {
-    qDebug() << "heartbeat";
-    requestCameraState();
-  });
-
+  connect(&heartbeat_timer_, &QTimer::timeout, this,
+          &CameraNetwork::requestCameraState);
   heartbeat_timer_.start();
+
+  lcd_keepalive_timer_.setInterval(std::chrono::seconds{45});
+  connect(&lcd_keepalive_timer_, &QTimer::timeout, this,
+          &CameraNetwork::requestLcdOn);
+  lcd_keepalive_timer_.start();
 }
 
 void CameraNetwork::requestCapabilities() {}
 
-/// cam.cgi?mode=getstate
-
 void CameraNetwork::requestCameraState() {
-  static const QUrl getStateUrl{"http://192.168.54.1/cam.cgi?mode=getstate"};
+  sendRequest(camModeValue().arg("getstate"_L1, "keepalive"_L1));
+}
 
-  auto &&reply = network_manager_.get(QNetworkRequest(getStateUrl));
+void CameraNetwork::startStream() {
+  sendRequest(camModeValue().arg("startstream"_L1).arg(5111));
+}
+
+void CameraNetwork::stopStream() {
+  sendRequest(camMode().arg("stopstream"_L1));
+}
+
+void CameraNetwork::requestLcdOn() {
+  sendRequest(camModeValue().arg("camcmd"_L1, "lcd_on"_L1));
+}
+
+void CameraNetwork::sendRequest(const QUrl &url) {
+  auto &&reply = network_manager_.get(QNetworkRequest{url});
   connect(reply, &QNetworkReply::errorOccurred, this,
           [](QNetworkReply::NetworkError err) {
             qDebug() << "error during request:" << err;
