@@ -34,6 +34,7 @@ class CameraNetwork : public QObject
     void requestCapabilities();
     Q_INVOKABLE void startStream();
     Q_INVOKABLE void stopStream();
+    Q_INVOKABLE void captureImage();
 
     const CameraState &state() const;
 

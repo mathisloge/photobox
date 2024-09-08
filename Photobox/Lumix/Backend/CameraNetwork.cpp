@@ -57,6 +57,11 @@ void CameraNetwork::requestLcdOn()
     sendRequest(camModeValue().arg("camcmd"_L1, "lcd_on"_L1));
 }
 
+void CameraNetwork::captureImage()
+{
+    sendRequest(camModeValue().arg("camcmd"_L1, "capture"_L1));
+}
+
 void CameraNetwork::sendRequest(const QUrl &url)
 {
     auto &&reply = network_manager_.get(QNetworkRequest{url});

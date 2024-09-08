@@ -19,12 +19,9 @@ Item {
         onTriggered: {
             if (__count > 0) {
                 __count--;
-                // finish when the smile is beeing displayed
-                if(__count === 0) {
-                    root.finished();
-                }
             } else {
                 countdownTimer.stop();
+                root.finished();
             }
         }
 

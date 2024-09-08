@@ -43,7 +43,7 @@ Rectangle {
         anchors.top: btnPlay.bottom
         text: "Start"
         onClicked: {
-            network.startStream();
+            network.captureImage();
         }
     }
 }
