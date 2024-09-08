@@ -15,6 +15,11 @@ qt_add_qml_module(PhotoboxApp
       Main.qml
       Countdown.qml
       ShutterEffect.qml
+      ShutterShader.qml
+    RESOURCES
+        ShutterShader/shuttershader.vert.qsb     
+        ShutterShader/shuttershader.frag.qsb
+        camera-shutter.wav
 )
 
 

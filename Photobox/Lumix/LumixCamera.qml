@@ -11,6 +11,7 @@ Rectangle {
         source: "udp://@:5111?overrun_nonfatal=1&fifo_size=10000000"
         videoOutput: videoOutput
         playbackRate: 2.0
+        autoPlay: true
     }
 
     VideoOutput {

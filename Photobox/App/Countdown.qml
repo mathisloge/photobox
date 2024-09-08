@@ -10,7 +10,7 @@ Item {
 
     property int __count: 0
 
-    signal finished
+    signal finished()
 
     Timer {
         id: countdownTimer
@@ -19,9 +19,12 @@ Item {
         onTriggered: {
             if (__count > 0) {
                 __count--;
+                // finish when the smile is beeing displayed
+                if(__count === 0) {
+                    root.finished();
+                }
             } else {
                 countdownTimer.stop();
-                root.finished();
             }
         }
 
@@ -35,7 +38,7 @@ Item {
     Text {
         id: countdownText
         text: __count > 0 ? __count : "Smile!"
-        font.pixelSize: 100
+        font.pixelSize: 192
         color: "white"
         anchors.centerIn: parent
         scale: 1
