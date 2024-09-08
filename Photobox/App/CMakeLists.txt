@@ -5,6 +5,8 @@ target_link_libraries(PhotoboxApp PRIVATE
     Qt6::Gui
     Qt6::Qml
     Qt6::Quick
+    PhotoboxCore
+    PhotoboxCoreplugin
     PhotoboxLumixplugin
 )
 

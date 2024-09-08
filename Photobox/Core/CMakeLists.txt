@@ -3,6 +3,17 @@ qt_add_qml_module(
     URI "Photobox.Core"
     STATIC
     SOURCES
-        Backend/CameraNetwork.hpp
-        Backend/CameraNetwork.cpp
+        CameraImageProvider.hpp
+        CameraImageProvider.cpp
+        ICamera.hpp
+        ICamera.cpp
+        MockCamera.hpp
+        MockCamera.cpp
+        ApplicationState.hpp
+)
+
+target_include_directories(PhotoboxCore PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
+target_link_libraries(PhotoboxCore PUBLIC 
+    Qt6::Quick
+    Qt6::Multimedia
 )
