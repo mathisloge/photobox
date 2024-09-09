@@ -21,6 +21,5 @@ class MockCamera : public ICamera
     QMediaCaptureSession capture_session_;
     QImageCapture image_capture_;
     QCamera camera_;
-    QVideoFrame frame_;
 };
 } // namespace Pbox

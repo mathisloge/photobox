@@ -4,10 +4,10 @@
 #include <ApplicationState.hpp>
 #include <CameraImageProvider.hpp>
 #include <ICamera.hpp>
+#include <ImageStorage.hpp>
 #include <MockCamera.hpp>
 
 Q_IMPORT_QML_PLUGIN(Photobox_CorePlugin)
-Q_IMPORT_QML_PLUGIN(Photobox_LumixPlugin)
 
 using namespace Pbox;
 
@@ -19,6 +19,9 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationVersion(QStringLiteral(QT_VERSION_STR));
 
     std::shared_ptr<ICamera> camera = std::make_shared<MockCamera>();
+
+    ImageStorage image_storage{};
+    QObject::connect(camera.get(), &ICamera::imageCaptured, &image_storage, &ImageStorage::onImageCaptured);
 
     QQmlApplicationEngine engine;
 

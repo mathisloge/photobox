@@ -9,11 +9,13 @@ qt_add_qml_module(
         ICamera.cpp
         MockCamera.hpp
         MockCamera.cpp
+        ImageStorage.hpp
+        ImageStorage.cpp
         ApplicationState.hpp
 )
 
 target_include_directories(PhotoboxCore PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
-target_link_libraries(PhotoboxCore PUBLIC 
+target_link_libraries(PhotoboxCore PUBLIC
     Qt6::Quick
     Qt6::Multimedia
 )

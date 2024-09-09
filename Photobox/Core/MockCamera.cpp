@@ -7,8 +7,7 @@
 namespace Pbox
 {
 MockCamera::MockCamera()
-    : frame_{QVideoFrameFormat{QSize{640, 480}, QVideoFrameFormat::Format_RGBA8888}}
-    , camera_{QMediaDevices::defaultVideoInput()}
+    : camera_{QMediaDevices::defaultVideoInput()}
 {
     capture_session_.setCamera(&camera_);
     capture_session_.setImageCapture(&image_capture_);
@@ -17,6 +16,8 @@ MockCamera::MockCamera()
     connect(this, &ICamera::videoSinkChanged, this, [this]() {
         capture_session_.setVideoSink(getVideoSink());
         /**
+        frame_{QVideoFrameFormat{QSize{640, 480}, QVideoFrameFormat::Format_RGBA8888}};
+
         QPointer<QVideoSink> video_sink{getVideoSink()};
         if (video_sink.isNull())
         {

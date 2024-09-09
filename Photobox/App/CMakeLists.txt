@@ -7,7 +7,6 @@ target_link_libraries(PhotoboxApp PRIVATE
     Qt6::Quick
     PhotoboxCore
     PhotoboxCoreplugin
-    PhotoboxLumixplugin
 )
 
 qt_add_qml_module(PhotoboxApp
@@ -19,9 +18,10 @@ qt_add_qml_module(PhotoboxApp
       ShutterEffect.qml
       ShutterShader.qml
     RESOURCES
-        ShutterShader/shuttershader.vert.qsb     
+        ShutterShader/shuttershader.vert.qsb
         ShutterShader/shuttershader.frag.qsb
         camera-shutter.wav
+        border.svg
 )
 
 
