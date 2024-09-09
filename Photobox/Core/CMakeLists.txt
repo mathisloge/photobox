@@ -12,6 +12,8 @@ qt_add_qml_module(
         ImageStorage.hpp
         ImageStorage.cpp
         ApplicationState.hpp
+        PhotoTriggerClient.cpp
+        PhotoTriggerClient.hpp
 )
 
 target_include_directories(PhotoboxCore PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")

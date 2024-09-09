@@ -1,0 +1,42 @@
+esphome:
+  name: photobox-trigger
+
+esp32:
+  board: esp32-c3-devkitm-1
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+ota:
+  - platform: esphome
+    password: ""
+
+wifi:
+  ssid: "Vodafone-DC33"
+  password: "tc7BP8nAdqQ7TmuF"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Photobox-Trigger"
+    password: "enWbNOQBPMXL"
+
+captive_portal:
+    
+web_server:
+  port: 80
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO3
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    name: "PhotoTriggerButton"
+    filters:
+      - delayed_on: 10ms
+      - delayed_off: 10ms

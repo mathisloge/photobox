@@ -98,6 +98,15 @@ ApplicationWindow {
                 visible: !countdown.running
                 onClicked: countdown.running = true
             }
+
+            Connections {
+                target: ApplicationState.triggerClient
+                 function onTriggered() { 
+                    if(!countdown.running) {
+                        countdown.running = true
+                    }
+                  }
+            }
         }
     }
 

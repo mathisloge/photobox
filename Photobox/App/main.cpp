@@ -6,6 +6,7 @@
 #include <ICamera.hpp>
 #include <ImageStorage.hpp>
 #include <MockCamera.hpp>
+#include <PhotoTriggerClient.hpp>
 
 Q_IMPORT_QML_PLUGIN(Photobox_CorePlugin)
 
@@ -18,6 +19,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName(QStringLiteral("com.mathisloge.photobox"));
     QCoreApplication::setApplicationVersion(QStringLiteral(QT_VERSION_STR));
 
+    std::shared_ptr<PhotoTriggerClient> photo_trigger_client = std::make_shared<PhotoTriggerClient>();
     std::shared_ptr<ICamera> camera = std::make_shared<MockCamera>();
 
     ImageStorage image_storage{};
@@ -29,6 +31,7 @@ int main(int argc, char *argv[])
     Q_ASSERT(app_state != nullptr);
 
     app_state->camera = camera;
+    app_state->trigger_client = photo_trigger_client;
 
     engine.loadFromModule("Photobox.App", "Main");
     engine.addImageProvider(QLatin1String("camera"), new CameraImageProvider(camera)); // qml engine takes ownership
