@@ -114,7 +114,7 @@ ApplicationWindow {
         id: captureView
         Item {
             Image {
-                anchors.centerIn: parent
+                anchors.fill: parent
                 source: "image://camera/capture"
                 cache: false
                 fillMode: Image.PreserveAspectFit

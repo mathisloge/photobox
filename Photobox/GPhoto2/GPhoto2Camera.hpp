@@ -4,9 +4,11 @@
 #include <QMediaCaptureSession>
 #include <QVideoFrame>
 #include "ICamera.hpp"
+#include "GPhoto2Worker.hpp"
 
 namespace Pbox
 {
+class GPhoto2Worker;
 class GPhoto2Camera : public ICamera
 {
     Q_OBJECT
@@ -17,5 +19,7 @@ class GPhoto2Camera : public ICamera
 
     void requestCapturePhoto() override;
 
+  private:
+    GPhoto2Worker worker_thread_;
 };
 } // namespace Pbox
