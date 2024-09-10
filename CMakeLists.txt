@@ -8,4 +8,8 @@ qt_policy(SET QTP0001 NEW)
 
 qt_standard_project_setup()
 
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(gphoto2 REQUIRED IMPORTED_TARGET libgphoto2)
+message(STATUS "Found gphoto2 ${gphoto2_VERSION}")
+
 add_subdirectory(Photobox)

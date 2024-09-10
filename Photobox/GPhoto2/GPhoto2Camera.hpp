@@ -17,6 +17,5 @@ class GPhoto2Camera : public ICamera
 
     void requestCapturePhoto() override;
 
-  private:
 };
 } // namespace Pbox
