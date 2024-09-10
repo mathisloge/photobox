@@ -7,6 +7,8 @@ target_link_libraries(PhotoboxApp PRIVATE
     Qt6::Quick
     PhotoboxCore
     PhotoboxCoreplugin
+    PhotoboxGPhoto2
+    PhotoboxGPhoto2plugin
 )
 
 qt_add_qml_module(PhotoboxApp
