@@ -70,5 +70,32 @@ void PhotoTriggerClient::handleTriggerButtonEvent(const QJsonDocument &json)
     }
 }
 
+void PhotoTriggerClient::playEffect(Effect new_effect)
+{
+    static const std::unordered_map<Effect, QString> kEffectStrings{
+        {Effect::Idle, QStringLiteral("IdleMode")},
+        {Effect::Countdown, QStringLiteral("CountdownMode")},
+    };
+
+    const auto it = kEffectStrings.find(new_effect);
+    if (it == kEffectStrings.end())
+    {
+        return;
+    }
+    QNetworkRequest req{QStringLiteral("http://192.168.0.31/light/statuslight/turn_on?effect=%1").arg(it->second)};
+    qDebug() << "Requuest" << req.url();
+    req.setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader, "text/plain;charset=UTF-8"_L1);
+    auto &&reply = net_manager_.post(req, QByteArray{});
+    setupRequestReply(reply);
+}
+
+void PhotoTriggerClient::setupRequestReply(QNetworkReply *reply)
+{
+    connect(reply, &QNetworkReply::errorOccurred, this, [](QNetworkReply::NetworkError err) {
+        qDebug() << "error during request:" << err;
+    });
+    connect(reply, &QNetworkReply::sslErrors, this, []() { qDebug() << "ssl error"; });
+}
+
 PhotoTriggerClient::~PhotoTriggerClient() = default;
 } // namespace Pbox

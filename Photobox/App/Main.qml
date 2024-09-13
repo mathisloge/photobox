@@ -58,6 +58,10 @@ ApplicationWindow {
         }
     }
 
+    Component.onCompleted: {
+        ApplicationState.triggerClient.playEffect(PhotoTriggerClient.Idle);
+    }
+
     Component {
         id: liveFeedView
 
@@ -85,12 +89,20 @@ ApplicationWindow {
                 id: countdown
                 anchors.fill: parent
                 visible: running
-                initialCount: 1
+                initialCount: 5
 
                 onFinished: {
                     shutter.running = true;
                     ApplicationState.camera.requestCapturePhoto();
                     shutterSound.play();
+                }
+
+                onRunningChanged: {
+                    if(this.running) {
+                        ApplicationState.triggerClient.playEffect(PhotoTriggerClient.Countdown);
+                    } else {
+                        ApplicationState.triggerClient.playEffect(PhotoTriggerClient.Idle);
+                    }
                 }
             }
             Button {

@@ -8,11 +8,22 @@ namespace Pbox
 class PhotoTriggerClient : public QObject
 {
     Q_OBJECT
-    QML_ANONYMOUS
+    QML_ELEMENT
+    QML_UNCREATABLE("only enum")
+
   public:
+    enum class Effect
+    {
+        Idle,
+        Countdown
+    };
+    Q_ENUM(Effect);
+
     PhotoTriggerClient();
     ~PhotoTriggerClient() override;
     Q_DISABLE_COPY_MOVE(PhotoTriggerClient);
+
+    Q_INVOKABLE void playEffect(Effect new_effect);
 
   Q_SIGNALS:
     void triggered();
@@ -20,6 +31,7 @@ class PhotoTriggerClient : public QObject
   private:
     void handleEvent(const QJsonDocument &json);
     void handleTriggerButtonEvent(const QJsonDocument &json);
+    void setupRequestReply(QNetworkReply* reply);
 
   private:
     bool trigger_state_{false};
