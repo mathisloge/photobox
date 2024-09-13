@@ -92,6 +92,11 @@ bool GPhoto2CameraX::autodetectAndConnectCamera()
     return true;
 }
 
+void GPhoto2CameraX::closeCamera()
+{
+    camera_ = nullptr;
+}
+
 GPContext *GPhoto2CameraX::context()
 {
     return context_.get();

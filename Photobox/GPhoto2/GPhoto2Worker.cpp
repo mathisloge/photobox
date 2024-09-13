@@ -1,7 +1,7 @@
 #include "GPhoto2Worker.hpp"
+#include <QDateTime>
 #include <QDebug>
 #include <QImage>
-
 namespace Pbox
 {
 using CameraFilePtr = std::unique_ptr<CameraFile, decltype(&gp_file_free)>;
@@ -50,83 +50,60 @@ void GPhoto2Worker::run_normal_operation()
     /* NOP: This gets overridden in the library to /capt0000.jpg */
     strcpy(camera_file_path.folder, "/");
     strcpy(camera_file_path.name, "foo.jpg");
+
+    int error_count{0};
     while (camera_.camera() != nullptr and running_)
     {
         if (capture_requested_)
         {
-            // gp_camera_trigger_capture(camera_.camera(), camera_.context()) <
+            qDebug() << "STart capture" << QDateTime::currentDateTime();
+            // const auto ret_val = gp_camera_trigger_capture(camera_.camera(), camera_.context());
             const auto ret_val =
                 gp_camera_capture(camera_.camera(), GP_CAPTURE_IMAGE, &camera_file_path, camera_.context());
             if (ret_val < GP_OK)
             {
-                qDebug() << "Could not trigger capture";
+                qDebug() << "Could not trigger capture" << QDateTime::currentDateTime();
             }
             else
             {
                 capture_requested_ = false;
+                qDebug() << "start get photo" << QDateTime::currentDateTime();
+                gp_camera_file_get(camera_.camera(),
+                                   camera_file_path.folder,
+                                   camera_file_path.name,
+                                   GP_FILE_TYPE_NORMAL,
+                                   file.get(),
+                                   camera_.context());
+
+                qDebug() << "start readImageFromFile" << QDateTime::currentDateTime();
+
                 auto captured_image = readImageFromFile(file.get());
                 if (captured_image.has_value())
                 {
+                    qDebug() << "start gotCapturedImage" << QDateTime::currentDateTime();
                     Q_EMIT gotCapturedImage(captured_image.value());
                 }
+                qDebug() << "end capture" << QDateTime::currentDateTime();
             }
         }
-
         const auto ret_val = gp_camera_capture_preview(camera_.camera(), file.get(), camera_.context());
         if (ret_val < GP_OK)
         {
+            error_count++;
+            if (error_count > 5)
+            {
+                qCritical() << "couldn't capture image multiple times. Leaving capture loop now";
+                camera_.closeCamera();
+                break;
+            }
             qDebug() << "could not capture preview input";
             continue;
         }
         auto preview_image = readImageFromFile(file.get());
         if (preview_image.has_value())
         {
+            error_count = 0;
             Q_EMIT gotPreviewImage(preview_image.value());
-        }
-        // run_event_queue();
-    }
-}
-
-void GPhoto2Worker::run_event_queue()
-{
-    Q_ASSERT(camera_.camera());
-    while (running_)
-    {
-        CameraEventType evttype{};
-        void *evtdata{nullptr};
-        const auto retval = gp_camera_wait_for_event(camera_.camera(), 1, &evttype, &evtdata, camera_.context());
-        if (retval != GP_OK)
-        {
-            break;
-        }
-
-        switch (evttype)
-        {
-        case GP_EVENT_FILE_ADDED:
-            qDebug() << "Got event GP_EVENT_FILE_ADDED";
-            break;
-        case GP_EVENT_FILE_CHANGED:
-            qDebug() << "Got event GP_EVENT_FILE_CHANGED";
-            break;
-        case GP_EVENT_FOLDER_ADDED:
-            qDebug() << "Got event GP_EVENT_FOLDER_ADDED";
-            break;
-        case GP_EVENT_CAPTURE_COMPLETE:
-            qDebug() << "Got event GP_EVENT_CAPTURE_COMPLETE";
-            break;
-        case GP_EVENT_TIMEOUT:
-            qDebug() << "Got event GP_EVENT_TIMEOUT";
-            break;
-        case GP_EVENT_UNKNOWN:
-            qDebug() << "Got event GP_EVENT_UNKNOWN";
-            break;
-        default:
-            qDebug() << "Got unexpected event =" << evttype;
-            break;
-        }
-        if (evtdata != nullptr)
-        {
-            free(evtdata);
         }
     }
 }

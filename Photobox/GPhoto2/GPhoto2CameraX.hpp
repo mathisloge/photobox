@@ -31,6 +31,7 @@ class GPhoto2CameraX
     GPContext* context();
     Camera* camera();
     bool autodetectAndConnectCamera();
+    void closeCamera();
 
   private:
     GPhoto2ContextSharedPtr context_{make_gphoto2_context()};

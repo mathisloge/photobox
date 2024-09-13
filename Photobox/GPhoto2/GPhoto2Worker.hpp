@@ -15,7 +15,6 @@ class GPhoto2Worker : public QThread
     void run() override;
 
     void run_normal_operation();
-    void run_event_queue();
 
   Q_SIGNALS:
     void gotPreviewImage(QImage image);

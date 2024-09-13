@@ -8,7 +8,7 @@ Item {
     property alias running: countdownTimer.running
     property alias textColor: countdownText.color
 
-    property int __count: 0
+    property int count: 0
 
     signal finished()
 
@@ -17,8 +17,8 @@ Item {
         interval: 1000
         repeat: true
         onTriggered: {
-            if (__count > 0) {
-                __count--;
+            if (count > 0) {
+                count--;
             } else {
                 countdownTimer.stop();
                 root.finished();
@@ -27,14 +27,14 @@ Item {
 
         onRunningChanged: {
             if (this.running) {
-                root.__count = root.initialCount;
+                root.count = root.initialCount;
             }
         }
     }
 
     Text {
         id: countdownText
-        text: __count > 0 ? __count : "Smile!"
+        text: count > 0 ? count : "Smile!"
         font.pixelSize: 192
         color: "white"
         anchors.centerIn: parent
