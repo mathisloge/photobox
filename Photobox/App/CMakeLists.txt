@@ -29,8 +29,5 @@ install(TARGETS PhotoboxApp
 qt_generate_deploy_qml_app_script(
     TARGET PhotoboxApp
     OUTPUT_SCRIPT deploy_script
-    MACOS_BUNDLE_POST_BUILD
-    NO_UNSUPPORTED_PLATFORM_ERROR
-    DEPLOY_USER_QML_MODULES_ON_UNSUPPORTED_PLATFORM
 )
 install(SCRIPT ${deploy_script})
