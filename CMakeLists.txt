@@ -16,4 +16,5 @@ add_subdirectory(Photobox)
 
 set(CPACK_PACKAGE_CONTACT "Mathis")
 set(CPACK_PACKAGE_FILE_NAME "photobox")
+set(CPACK_RPM_SPEC_MORE_DEFINE "%define _build_id_links none")
 include(CPack)
