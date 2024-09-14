@@ -17,7 +17,7 @@ repos:
     hooks:
       - id: format-qml
         name: format-qml
-        entry: /opt/qt6/bin/qmlformat -i --objects-spacing -w 4 -l native
+        entry: qmlformat -i --objects-spacing -w 4 -l native
         types_or: ["qml"]
         pass_filenames: true
         language: system

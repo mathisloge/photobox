@@ -9,6 +9,7 @@ target_link_libraries(PhotoboxApp PRIVATE
     PhotoboxCoreplugin
     PhotoboxGPhoto2
     PhotoboxGPhoto2plugin
+    PhotoboxUiplugin
 )
 
 qt_add_qml_module(PhotoboxApp
@@ -16,14 +17,6 @@ qt_add_qml_module(PhotoboxApp
     VERSION 1.0
     QML_FILES
       Main.qml
-      Countdown.qml
-      ShutterEffect.qml
-      ShutterShader.qml
-    RESOURCES
-        ShutterShader/shuttershader.vert.qsb
-        ShutterShader/shuttershader.frag.qsb
-        camera-shutter.wav
-        border.svg
 )
 
 

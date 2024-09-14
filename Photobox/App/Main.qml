@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQml.StateMachine as DSM
 import QtMultimedia
 import Photobox.Core
+import Photobox.Ui
 
 ApplicationWindow {
     visible: true
@@ -75,11 +76,6 @@ ApplicationWindow {
                 }
             }
 
-            SoundEffect {
-                id: shutterSound
-                source: "camera-shutter.wav"
-            }
-
             ShutterEffect {
                 id: shutter
                 anchors.fill: parent
@@ -124,29 +120,8 @@ ApplicationWindow {
 
     Component {
         id: captureView
-        Item {
-            Image {
-                anchors.fill: parent
-                source: "image://camera/capture"
-                cache: false
-                fillMode: Image.PreserveAspectFit
-
-                BorderImage {
-                    anchors {
-                        fill: parent
-                        margins: 1
-                    }
-                    border {
-                        left: 30
-                        top: 30
-                        right: 30
-                        bottom: 30
-                    }
-                    horizontalTileMode: BorderImage.Stretch
-                    verticalTileMode: BorderImage.Stretch
-                    source: "border.svg"
-                }
-            }
+        PreviewImage {
+            source: "image://camera/capture"
         }
     }
 

@@ -33,6 +33,15 @@
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"
             }
+        },
+        {
+            "name": "release",
+            "displayName": "Release configuration",
+            "inherits": "default",
+            "cacheVariables": {
+                "BUILD_TESTING": "OFF",
+                "CMAKE_BUILD_TYPE": "Release"
+            }
         }
     ],
     "buildPresets": [
@@ -43,6 +52,10 @@
         {
             "name": "ci",
             "configurePreset": "ci"
+        },
+        {
+            "name": "release",
+            "configurePreset": "release"
         }
     ],
     "testPresets": [
@@ -62,6 +75,11 @@
         {
             "name": "ci",
             "configurePreset": "ci",
+            "generators": ["RPM"]
+        },
+        {
+            "name": "release",
+            "configurePreset": "release",
             "generators": ["RPM"]
         }
     ],
@@ -84,6 +102,23 @@
                 {
                     "type": "package",
                     "name": "ci"
+                }
+            ]
+        },
+        {
+            "name": "release",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "release"
+                },
+                {
+                    "type": "build",
+                    "name": "release"
+                },
+                {
+                    "type": "package",
+                    "name": "release"
                 }
             ]
         }

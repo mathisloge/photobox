@@ -10,6 +10,7 @@
 #include <PhotoTriggerClient.hpp>
 
 Q_IMPORT_QML_PLUGIN(Photobox_CorePlugin)
+Q_IMPORT_QML_PLUGIN(Photobox_UiPlugin)
 
 using namespace Pbox;
 
@@ -21,7 +22,8 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationVersion(QStringLiteral(QT_VERSION_STR));
 
     std::shared_ptr<PhotoTriggerClient> photo_trigger_client = std::make_shared<PhotoTriggerClient>();
-    std::shared_ptr<ICamera> camera = std::make_shared<GPhoto2Camera>();
+    //std::shared_ptr<ICamera> camera = std::make_shared<GPhoto2Camera>();
+    std::shared_ptr<ICamera> camera = std::make_shared<MockCamera>();
 
     ImageStorage image_storage{};
     QObject::connect(camera.get(), &ICamera::imageCaptured, &image_storage, &ImageStorage::onImageCaptured);
