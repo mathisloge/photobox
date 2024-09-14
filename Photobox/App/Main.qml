@@ -8,9 +8,6 @@ import QtQuick.Controls
 ApplicationWindow {
     visible: true
     color: "black"
-    Component.onCompleted: {
-        ApplicationState.triggerClient.playEffect(PhotoTriggerClient.Idle);
-    }
 
     StackView {
         id: stack
@@ -92,31 +89,60 @@ ApplicationWindow {
                 anchors.fill: parent
                 visible: running
                 initialCount: 5
-                onFinished: {
-                    ApplicationState.camera.requestCapturePhoto();
-                }
-                onRunningChanged: {
-                    if (this.running)
-                        ApplicationState.triggerClient.playEffect(PhotoTriggerClient.Countdown);
-                    else
+            }
+
+            MouseArea {
+                id: startButton
+
+                anchors.fill: parent
+            }
+
+            DSM.StateMachine {
+                initialState: statePreview
+                running: true
+
+                DSM.State {
+                    id: statePreview
+
+                    onEntered: {
                         ApplicationState.triggerClient.playEffect(PhotoTriggerClient.Idle);
+                    }
+
+                    DSM.SignalTransition {
+                        signal: ApplicationState.triggerClient.triggered
+                        targetState: stateBeginCountdown
+                    }
+
+                    DSM.SignalTransition {
+                        signal: startButton.clicked
+                        targetState: stateBeginCountdown
+                    }
+
                 }
-            }
 
-            Button {
-                text: "start"
-                visible: !countdown.running
-                onClicked: countdown.running = true
-            }
+                DSM.State {
+                    id: stateBeginCountdown
 
-            Connections {
-                function onTriggered() {
-                    if (!countdown.running)
+                    onEntered: {
                         countdown.running = true;
+                        ApplicationState.triggerClient.playEffect(PhotoTriggerClient.Countdown);
+                    }
+
+                    DSM.SignalTransition {
+                        signal: countdown.finished
+                        targetState: stateCapturePhoto
+                    }
 
                 }
 
-                target: ApplicationState.triggerClient
+                DSM.State {
+                    id: stateCapturePhoto
+
+                    onEntered: {
+                        ApplicationState.camera.requestCapturePhoto();
+                    }
+                }
+
             }
 
         }
@@ -133,13 +159,13 @@ ApplicationWindow {
     }
 
     DSM.StateMachine {
-        id: captureFlow
+        id: applicationFlow
 
         initialState: stateLiveFeed
         running: true
         onFinished: {
             stack.pop(null);
-            captureFlow.start();
+            applicationFlow.start();
         }
 
         DSM.State {
