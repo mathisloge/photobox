@@ -86,12 +86,6 @@ ApplicationWindow {
                 }
             }
 
-            ShutterEffect {
-                id: shutter
-
-                anchors.fill: parent
-            }
-
             Countdown {
                 id: countdown
 
@@ -99,9 +93,7 @@ ApplicationWindow {
                 visible: running
                 initialCount: 5
                 onFinished: {
-                    shutter.running = true;
                     ApplicationState.camera.requestCapturePhoto();
-                    shutterSound.play();
                 }
                 onRunningChanged: {
                     if (this.running)
