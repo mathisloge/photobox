@@ -1,3 +1,3 @@
-docker buildx create --use --platform=linux/arm64/v8 --name crossbuild-builder
-docker buildx inspect --bootstrap
-docker buildx build --platform=linux/arm64/v8 --push --tag ghcr.io/mathisloge/photobox/build:latest .
+#docker buildx create --use --platform=linux/arm64/v8 --name crossbuild-builder
+#docker buildx inspect --bootstrap
+docker buildx build --output outdir --platform=linux/arm64/v8 --target=artifact .

@@ -1,0 +1,25 @@
+name: ci
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build RPM
+        uses: docker/build-push-action@v6
+        with:
+          tags: photobox-cross:latest
+          outputs: type=local,dest=/opt/outdir
+          target: artifact
+          platforms: linux/arm64/v8
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: photobox-arm
+          path: /opt/outdir/photobox.rpm

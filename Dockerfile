@@ -1,4 +1,5 @@
-FROM fedora:latest
+FROM fedora:latest as build
+
 
 RUN dnf install -y cmake ninja-build gcc mesa-libGL-devel qt6-qtbase-devel qt6-qtdeclarative-devel qt6-qtmultimedia-devel libgphoto2-devel fedora-packager rpmdevtools && \
     dnf clean all && \
@@ -7,3 +8,6 @@ RUN dnf install -y cmake ninja-build gcc mesa-libGL-devel qt6-qtbase-devel qt6-q
 COPY . .
 
 RUN cmake --workflow --preset release 
+
+FROM scratch as artifact
+COPY --from=build /build/photobox.rpm /photobox.rpm

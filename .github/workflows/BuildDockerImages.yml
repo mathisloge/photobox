@@ -25,4 +25,4 @@ jobs:
           file: Docker/BuildImage/Dockerfile
           platforms: linux/amd64,linux/arm64/v8
           push: true
-          tags: photobox/build:latest
+          tags: mathisloge/photobox-build:latest

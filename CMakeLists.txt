@@ -14,4 +14,6 @@ message(STATUS "Found gphoto2 ${gphoto2_VERSION}")
 
 add_subdirectory(Photobox)
 
+set(CPACK_PACKAGE_CONTACT "Mathis")
+set(CPACK_PACKAGE_FILE_NAME "photobox")
 include(CPack)
