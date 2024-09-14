@@ -6,14 +6,14 @@ qt_add_qml_module(
         GPhoto2Camera.hpp
         GPhoto2Camera.cpp
 )
-target_link_libraries(PhotoboxGPhoto2 PUBLIC 
+target_link_libraries(PhotoboxGPhoto2 PUBLIC
     PhotoboxCore
     PkgConfig::gphoto2
 )
 
 target_include_directories(PhotoboxGPhoto2 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_sources(PhotoboxGPhoto2 PRIVATE 
+target_sources(PhotoboxGPhoto2 PRIVATE
     GPhoto2CameraX.cpp
     GPhoto2CameraX.hpp
     GPhoto2Context.cpp

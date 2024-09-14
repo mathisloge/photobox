@@ -28,8 +28,8 @@ class GPhoto2CameraX
     ~GPhoto2CameraX();
     Q_DISABLE_COPY_MOVE(GPhoto2CameraX);
 
-    GPContext* context();
-    Camera* camera();
+    GPContext *context();
+    Camera *camera();
     bool autodetectAndConnectCamera();
     void closeCamera();
 

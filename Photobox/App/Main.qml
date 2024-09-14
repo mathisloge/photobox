@@ -1,16 +1,20 @@
-import QtQuick
-import QtQuick.Controls
-import QtQml.StateMachine as DSM
-import QtMultimedia
 import Photobox.Core
 import Photobox.Ui
+import QtMultimedia
+import QtQml.StateMachine as DSM
+import QtQuick
+import QtQuick.Controls
 
 ApplicationWindow {
     visible: true
     color: "black"
+    Component.onCompleted: {
+        ApplicationState.triggerClient.playEffect(PhotoTriggerClient.Idle);
+    }
 
     StackView {
         id: stack
+
         initialItem: liveFeedView
         anchors.fill: parent
 
@@ -23,6 +27,7 @@ ApplicationWindow {
                     duration: 1000
                     easing.type: Easing.InCubic
                 }
+
                 NumberAnimation {
                     property: "scale"
                     from: 0
@@ -30,8 +35,11 @@ ApplicationWindow {
                     duration: 1000
                     easing.type: Easing.InCubic
                 }
+
             }
+
         }
+
         pushExit: Transition {
             NumberAnimation {
                 property: "scale"
@@ -40,7 +48,9 @@ ApplicationWindow {
                 duration: 1000
                 easing.type: Easing.InCubic
             }
+
         }
+
         popEnter: Transition {
             PropertyAnimation {
                 property: "opacity"
@@ -48,7 +58,9 @@ ApplicationWindow {
                 to: 1
                 duration: 200
             }
+
         }
+
         popExit: Transition {
             PropertyAnimation {
                 property: "opacity"
@@ -56,11 +68,9 @@ ApplicationWindow {
                 to: 0
                 duration: 200
             }
-        }
-    }
 
-    Component.onCompleted: {
-        ApplicationState.triggerClient.playEffect(PhotoTriggerClient.Idle);
+        }
+
     }
 
     Component {
@@ -69,8 +79,8 @@ ApplicationWindow {
         Item {
             VideoOutput {
                 id: videoOutput
-                anchors.fill: parent
 
+                anchors.fill: parent
                 Component.onCompleted: {
                     ApplicationState.camera.videoSink = videoOutput.videoSink;
                 }
@@ -78,29 +88,29 @@ ApplicationWindow {
 
             ShutterEffect {
                 id: shutter
+
                 anchors.fill: parent
             }
 
             Countdown {
                 id: countdown
+
                 anchors.fill: parent
                 visible: running
                 initialCount: 5
-
                 onFinished: {
                     shutter.running = true;
                     ApplicationState.camera.requestCapturePhoto();
                     shutterSound.play();
                 }
-
                 onRunningChanged: {
-                    if(this.running) {
+                    if (this.running)
                         ApplicationState.triggerClient.playEffect(PhotoTriggerClient.Countdown);
-                    } else {
+                    else
                         ApplicationState.triggerClient.playEffect(PhotoTriggerClient.Idle);
-                    }
                 }
             }
+
             Button {
                 text: "start"
                 visible: !countdown.running
@@ -108,52 +118,64 @@ ApplicationWindow {
             }
 
             Connections {
+                function onTriggered() {
+                    if (!countdown.running)
+                        countdown.running = true;
+
+                }
+
                 target: ApplicationState.triggerClient
-                 function onTriggered() { 
-                    if(!countdown.running) {
-                        countdown.running = true
-                    }
-                  }
             }
+
         }
+
     }
 
     Component {
         id: captureView
+
         PreviewImage {
             source: "image://camera/capture"
         }
+
     }
 
     DSM.StateMachine {
         id: captureFlow
+
         initialState: stateLiveFeed
         running: true
+        onFinished: {
+            stack.pop(null);
+            captureFlow.start();
+        }
 
         DSM.State {
             id: stateLiveFeed
+
             DSM.SignalTransition {
                 signal: ApplicationState.camera.imageCaptured
                 targetState: stateShowCaptureImage
             }
+
         }
 
         DSM.State {
             id: stateShowCaptureImage
+
+            onEntered: stack.push(captureView)
+
             DSM.TimeoutTransition {
                 targetState: stateFinal
                 timeout: 5000
             }
-            onEntered: stack.push(captureView)
+
         }
 
         DSM.FinalState {
             id: stateFinal
         }
 
-        onFinished: {
-            stack.pop(null);
-            captureFlow.start();
-        }
     }
+
 }

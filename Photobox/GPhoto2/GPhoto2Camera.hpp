@@ -3,8 +3,8 @@
 #include <QImageCapture>
 #include <QMediaCaptureSession>
 #include <QVideoFrame>
-#include "ICamera.hpp"
 #include "GPhoto2Worker.hpp"
+#include "ICamera.hpp"
 
 namespace Pbox
 {

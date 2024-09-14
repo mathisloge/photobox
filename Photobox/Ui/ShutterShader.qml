@@ -14,22 +14,23 @@ Item {
 
     FrameAnimation {
         id: frameAnimation
-        running: rootItem.timeRunning
 
+        running: rootItem.timeRunning
         onTriggered: {
-            if(elapsedTime > 1.3) {
-                stop()
-            }
+            if (elapsedTime > 1.3)
+                stop();
+
         }
     }
 
     ShaderEffect {
         readonly property alias iSource: rootItem.source
         readonly property alias iTime: rootItem.animatedTime
-        readonly property vector3d iResolution: Qt.vector3d(width, height, 1.0)
+        readonly property vector3d iResolution: Qt.vector3d(width, height, 1)
 
         vertexShader: 'ShutterShader/shuttershader.vert.qsb'
         fragmentShader: 'ShutterShader/shuttershader.frag.qsb'
         anchors.fill: parent
     }
+
 }

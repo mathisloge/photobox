@@ -7,13 +7,13 @@ Item {
     property int initialCount: 10
     property alias running: countdownTimer.running
     property alias textColor: countdownText.color
-
     property int count: 0
 
     signal finished()
 
     Timer {
         id: countdownTimer
+
         interval: 1000
         repeat: true
         onTriggered: {
@@ -24,22 +24,26 @@ Item {
                 root.finished();
             }
         }
-
         onRunningChanged: {
-            if (this.running) {
+            if (this.running)
                 root.count = root.initialCount;
-            }
+
         }
     }
 
     Text {
         id: countdownText
+
         text: count > 0 ? count : "Smile!"
         font.pixelSize: 192
         color: "white"
         anchors.centerIn: parent
         scale: 1
         opacity: 1
+        onTextChanged: {
+            countdownText.scale = 1;
+            countdownText.opacity = 1;
+        }
 
         Behavior on text {
             SequentialAnimation {
@@ -60,11 +64,11 @@ Item {
                     duration: 200
                     easing.type: Easing.InQuad
                 }
+
             }
+
         }
-        onTextChanged: {
-            countdownText.scale = 1;
-            countdownText.opacity = 1;
-        }
+
     }
+
 }

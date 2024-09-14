@@ -50,11 +50,16 @@ GPhoto2Camera::GPhoto2Camera()
 
         video_sink->setVideoFrame(video_frame);
     });
-    connect(&worker_thread_, &GPhoto2Worker::gotCapturedImage, this, [this](QImage image) {
-        qDebug() << "emit image capture" << QDateTime::currentDateTime();
-        Q_EMIT imageCaptured(image);
-        qDebug() << "finish image capture" << QDateTime::currentDateTime();
-    }, Qt::QueuedConnection);
+    connect(
+        &worker_thread_,
+        &GPhoto2Worker::gotCapturedImage,
+        this,
+        [this](QImage image) {
+            qDebug() << "emit image capture" << QDateTime::currentDateTime();
+            Q_EMIT imageCaptured(image);
+            qDebug() << "finish image capture" << QDateTime::currentDateTime();
+        },
+        Qt::QueuedConnection);
 
     worker_thread_.start();
 }

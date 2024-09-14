@@ -31,7 +31,7 @@ class PhotoTriggerClient : public QObject
   private:
     void handleEvent(const QJsonDocument &json);
     void handleTriggerButtonEvent(const QJsonDocument &json);
-    void setupRequestReply(QNetworkReply* reply);
+    void setupRequestReply(QNetworkReply *reply);
 
   private:
     bool trigger_state_{false};
