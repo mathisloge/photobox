@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
     // std::shared_ptr<ICamera> camera = std::make_shared<GPhoto2Camera>();
     std::shared_ptr<ICamera> camera = std::make_shared<MockCamera>();
 
-    ImageStorage image_storage{};
+    ImageStorage image_storage{std::filesystem::current_path()};
     QObject::connect(camera.get(), &ICamera::imageCaptured, &image_storage, &ImageStorage::onImageCaptured);
 
     QQmlApplicationEngine engine;

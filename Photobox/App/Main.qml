@@ -141,6 +141,12 @@ ApplicationWindow {
                     onEntered: {
                         ApplicationState.camera.requestCapturePhoto();
                     }
+
+                    DSM.SignalTransition {
+                        signal: ApplicationState.camera.imageCaptured
+                        targetState: statePreview
+                    }
+
                 }
 
             }
