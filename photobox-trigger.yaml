@@ -24,7 +24,7 @@ wifi:
     password: "enWbNOQBPMXL"
 
 captive_portal:
-    
+
 web_server:
   port: 80
 
@@ -41,6 +41,10 @@ binary_sensor:
       - delayed_on: 10ms
       - delayed_off: 10ms
 
+status_led:
+  pin:
+    number: GPIO8
+
 light:
   - platform: esp32_rmt_led_strip
     rgb_order: GRB
@@ -52,7 +56,7 @@ light:
     effects:
       - addressable_random_twinkle:
           name: IdleMode
-          twinkle_probability: 25%
+          twinkle_probability: 5%
           progress_interval: 32ms
       - addressable_rainbow:
           name: CountdownMode
@@ -61,15 +65,40 @@ light:
 
   - platform: esp32_rmt_led_strip
     rgb_order: GRB
-    pin: GPIO8
+    pin: GPIO7
     num_leds: 5
     rmt_channel: 1
     chipset: ws2812
     name: "Test"
     effects:
-      - strobe:
-      - addressable_rainbow:
-      - addressable_scan:
-          name: Scan Effect With Custom Values
-          move_interval: 100ms
-          scan_width: 1
+      - addressable_color_wipe:
+          name: CountdownActive
+          colors:
+            - red: 100%
+              green: 100%
+              blue: 100%
+              num_leds: 5
+              gradient: true
+            - red: 0%
+              green: 0%
+              blue: 0%
+              num_leds: 4
+              gradient: true
+          add_led_interval: 75ms
+          reverse: false
+number:
+  - platform: template
+    name: CountdownCount
+    min_value: 0
+    max_value: 10
+    step: 1
+    optimistic: true
+    on_value_range:
+      above: 1
+      below: 6
+      then: 
+        lambda: |-
+          ESP_LOGD("main", "I am at execution number %d", x);
+
+
+

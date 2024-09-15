@@ -81,6 +81,14 @@ ApplicationWindow {
                 Component.onCompleted: {
                     ApplicationState.camera.videoSink = videoOutput.videoSink;
                 }
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: 500
+                    }
+
+                }
+
             }
 
             Countdown {
@@ -105,6 +113,7 @@ ApplicationWindow {
                     id: statePreview
 
                     onEntered: {
+                        videoOutput.opacity = 1;
                         ApplicationState.triggerClient.playEffect(PhotoTriggerClient.Idle);
                     }
 
@@ -125,7 +134,21 @@ ApplicationWindow {
 
                     onEntered: {
                         countdown.running = true;
-                        ApplicationState.triggerClient.playEffect(PhotoTriggerClient.Countdown);
+                    }
+
+                    DSM.SignalTransition {
+                        signal: countdown.countChanged
+                        targetState: stateBeforeCapture
+                        guard: countdown.count <= 1
+                    }
+
+                }
+
+                DSM.State {
+                    id: stateBeforeCapture
+
+                    onEntered: {
+                        videoOutput.opacity = 0;
                     }
 
                     DSM.SignalTransition {
