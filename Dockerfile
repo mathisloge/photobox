@@ -1,4 +1,4 @@
-FROM ghcr.io/mathisloge/photobox/build-context as build
+FROM ghcr.io/mathisloge/photobox/build-context:main as build
 
 
 RUN dnf install -y cmake ninja-build gcc mesa-libGL-devel qt6-qtbase-devel qt6-qtdeclarative-devel qt6-qtmultimedia-devel libgphoto2-devel fedora-packager rpmdevtools && \
