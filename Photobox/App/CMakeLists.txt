@@ -25,9 +25,3 @@ install(TARGETS PhotoboxApp
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
-
-qt_generate_deploy_qml_app_script(
-    TARGET PhotoboxApp
-    OUTPUT_SCRIPT deploy_script
-)
-install(SCRIPT ${deploy_script})

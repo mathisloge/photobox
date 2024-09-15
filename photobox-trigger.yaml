@@ -45,7 +45,7 @@ light:
   - platform: esp32_rmt_led_strip
     rgb_order: GRB
     pin: GPIO10
-    num_leds: 224
+    num_leds: 24
     rmt_channel: 0
     chipset: ws2812
     name: "StatusLight"
@@ -58,3 +58,18 @@ light:
           name: CountdownMode
           speed: 40
           width: 40
+
+  - platform: esp32_rmt_led_strip
+    rgb_order: GRB
+    pin: GPIO8
+    num_leds: 5
+    rmt_channel: 1
+    chipset: ws2812
+    name: "Test"
+    effects:
+      - strobe:
+      - addressable_rainbow:
+      - addressable_scan:
+          name: Scan Effect With Custom Values
+          move_interval: 100ms
+          scan_width: 1
