@@ -1,4 +1,4 @@
-#include <QGuiApplication>
+#include <QApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlExtensionPlugin>
 #include <ApplicationState.hpp>
@@ -9,34 +9,59 @@
 #include <MockCamera.hpp>
 #include <PhotoTriggerClient.hpp>
 
+#include <QPainter>
+#include <QPrintDialog>
+#include <QPrinter>
+#include <QSvgRenderer>
+#include <QSvgWidget>
+
 Q_IMPORT_QML_PLUGIN(Photobox_CorePlugin)
 Q_IMPORT_QML_PLUGIN(Photobox_UiPlugin)
 
 using namespace Pbox;
 
+namespace
+{
+void testPrint()
+{
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setOutputFileName("print.pdf");
+
+    QPainter painter;
+    painter.begin(&printer);
+
+    int numberOfPages = 2;
+    int lastPage = numberOfPages - 1;
+
+    QSvgWidget x("/home/mathis/Downloads/TestImageEx.svg");
+
+    for (int page = 0; page < numberOfPages; ++page)
+    {
+
+        painter.save();
+
+        x.renderer()->render(&painter);
+
+        painter.restore();
+
+        if (page != lastPage)
+            printer.newPage();
+    }
+
+    painter.end();
+
+    printer.setOutputFormat(QPrinter::OutputFormat::PdfFormat);
+}
+} // namespace
+
 int main(int argc, char *argv[])
 {
-    QGuiApplication app(argc, argv);
-    QCoreApplication::setApplicationName(QStringLiteral("PhotoBox"));
+    QApplication app(argc, argv);
+    QCoreApplication::setApplicationName(QStringLiteral("PhotoBox Collage"));
     QCoreApplication::setOrganizationName(QStringLiteral("com.mathisloge-photobox.collage"));
     QCoreApplication::setApplicationVersion(QStringLiteral(QT_VERSION_STR));
 
-    std::shared_ptr<PhotoTriggerClient> photo_trigger_client = std::make_shared<PhotoTriggerClient>();
-    // std::shared_ptr<ICamera> camera = std::make_shared<GPhoto2Camera>();
-    std::shared_ptr<ICamera> camera = std::make_shared<MockCamera>();
-
-    ImageStorage image_storage{std::filesystem::current_path()};
-    QObject::connect(camera.get(), &ICamera::imageCaptured, &image_storage, &ImageStorage::onImageCaptured);
-
-    QQmlApplicationEngine engine;
-
-    auto &&app_state = engine.singletonInstance<ApplicationState *>("Photobox.Core", "ApplicationState");
-    Q_ASSERT(app_state != nullptr);
-
-    app_state->camera = camera;
-    app_state->trigger_client = photo_trigger_client;
-
-    engine.loadFromModule("Photobox.CollageEditorApp", "Main");
+    testPrint();
 
     return app.exec();
 }

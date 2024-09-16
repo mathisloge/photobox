@@ -3,7 +3,7 @@ project(photobox VERSION 0.0.1 LANGUAGES CXX)
 
 include(CTest)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Qml Quick Network Multimedia PrintSupport REQUIRED)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Qml Quick Network Multimedia PrintSupport SvgWidgets REQUIRED)
 qt_policy(SET QTP0001 NEW)
 
 qt_standard_project_setup()
