@@ -1,11 +1,15 @@
 cmake_minimum_required(VERSION 3.28)
 project(photobox VERSION 0.0.1 LANGUAGES CXX)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
+
 include(CTest)
+include(get_cpm)
+
+CPMAddPackage("gh:sammycage/lunasvg#167416671a68e63f2e0e8234518dbbdde0adf2a6")
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Qml Quick Network Multimedia PrintSupport SvgWidgets REQUIRED)
 qt_policy(SET QTP0001 NEW)
-
 qt_standard_project_setup()
 
 find_package(PkgConfig REQUIRED)

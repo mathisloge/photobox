@@ -12,6 +12,19 @@ target_link_libraries(CollageEditorApp PRIVATE
     PhotoboxGPhoto2
     PhotoboxGPhoto2plugin
     PhotoboxUiplugin
+    lunasvg
+)
+
+qt_add_qml_module(CollageEditorApp
+    URI "Photobox.CollageEditorApp"
+    VERSION 1.0
+    QML_FILES
+      Main.qml
+    SOURCES
+        CollageRenderer.hpp
+        CollageRenderer.cpp
+        CollageImage.hpp
+        CollageImage.cpp
 )
 
 install(TARGETS CollageEditorApp

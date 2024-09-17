@@ -91,7 +91,7 @@ void PhotoTriggerClient::playEffect(Effect new_effect)
         return;
     }
     QNetworkRequest req{QStringLiteral("http://192.168.0.31/light/statuslight/turn_on?effect=%1").arg(it->second)};
-    qDebug() << "Requuest" << req.url();
+    qDebug() << "Request" << req.url();
     req.setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader, "text/plain;charset=UTF-8"_L1);
     auto &&reply = net_manager_.post(req, QByteArray{});
     setupRequestReply(reply);

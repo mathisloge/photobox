@@ -24,33 +24,29 @@ namespace
 {
 void testPrint()
 {
-    QPrinter printer(QPrinter::HighResolution);
-    printer.setOutputFileName("print.pdf");
+    QPrinter printer(QPrinter::PrinterMode::HighResolution);
+    /// printer.setOutputFileName("print.pdf");
+    QPrintDialog printDialog(&printer);
+    if (printDialog.exec() != QDialog::Accepted)
+    {
+        return;
+    }
+    // todo save printer configuration to json
 
     QPainter painter;
     painter.begin(&printer);
 
-    int numberOfPages = 2;
-    int lastPage = numberOfPages - 1;
-
     QSvgWidget x("/home/mathis/Downloads/TestImageEx.svg");
 
-    for (int page = 0; page < numberOfPages; ++page)
-    {
+    x.renderer();
 
-        painter.save();
+    painter.save();
 
-        x.renderer()->render(&painter);
+    x.renderer()->render(&painter);
 
-        painter.restore();
-
-        if (page != lastPage)
-            printer.newPage();
-    }
+    painter.restore();
 
     painter.end();
-
-    printer.setOutputFormat(QPrinter::OutputFormat::PdfFormat);
 }
 } // namespace
 
@@ -61,7 +57,10 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName(QStringLiteral("com.mathisloge-photobox.collage"));
     QCoreApplication::setApplicationVersion(QStringLiteral(QT_VERSION_STR));
 
-    testPrint();
+    /// QTimer::singleShot(0, []() { testPrint(); });
+
+    QQmlApplicationEngine engine;
+    engine.loadFromModule("Photobox.CollageEditorApp", "Main");
 
     return app.exec();
 }
