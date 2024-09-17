@@ -134,6 +134,7 @@ ApplicationWindow {
 
                     onEntered: {
                         countdown.running = true;
+                        ApplicationState.triggerClient.playEffect(PhotoTriggerClient.Countdown);
                     }
 
                     DSM.SignalTransition {

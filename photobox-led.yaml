@@ -63,3 +63,42 @@ light:
           speed: 40
           width: 40
 
+  - platform: esp32_rmt_led_strip
+    rgb_order: GRB
+    pin: GPIO7
+    num_leds: 5
+    rmt_channel: 1
+    chipset: ws2812
+    name: "Test"
+    effects:
+      - addressable_color_wipe:
+          name: CountdownActive
+          colors:
+            - red: 100%
+              green: 100%
+              blue: 100%
+              num_leds: 5
+              gradient: true
+            - red: 0%
+              green: 0%
+              blue: 0%
+              num_leds: 4
+              gradient: true
+          add_led_interval: 75ms
+          reverse: false
+number:
+  - platform: template
+    name: CountdownCount
+    min_value: 0
+    max_value: 10
+    step: 1
+    optimistic: true
+    on_value_range:
+      above: 1
+      below: 6
+      then: 
+        lambda: |-
+          ESP_LOGD("main", "I am at execution number %d", x);
+
+
+

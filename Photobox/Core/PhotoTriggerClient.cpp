@@ -26,21 +26,29 @@ PhotoTriggerClient::PhotoTriggerClient()
     auto *reply = net_manager_.get(request);
 
     connect(reply, &QNetworkReply::readyRead, this, [this, reply]() {
-        const auto event_type = QString{reply->readLine()};
-        auto payload = reply->readAll();
-        if (event_type.startsWith("event: state"_L1))
+        bool next_is_state{false};
+        while (reply->canReadLine())
         {
-            payload.remove(0, "data:"_L1.size());
-            QJsonParseError parse_error;
-            auto json = QJsonDocument::fromJson(payload, &parse_error);
-            if (parse_error.error == QJsonParseError::NoError and json.isObject())
+            auto event_line = QString{reply->readLine()};
+            if (event_line.startsWith("event: state"_L1))
             {
-                handleEvent(json);
+                next_is_state = true;
             }
-            else
+            else if (next_is_state and event_line.startsWith("data:"_L1))
             {
-                qDebug() << "got event with data but couldn't parse json. Reason:" << parse_error.errorString()
-                         << "payload=" << payload;
+                next_is_state = false;
+                event_line.remove(0, "data:"_L1.size());
+                QJsonParseError parse_error;
+                auto json = QJsonDocument::fromJson(event_line.toLocal8Bit(), &parse_error);
+                if (parse_error.error == QJsonParseError::NoError and json.isObject())
+                {
+                    handleEvent(json);
+                }
+                else
+                {
+                    qDebug() << "got event with data but couldn't parse json. Reason:" << parse_error.errorString()
+                             << "payload=" << event_line;
+                }
             }
         }
     });
