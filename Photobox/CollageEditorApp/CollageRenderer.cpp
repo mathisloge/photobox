@@ -3,6 +3,14 @@
 
 namespace Pbox
 {
+
+CollageRenderer::CollageRenderer()
+{
+    qDebug() << "ADDED FONT"
+             << lunasvg_add_font_face_from_file(
+                    "Roboto", false, false, "/home/mathis/dev/photobox2/test/Roboto-Regular.ttf");
+}
+
 void CollageRenderer::loadImage(const std::string &file_path)
 {
     document_ = lunasvg::Document::loadFromFile(file_path);
@@ -36,24 +44,35 @@ void CollageRenderer::setSourceOfPhoto(const std::string &element_id, const std:
     it->second.setAttribute("href", file_path);
 }
 
-void CollageRenderer::render(QPainter *painter)
+void CollageRenderer::render(QPainter *painter, float width, float height, FillMode /*mode*/)
 {
     if (document_ == nullptr or painter == nullptr)
     {
         return;
     }
 
+    if (width > 0 and height > 0)
+    {
+        const float scale_width = static_cast<float>(width) / document_->width();
+        const float scale_height = static_cast<float>(height) / document_->height();
+
+        const float scale = std::min(scale_width, scale_height);
+
+        width = static_cast<float>(document_->width() * scale);
+        height = static_cast<float>(document_->height() * scale);
+    }
+    else
+    {
+        width = static_cast<float>(document_->width());
+        height = static_cast<float>(document_->height());
+    }
+
+    const auto bitmap = document_->renderToBitmap(static_cast<int>(width), static_cast<int>(height));
+    const QImage pixmap{
+        bitmap.data(), static_cast<int>(width), static_cast<int>(height), QImage::Format::Format_ARGB32_Premultiplied};
+
     painter->save();
 
-    painter->setPen(Qt::GlobalColor::red);
-    painter->drawLine(QPoint{0, 0}, QPoint{200, 200});
-
-    const auto bitmap = document_->renderToBitmap();
-    const QImage pixmap{bitmap.data(),
-                        static_cast<int>(bitmap.width()),
-                        static_cast<int>(bitmap.height()),
-                        QImage::Format::Format_ARGB32_Premultiplied};
-    qDebug() << "draw" << bitmap.width() << bitmap.height() << pixmap.rect();
     painter->drawImage(pixmap.rect(), pixmap);
 
     painter->restore();

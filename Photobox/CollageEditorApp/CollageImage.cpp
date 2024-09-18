@@ -6,7 +6,7 @@ namespace Pbox
 {
 void CollageImage::paint(QPainter *painter)
 {
-    renderer_.render(painter);
+    renderer_.render(painter, width(), height());
 }
 
 void CollageImage::loadSource(QString file_path)
