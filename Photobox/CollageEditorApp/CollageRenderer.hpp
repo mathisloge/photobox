@@ -8,18 +8,14 @@ namespace Pbox
 class CollageRenderer
 {
   public:
-    enum FillMode
-    {
-        KeepAspectRatio
-    };
     CollageRenderer();
-    void loadImage(const std::string &file_path);
+    void loadDocument(const std::string &file_path);
     void addPhotoElement(const std::string &element_id);
     void removePhotoElement(const std::string &element_id);
 
     void setSourceOfPhoto(const std::string &element_id, const std::string &file_path);
 
-    void render(QPainter *painter, float width = -1, float height = -1, FillMode mode = FillMode::KeepAspectRatio);
+    void render(QPainter *painter, float width = -1, float height = -1);
 
   private:
     std::unique_ptr<lunasvg::Document> document_;

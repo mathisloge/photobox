@@ -1,17 +1,30 @@
 #include "CollageRenderer.hpp"
 #include <QDebug>
+#include <mutex>
+namespace
+{
 
+void init_lunasvg()
+{
+    static std::once_flag has_init;
+    std::call_once(has_init, []() {
+        lunasvg_add_font_face_from_file("", false, false, "/home/mathis/dev/photobox2/test/Roboto-Regular.ttf");
+        lunasvg_add_font_face_from_file("", true, false, "/home/mathis/dev/photobox2/test/Roboto-Bold.ttf");
+        lunasvg_add_font_face_from_file("", false, true, "/home/mathis/dev/photobox2/test/Roboto-Italic.ttf");
+        lunasvg_add_font_face_from_file("", true, true, "/home/mathis/dev/photobox2/test/Roboto-BoldItalic.ttf");
+    });
+}
+
+} // namespace
 namespace Pbox
 {
 
 CollageRenderer::CollageRenderer()
 {
-    qDebug() << "ADDED FONT"
-             << lunasvg_add_font_face_from_file(
-                    "Roboto", false, false, "/home/mathis/dev/photobox2/test/Roboto-Regular.ttf");
+    init_lunasvg();
 }
 
-void CollageRenderer::loadImage(const std::string &file_path)
+void CollageRenderer::loadDocument(const std::string &file_path)
 {
     document_ = lunasvg::Document::loadFromFile(file_path);
     qDebug() << "loaded image" << file_path << "valid=" << (document_ != nullptr);
@@ -25,7 +38,7 @@ void CollageRenderer::addPhotoElement(const std::string &element_id)
         qDebug() << "null element";
         return;
     }
-    images_.insert_or_assign(element_id, std::move(el));
+    images_[element_id] = std::move(el);
 }
 
 void CollageRenderer::removePhotoElement(const std::string &element_id)
@@ -36,15 +49,16 @@ void CollageRenderer::removePhotoElement(const std::string &element_id)
 void CollageRenderer::setSourceOfPhoto(const std::string &element_id, const std::string &file_path)
 {
     auto it = images_.find(element_id);
-    if (it != images_.end())
+    if (it == images_.end())
     {
         qDebug() << "Could not find image element" << element_id << "to set to path" << file_path;
         return;
     }
     it->second.setAttribute("href", file_path);
+    document_->updateLayout();
 }
 
-void CollageRenderer::render(QPainter *painter, float width, float height, FillMode /*mode*/)
+void CollageRenderer::render(QPainter *painter, float width, float height)
 {
     if (document_ == nullptr or painter == nullptr)
     {

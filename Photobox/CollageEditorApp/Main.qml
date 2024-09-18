@@ -34,9 +34,12 @@ ApplicationWindow {
             RowLayout {
                 Button {
                     text: "Hinzufügen"
-                    onClicked: imageElements.append({
-                        "elementId": textInput.text
-                    })
+                    onClicked: {
+                        imageElements.append({
+                            "elementId": textInput.text
+                        });
+                        image.addPhotoElement(textInput.text);
+                    }
                     enabled: textInput.text
                 }
 
@@ -72,12 +75,23 @@ ApplicationWindow {
                     DelayButton {
                         anchors.top: parent.top
                         anchors.right: parent.right
-                        onActivated: imageElements.remove(index)
+                        onActivated: {
+                            image.removePhotoElement(model.elementId);
+                            imageElements.remove(index);
+                        }
                         icon.name: "edit-delete"
                     }
 
                     Label {
                         text: model.elementId
+                    }
+
+                    Button {
+                        text: "Testfoto"
+                        onClicked: {
+                            fileSetImageDialog.currentElement = model.elementId;
+                            fileSetImageDialog.open();
+                        }
                     }
 
                 }
@@ -87,8 +101,6 @@ ApplicationWindow {
         }
 
         CollageImage {
-            ///fillMode: Image.PreserveAspectFit
-
             id: image
 
             Layout.fillWidth: true
@@ -102,6 +114,17 @@ ApplicationWindow {
 
         currentFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
         onAccepted: image.loadSource(selectedFile)
+    }
+
+    FileDialog {
+        id: fileSetImageDialog
+
+        property string currentElement: ""
+
+        currentFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
+        onAccepted: {
+            image.setSourceOfPhoto(fileSetImageDialog.currentElement, selectedFile);
+        }
     }
 
     header: ToolBar {
@@ -122,6 +145,12 @@ ApplicationWindow {
 
             ToolButton {
                 text: "Printer settings"
+                onClicked: {
+                }
+            }
+
+            ToolButton {
+                text: "Save collage"
                 onClicked: {
                 }
             }

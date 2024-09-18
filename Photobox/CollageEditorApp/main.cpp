@@ -12,8 +12,7 @@
 #include <QPainter>
 #include <QPrintDialog>
 #include <QPrinter>
-#include <QSvgRenderer>
-#include <QSvgWidget>
+#include "CollageRenderer.hpp"
 
 Q_IMPORT_QML_PLUGIN(Photobox_CorePlugin)
 Q_IMPORT_QML_PLUGIN(Photobox_UiPlugin)
@@ -36,13 +35,12 @@ void testPrint()
     QPainter painter;
     painter.begin(&printer);
 
-    QSvgWidget x("/home/mathis/Downloads/TestImageEx.svg");
-
-    x.renderer();
+    CollageRenderer x;
+    x.loadDocument("/home/mathis/Downloads/test.svg");
 
     painter.save();
 
-    x.renderer()->render(&painter);
+    x.render(&painter, printer.width(), printer.height());
 
     painter.restore();
 
@@ -57,7 +55,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName(QStringLiteral("com.mathisloge-photobox.collage"));
     QCoreApplication::setApplicationVersion(QStringLiteral(QT_VERSION_STR));
 
-    /// QTimer::singleShot(0, []() { testPrint(); });
+    // QTimer::singleShot(0, []() { testPrint(); });
 
     QQmlApplicationEngine engine;
     engine.loadFromModule("Photobox.CollageEditorApp", "Main");
