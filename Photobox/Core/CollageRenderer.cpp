@@ -1,6 +1,10 @@
 #include "CollageRenderer.hpp"
 #include <QDebug>
+#include <fstream>
 #include <mutex>
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
 namespace
 {
 
@@ -26,6 +30,7 @@ CollageRenderer::CollageRenderer()
 
 void CollageRenderer::loadDocument(const std::string &file_path)
 {
+    base_image_file_path_ = file_path;
     document_ = lunasvg::Document::loadFromFile(file_path);
     qDebug() << "loaded image" << file_path << "valid=" << (document_ != nullptr);
 }
@@ -92,4 +97,24 @@ void CollageRenderer::render(QPainter *painter, float width, float height)
     painter->restore();
 }
 
+const std::unordered_map<std::string, lunasvg::Element> &CollageRenderer::registeredImages() const
+{
+    return images_;
+}
+
+void CollageRenderer::saveConfiguration()
+{
+    json collage_settings;
+
+    collage_settings["baseImage"] = base_image_file_path_;
+
+    auto &&json_images = collage_settings["images"];
+    for (auto &&k : images_)
+    {
+        json_images.emplace_back(k.first);
+    }
+
+    std::ofstream o("collage_settings.json");
+    o << std::setw(4) << collage_settings << std::endl;
+}
 } // namespace Pbox

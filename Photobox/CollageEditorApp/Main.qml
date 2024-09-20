@@ -12,8 +12,8 @@ ApplicationWindow {
     width: 720
     height: 480
 
-    ListModel {
-        id: imageElements
+    PrintController {
+        id: printController
     }
 
     Popup {
@@ -35,10 +35,7 @@ ApplicationWindow {
                 Button {
                     text: "Hinzufügen"
                     onClicked: {
-                        imageElements.append({
-                            "elementId": textInput.text
-                        });
-                        image.addPhotoElement(textInput.text);
+                        image.model.appendElement(textInput.text);
                     }
                     enabled: textInput.text
                 }
@@ -65,7 +62,7 @@ ApplicationWindow {
             ListView {
                 anchors.fill: parent
                 spacing: 3
-                model: imageElements
+                model: image.model
 
                 delegate: Frame {
                     //color: "salmon"
@@ -76,8 +73,7 @@ ApplicationWindow {
                         anchors.top: parent.top
                         anchors.right: parent.right
                         onActivated: {
-                            image.removePhotoElement(model.elementId);
-                            imageElements.remove(index);
+                            image.model.removePhotoElement(model.elementId);
                         }
                         icon.name: "edit-delete"
                     }
@@ -146,12 +142,14 @@ ApplicationWindow {
             ToolButton {
                 text: "Printer settings"
                 onClicked: {
+                    printController.showPrintSettings();
                 }
             }
 
             ToolButton {
                 text: "Save collage"
                 onClicked: {
+                    image.saveConfiguration();
                 }
             }
 

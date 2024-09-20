@@ -14,10 +14,14 @@ qt_add_qml_module(
         ApplicationState.hpp
         PhotoTriggerClient.cpp
         PhotoTriggerClient.hpp
+        CollageRenderer.hpp
+        CollageRenderer.cpp
 )
 
 target_include_directories(PhotoboxCore PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(PhotoboxCore PUBLIC
     Qt6::Quick
     Qt6::Multimedia
+    lunasvg
+    nlohmann_json::nlohmann_json
 )

@@ -1,5 +1,6 @@
 #pragma once
 #include <QPainter>
+#include <filesystem>
 #include <unordered_map>
 #include <lunasvg.h>
 
@@ -17,7 +18,12 @@ class CollageRenderer
 
     void render(QPainter *painter, float width = -1, float height = -1);
 
+    const std::unordered_map<std::string, lunasvg::Element> &registeredImages() const;
+
+    void saveConfiguration();
+
   private:
+    std::filesystem::path base_image_file_path_;
     std::unique_ptr<lunasvg::Document> document_;
     std::unordered_map<std::string, lunasvg::Element> images_;
 };

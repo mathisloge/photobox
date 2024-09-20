@@ -7,6 +7,7 @@ include(CTest)
 include(get_cpm)
 
 CPMAddPackage("gh:sammycage/lunasvg#167416671a68e63f2e0e8234518dbbdde0adf2a6")
+CPMAddPackage("gh:nlohmann/json@3.11.3")
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Qml Quick Network Multimedia PrintSupport SvgWidgets REQUIRED)
 qt_policy(SET QTP0001 NEW)
