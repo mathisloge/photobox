@@ -16,6 +16,8 @@ qt_add_qml_module(
         PhotoTriggerClient.hpp
         CollageRenderer.hpp
         CollageRenderer.cpp
+        CaptureController.hpp
+        CaptureController.cpp
 )
 
 target_include_directories(PhotoboxCore PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")

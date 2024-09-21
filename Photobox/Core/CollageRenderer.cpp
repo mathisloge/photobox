@@ -60,7 +60,7 @@ void CollageRenderer::setSourceOfPhoto(const std::string &element_id, const std:
         return;
     }
     it->second.setAttribute("href", file_path);
-    document_->updateLayout();
+    // document_->updateLayout();
 }
 
 void CollageRenderer::render(QPainter *painter, float width, float height)
@@ -95,6 +95,17 @@ void CollageRenderer::render(QPainter *painter, float width, float height)
     painter->drawImage(pixmap.rect(), pixmap);
 
     painter->restore();
+}
+
+void CollageRenderer::renderToFile()
+{
+    if (document_ == nullptr)
+    {
+        return;
+    }
+
+    const auto bitmap = document_->renderToBitmap();
+    bitmap.writeToPng("collage.png");
 }
 
 const std::unordered_map<std::string, lunasvg::Element> &CollageRenderer::registeredImages() const

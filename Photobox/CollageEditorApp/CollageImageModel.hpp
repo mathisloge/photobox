@@ -5,7 +5,7 @@
 
 namespace Pbox
 {
-class CollageImageModel final : public QAbstractListModel
+class CollageImageModel : public QAbstractListModel
 {
     Q_OBJECT
     QML_ANONYMOUS

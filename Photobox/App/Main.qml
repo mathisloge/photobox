@@ -6,6 +6,12 @@ import QtQuick
 import QtQuick.Controls
 
 ApplicationWindow {
+    id: window
+
+    property var currentImage: ""
+
+    signal capturedPreviewFinished()
+
     visible: true
     color: "black"
 
@@ -91,12 +97,75 @@ ApplicationWindow {
 
             }
 
+            Flow {
+                id: previewImages
+
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: 10
+                flow: Flow.TopToBottom
+
+                Repeater {
+                    model: ApplicationState.captureController.model
+
+                    delegate: PreviewImage {
+                        width: 200
+                        fillMode: Image.PreserveAspectFit
+                        source: "image://camera/" + model.source
+                    }
+
+                }
+
+                add: Transition {
+                    id: previewAddTransition
+
+                    SequentialAnimation {
+                        PropertyAction {
+                            property: "x"
+                            value: -previewAddTransition.ViewTransition.item.width
+                        }
+
+                        ScriptAction {
+                            script: {
+                                window.currentImage = previewAddTransition.ViewTransition.item.source;
+                                stack.push(captureView);
+                            }
+                        }
+
+                        PauseAnimation {
+                            duration: 5000
+                        }
+
+                        ScriptAction {
+                            script: stack.pop(null)
+                        }
+
+                        PauseAnimation {
+                            duration: 500
+                        }
+
+                        ScriptAction {
+                            script: window.capturedPreviewFinished()
+                        }
+
+                        NumberAnimation {
+                            properties: "x"
+                            duration: 1000
+                            easing.type: Easing.InOutCubic
+                        }
+
+                    }
+
+                }
+
+            }
+
             Countdown {
                 id: countdown
 
                 anchors.fill: parent
                 visible: running
-                initialCount: 5
+                initialCount: 1
             }
 
             MouseArea {
@@ -163,11 +232,21 @@ ApplicationWindow {
                     id: stateCapturePhoto
 
                     onEntered: {
-                        ApplicationState.camera.requestCapturePhoto();
+                        ApplicationState.captureController.captureImage();
                     }
 
                     DSM.SignalTransition {
                         signal: ApplicationState.camera.imageCaptured
+                        targetState: statePreviewCapturePhoto
+                    }
+
+                }
+
+                DSM.State {
+                    id: statePreviewCapturePhoto
+
+                    DSM.SignalTransition {
+                        signal: window.capturedPreviewFinished
                         targetState: statePreview
                     }
 
@@ -183,45 +262,7 @@ ApplicationWindow {
         id: captureView
 
         PreviewImage {
-            source: "image://camera/capture"
-        }
-
-    }
-
-    DSM.StateMachine {
-        id: applicationFlow
-
-        initialState: stateLiveFeed
-        running: true
-        onFinished: {
-            stack.pop(null);
-            applicationFlow.start();
-        }
-
-        DSM.State {
-            id: stateLiveFeed
-
-            DSM.SignalTransition {
-                signal: ApplicationState.camera.imageCaptured
-                targetState: stateShowCaptureImage
-            }
-
-        }
-
-        DSM.State {
-            id: stateShowCaptureImage
-
-            onEntered: stack.push(captureView)
-
-            DSM.TimeoutTransition {
-                targetState: stateFinal
-                timeout: 5000
-            }
-
-        }
-
-        DSM.FinalState {
-            id: stateFinal
+            source: window.currentImage
         }
 
     }
