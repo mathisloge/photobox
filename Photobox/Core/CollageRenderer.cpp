@@ -60,7 +60,11 @@ void CollageRenderer::setSourceOfPhoto(const std::string &element_id, const std:
         return;
     }
     it->second.setAttribute("href", file_path);
-    // document_->updateLayout();
+}
+
+void CollageRenderer::updateLayout()
+{
+    document_->updateLayout();
 }
 
 void CollageRenderer::render(QPainter *painter, float width, float height)

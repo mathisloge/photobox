@@ -16,6 +16,7 @@ class CollageRenderer
 
     void setSourceOfPhoto(const std::string &element_id, const std::string &file_path);
 
+    void updateLayout();
     void render(QPainter *painter, float width = -1, float height = -1);
     void renderToFile();
 

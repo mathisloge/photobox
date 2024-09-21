@@ -28,9 +28,16 @@ CaptureController::CaptureController(std::unique_ptr<ImageStorage> image_storage
 
         Q_EMIT imageCaptured(image, unique_image_name);
         capture_model_.setImage(current_image_count_, unique_image_name);
+        qDebug() << "CAPTURE COUNT current_image_count_ =" << current_image_count_
+                 << "image_count_collage_ =" << image_count_collage_;
         if (current_image_count_ == image_count_collage_)
         {
+            qDebug() << "capture complete";
             Q_EMIT collageCaptureComplete();
+        }
+        else
+        {
+            current_image_count_++;
         }
     });
     connect(image_storage_.get(),
@@ -41,6 +48,7 @@ CaptureController::CaptureController(std::unique_ptr<ImageStorage> image_storage
                     QStringLiteral("image-%1").arg(current_image_count_ + 1).toStdString(), captured_image_path);
                 if (current_image_count_ == image_count_collage_)
                 {
+                    collage_renderer_->updateLayout();
                     collage_renderer_->renderToFile();
                 }
             });
@@ -50,8 +58,13 @@ CaptureController::~CaptureController() = default;
 
 void CaptureController::captureImage()
 {
-    current_image_count_ = image_count_++;
     camera_->requestCapturePhoto();
+}
+
+void CaptureController::reset()
+{
+    current_image_count_ = 0;
+    capture_model_.resetImageCount(image_count_collage_);
 }
 
 CaptureImageModel *CaptureController::getModel()

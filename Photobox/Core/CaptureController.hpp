@@ -43,6 +43,7 @@ class CaptureController : public QObject
     Q_DISABLE_COPY_MOVE(CaptureController);
 
     Q_INVOKABLE void captureImage();
+    Q_INVOKABLE void reset();
     CaptureImageModel *getModel();
     CameraImageProvider *createImageProvider();
 
@@ -56,7 +57,6 @@ class CaptureController : public QObject
     std::unique_ptr<CollageRenderer> collage_renderer_;
     CaptureImageModel capture_model_;
     int current_image_count_{0};
-    int image_count_{0};
     int image_count_collage_;
 
     // a counter to invalidate any image providers
