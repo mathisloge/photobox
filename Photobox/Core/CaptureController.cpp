@@ -1,15 +1,45 @@
 #include "CaptureController.hpp"
 #include <fstream>
 #include "CameraImageProvider.hpp"
+#include "CollagePrinter.hpp"
 #include "CollageRenderer.hpp"
 #include "ICamera.hpp"
 #include "ImageStorage.hpp"
-
 namespace Pbox
 {
-CaptureController::CaptureController(std::unique_ptr<ImageStorage> image_storage, std::shared_ptr<ICamera> camera)
+namespace
+{
+class CollageSaveWorkerThread : public QThread
+{
+    Q_OBJECT
+  public:
+    CollageSaveWorkerThread(std::filesystem::path file_path, CollageRenderer &renderer, CollagePrinter &printer)
+        : file_path_{std::move(file_path)}
+        , renderer_{renderer}
+        , printer_{printer}
+    {}
+
+  private:
+    void run() override
+    {
+        renderer_.updateLayout();
+        renderer_.renderToFile(file_path_);
+        printer_.print(renderer_);
+    }
+
+  private:
+    std::filesystem::path file_path_;
+    CollageRenderer &renderer_;
+    CollagePrinter &printer_;
+};
+} // namespace
+
+CaptureController::CaptureController(std::unique_ptr<ImageStorage> image_storage,
+                                     std::shared_ptr<ICamera> camera,
+                                     std::unique_ptr<CollagePrinter> printer)
     : image_storage_{std::move(image_storage)}
     , camera_{std::move(camera)}
+    , printer_{std::move(printer)}
     , collage_renderer_{std::make_unique<CollageRenderer>()}
 {
     Q_ASSERT(image_storage_ != nullptr);
@@ -36,13 +66,19 @@ CaptureController::CaptureController(std::unique_ptr<ImageStorage> image_storage
                                                     captured_image_path);
                 if (collage_finished_)
                 {
-                    collage_renderer_->updateLayout();
                     collage_image_path_ =
                         QStringLiteral(
                             "/home/mathis/dev/photobox2/build/Photobox/CollageEditorApp/collage/collage_%1.png")
                             .arg(image_counter_);
-                    collage_renderer_->renderToFile(collage_image_path_.toStdString());
-                    Q_EMIT collageCaptureComplete();
+
+                    CollageSaveWorkerThread *worker_thread =
+                        new CollageSaveWorkerThread(collage_image_path_.toStdString(), *collage_renderer_, *printer_);
+                    connect(worker_thread,
+                            &CollageSaveWorkerThread::finished,
+                            this,
+                            &CaptureController::collageCaptureComplete);
+                    connect(worker_thread, &CollageSaveWorkerThread::finished, worker_thread, &QObject::deleteLater);
+                    worker_thread->start();
                 }
             });
 
@@ -156,3 +192,4 @@ void CaptureImageModel::setImage(int element_index, QString source)
     }
 }
 } // namespace Pbox
+#include "CaptureController.moc"

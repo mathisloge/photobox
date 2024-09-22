@@ -1,4 +1,5 @@
 #pragma once
+#include <QtClassHelperMacros>
 #include <filesystem>
 
 class QPrinter;
@@ -8,7 +9,9 @@ class CollageRenderer;
 class CollagePrinter
 {
   public:
+    Q_DISABLE_COPY_MOVE(CollagePrinter);
     explicit CollagePrinter(const std::filesystem::path &settings);
+    ~CollagePrinter();
 
     void print(CollageRenderer &renderer);
 

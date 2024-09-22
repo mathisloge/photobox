@@ -29,7 +29,10 @@ void to_json(json &j, const QPageLayout &l)
 
 void to_json(json &j, const QPrinter &l)
 {
-    j = json{{"name", l.printerName()}, {"pageLayout", l.pageLayout()}, {"fullPage", l.fullPage()}};
+    j = json{{"name", l.printerName()},
+             {"pageLayout", l.pageLayout()},
+             {"fullPage", l.fullPage()},
+             {"resolution", l.resolution()}};
 }
 
 namespace Pbox

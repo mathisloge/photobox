@@ -3,13 +3,13 @@
 #include <QObject>
 #include <QtQmlIntegration>
 #include "CollageSettings.hpp"
-
 namespace Pbox
 {
 class ICamera;
 class ImageStorage;
 class CollageRenderer;
 class CameraImageProvider;
+class CollagePrinter;
 
 class CaptureImageModel : public QAbstractListModel
 {
@@ -41,7 +41,9 @@ class CaptureController : public QObject
     Q_PROPERTY(QString collageImagePath READ getCollageImagePath NOTIFY collageCaptureComplete);
 
   public:
-    explicit CaptureController(std::unique_ptr<ImageStorage> image_storage, std::shared_ptr<ICamera> camera);
+    explicit CaptureController(std::unique_ptr<ImageStorage> image_storage,
+                               std::shared_ptr<ICamera> camera,
+                               std::unique_ptr<CollagePrinter> printer);
     ~CaptureController() override;
     Q_DISABLE_COPY_MOVE(CaptureController);
 
@@ -63,6 +65,7 @@ class CaptureController : public QObject
   private:
     std::unique_ptr<ImageStorage> image_storage_;
     std::shared_ptr<ICamera> camera_;
+    std::unique_ptr<CollagePrinter> printer_;
     std::unique_ptr<CollageRenderer> collage_renderer_;
     CaptureImageModel capture_model_;
     CollageSettings settings_;
