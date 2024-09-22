@@ -18,16 +18,21 @@ class StoreWorkerThread : public QThread
         , name_{std::move(name)}
         , image_to_save_{image_to_save}
     {}
+  Q_SIGNALS:
+    void imageSaved(const std::filesystem::path &file_path);
 
   private:
     void run() override
     {
         const auto image_name = name_ + QStringLiteral(".png");
-        qDebug() << "Saving image to " << image_name;
-        if (not image_to_save_.save(QString::fromStdString(storage_dir_ / image_name.toStdString())))
+        const auto image_path = storage_dir_ / image_name.toStdString();
+        qDebug() << "Saving image to " << image_path.c_str();
+        if (not image_to_save_.save(QString::fromStdString(image_path)))
         {
             qCritical() << "Could not save image";
+            return;
         }
+        Q_EMIT imageSaved(image_path);
     }
 
   private:
@@ -63,6 +68,7 @@ void ImageStorage::onImageCaptured(const QImage &captured_image)
     static const QString kNameTemplate = QStringLiteral("capture_%1");
     StoreWorkerThread *worker_thread =
         new StoreWorkerThread(storage_dir_, kNameTemplate.arg(image_counter_++), captured_image);
+    connect(worker_thread, &StoreWorkerThread::imageSaved, this, &ImageStorage::imageSaved);
     connect(worker_thread, &StoreWorkerThread::finished, worker_thread, &QObject::deleteLater);
     worker_thread->start();
 }

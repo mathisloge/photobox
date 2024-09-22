@@ -26,21 +26,30 @@ PhotoTriggerClient::PhotoTriggerClient()
     auto *reply = net_manager_.get(request);
 
     connect(reply, &QNetworkReply::readyRead, this, [this, reply]() {
-        const auto event_type = QString{reply->readLine()};
-        auto payload = reply->readAll();
-        if (event_type.startsWith("event: state"_L1))
+        bool next_is_state{false};
+        while (reply->canReadLine())
         {
-            payload.remove(0, "data:"_L1.size());
-            QJsonParseError parse_error;
-            auto json = QJsonDocument::fromJson(payload, &parse_error);
-            if (parse_error.error == QJsonParseError::NoError and json.isObject())
+            auto event_line = QString{reply->readLine()};
+            // qDebug() << "event_line=" <<event_line;
+            if (event_line.startsWith("event: state"_L1))
             {
-                handleEvent(json);
+                next_is_state = true;
             }
-            else
+            else if (next_is_state and event_line.startsWith("data:"_L1))
             {
-                qDebug() << "got event with data but couldn't parse json. Reason:" << parse_error.errorString()
-                         << "payload=" << payload;
+                next_is_state = false;
+                event_line.remove(0, "data:"_L1.size());
+                QJsonParseError parse_error;
+                auto json = QJsonDocument::fromJson(event_line.toLocal8Bit(), &parse_error);
+                if (parse_error.error == QJsonParseError::NoError and json.isObject())
+                {
+                    handleEvent(json);
+                }
+                else
+                {
+                    qDebug() << "got event with data but couldn't parse json. Reason:" << parse_error.errorString()
+                             << "payload=" << event_line;
+                }
             }
         }
     });
@@ -83,7 +92,7 @@ void PhotoTriggerClient::playEffect(Effect new_effect)
         return;
     }
     QNetworkRequest req{QStringLiteral("http://192.168.0.31/light/statuslight/turn_on?effect=%1").arg(it->second)};
-    qDebug() << "Requuest" << req.url();
+    qDebug() << "Request" << req.url();
     req.setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader, "text/plain;charset=UTF-8"_L1);
     auto &&reply = net_manager_.post(req, QByteArray{});
     setupRequestReply(reply);

@@ -10,6 +10,8 @@ class ImageStorage : public QObject
   public:
     explicit ImageStorage(std::filesystem::path storage_dir);
     void onImageCaptured(const QImage &captured_image);
+  Q_SIGNALS:
+    void imageSaved(const std::filesystem::path &file_path);
 
   private:
     std::filesystem::path storage_dir_;

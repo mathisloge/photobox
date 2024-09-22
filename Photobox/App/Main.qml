@@ -6,6 +6,12 @@ import QtQuick
 import QtQuick.Controls
 
 ApplicationWindow {
+    id: window
+
+    property var currentImage: ""
+
+    signal capturedPreviewFinished()
+
     visible: true
     color: "black"
 
@@ -91,12 +97,75 @@ ApplicationWindow {
 
             }
 
+            Flow {
+                id: previewImages
+
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: 10
+                flow: Flow.TopToBottom
+
+                Repeater {
+                    model: ApplicationState.captureController.model
+
+                    delegate: PreviewImage {
+                        width: 200
+                        fillMode: Image.PreserveAspectFit
+                        source: "image://camera/" + model.source
+                    }
+
+                }
+
+                add: Transition {
+                    id: previewAddTransition
+
+                    SequentialAnimation {
+                        PropertyAction {
+                            property: "x"
+                            value: -previewAddTransition.ViewTransition.item.width
+                        }
+
+                        ScriptAction {
+                            script: {
+                                window.currentImage = previewAddTransition.ViewTransition.item.source;
+                                stack.push(captureView);
+                            }
+                        }
+
+                        PauseAnimation {
+                            duration: 5000
+                        }
+
+                        ScriptAction {
+                            script: stack.pop(null)
+                        }
+
+                        PauseAnimation {
+                            duration: 500
+                        }
+
+                        ScriptAction {
+                            script: window.capturedPreviewFinished()
+                        }
+
+                        NumberAnimation {
+                            properties: "x"
+                            duration: 1000
+                            easing.type: Easing.InOutCubic
+                        }
+
+                    }
+
+                }
+
+            }
+
             Countdown {
                 id: countdown
 
                 anchors.fill: parent
                 visible: running
-                initialCount: 5
+                initialCount: 1
             }
 
             MouseArea {
@@ -106,68 +175,125 @@ ApplicationWindow {
             }
 
             DSM.StateMachine {
-                initialState: statePreview
+                id: captureStateMachine
+
+                initialState: idleState
                 running: true
 
                 DSM.State {
-                    id: statePreview
+                    id: idleState
 
                     onEntered: {
+                        stack.pop(null);
                         videoOutput.opacity = 1;
                         ApplicationState.triggerClient.playEffect(PhotoTriggerClient.Idle);
                     }
 
                     DSM.SignalTransition {
                         signal: ApplicationState.triggerClient.triggered
-                        targetState: stateBeginCountdown
+                        targetState: collageCapture
                     }
 
                     DSM.SignalTransition {
                         signal: startButton.clicked
-                        targetState: stateBeginCountdown
+                        targetState: collageCapture
                     }
 
                 }
 
                 DSM.State {
-                    id: stateBeginCountdown
+                    id: collageCapture
 
-                    onEntered: {
-                        countdown.running = true;
+                    initialState: stateBeginCountdown
+                    onExited: {
+                        ApplicationState.captureController.reset();
                     }
 
-                    DSM.SignalTransition {
-                        signal: countdown.countChanged
-                        targetState: stateBeforeCapture
-                        guard: countdown.count <= 1
+                    DSM.State {
+                        id: statePreview
+
+                        onEntered: {
+                            videoOutput.opacity = 1;
+                            ApplicationState.triggerClient.playEffect(PhotoTriggerClient.Idle);
+                        }
+
+                        DSM.SignalTransition {
+                            signal: ApplicationState.triggerClient.triggered
+                            targetState: stateBeginCountdown
+                        }
+
+                        DSM.SignalTransition {
+                            signal: startButton.clicked
+                            targetState: stateBeginCountdown
+                        }
+
                     }
 
-                }
+                    DSM.State {
+                        id: stateBeginCountdown
 
-                DSM.State {
-                    id: stateBeforeCapture
+                        onEntered: {
+                            countdown.running = true;
+                            ApplicationState.triggerClient.playEffect(PhotoTriggerClient.Countdown);
+                        }
 
-                    onEntered: {
-                        videoOutput.opacity = 0;
+                        DSM.SignalTransition {
+                            signal: countdown.countChanged
+                            targetState: stateBeforeCapture
+                            guard: countdown.count <= 1
+                        }
+
                     }
 
-                    DSM.SignalTransition {
-                        signal: countdown.finished
-                        targetState: stateCapturePhoto
+                    DSM.State {
+                        id: stateBeforeCapture
+
+                        onEntered: {
+                            videoOutput.opacity = 0;
+                        }
+
+                        DSM.SignalTransition {
+                            signal: countdown.finished
+                            targetState: stateCapturePhoto
+                        }
+
                     }
 
-                }
+                    DSM.State {
+                        id: stateCapturePhoto
 
-                DSM.State {
-                    id: stateCapturePhoto
+                        onEntered: {
+                            ApplicationState.captureController.captureImage();
+                        }
 
-                    onEntered: {
-                        ApplicationState.camera.requestCapturePhoto();
+                        DSM.SignalTransition {
+                            signal: ApplicationState.captureController.collageCaptureComplete
+                            targetState: stateShowCollageFinal
+                        }
+
+                        DSM.SignalTransition {
+                            signal: window.capturedPreviewFinished
+                            targetState: statePreview
+                            guard: !ApplicationState.captureController.collageComplete
+                        }
+
                     }
 
-                    DSM.SignalTransition {
-                        signal: ApplicationState.camera.imageCaptured
-                        targetState: statePreview
+                    DSM.State {
+                        // todo: push collage image onto stack after everything was stored.
+
+                        id: stateShowCollageFinal
+
+                        onEntered: {
+                            window.currentImage = "file://" + ApplicationState.captureController.collageImagePath;
+                            stack.push(captureView);
+                        }
+
+                        DSM.TimeoutTransition {
+                            targetState: idleState
+                            timeout: 10000
+                        }
+
                     }
 
                 }
@@ -182,45 +308,7 @@ ApplicationWindow {
         id: captureView
 
         PreviewImage {
-            source: "image://camera/capture"
-        }
-
-    }
-
-    DSM.StateMachine {
-        id: applicationFlow
-
-        initialState: stateLiveFeed
-        running: true
-        onFinished: {
-            stack.pop(null);
-            applicationFlow.start();
-        }
-
-        DSM.State {
-            id: stateLiveFeed
-
-            DSM.SignalTransition {
-                signal: ApplicationState.camera.imageCaptured
-                targetState: stateShowCaptureImage
-            }
-
-        }
-
-        DSM.State {
-            id: stateShowCaptureImage
-
-            onEntered: stack.push(captureView)
-
-            DSM.TimeoutTransition {
-                targetState: stateFinal
-                timeout: 5000
-            }
-
-        }
-
-        DSM.FinalState {
-            id: stateFinal
+            source: window.currentImage
         }
 
     }

@@ -1,8 +1,10 @@
-#include <QGuiApplication>
+#include <QApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlExtensionPlugin>
 #include <ApplicationState.hpp>
 #include <CameraImageProvider.hpp>
+#include <CaptureController.hpp>
+#include <CollagePrinter.hpp>
 #include <GPhoto2Camera.hpp>
 #include <ICamera.hpp>
 #include <ImageStorage.hpp>
@@ -16,7 +18,7 @@ using namespace Pbox;
 
 int main(int argc, char *argv[])
 {
-    QGuiApplication app(argc, argv);
+    QApplication app(argc, argv);
     QCoreApplication::setApplicationName(QStringLiteral("PhotoBox"));
     QCoreApplication::setOrganizationName(QStringLiteral("com.mathisloge.photobox"));
     QCoreApplication::setApplicationVersion(QStringLiteral(QT_VERSION_STR));
@@ -25,8 +27,11 @@ int main(int argc, char *argv[])
     // std::shared_ptr<ICamera> camera = std::make_shared<GPhoto2Camera>();
     std::shared_ptr<ICamera> camera = std::make_shared<MockCamera>();
 
-    ImageStorage image_storage{std::filesystem::current_path()};
-    QObject::connect(camera.get(), &ICamera::imageCaptured, &image_storage, &ImageStorage::onImageCaptured);
+    auto capture_controller = std::make_shared<CaptureController>(
+        std::make_unique<ImageStorage>(std::filesystem::current_path()),
+        camera,
+        std::make_unique<CollagePrinter>(
+            "/home/mathis/dev/photobox2/build/Photobox/CollageEditorApp/printer_settings.json"));
 
     QQmlApplicationEngine engine;
 
@@ -35,9 +40,10 @@ int main(int argc, char *argv[])
 
     app_state->camera = camera;
     app_state->trigger_client = photo_trigger_client;
+    app_state->capture_controller = capture_controller;
 
     engine.loadFromModule("Photobox.App", "Main");
-    engine.addImageProvider(QLatin1String("camera"), new CameraImageProvider(camera)); // qml engine takes ownership
+    engine.addImageProvider(QLatin1String("camera"), capture_controller->createImageProvider());
 
     return app.exec();
 }
