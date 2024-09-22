@@ -30,6 +30,7 @@ PhotoTriggerClient::PhotoTriggerClient()
         while (reply->canReadLine())
         {
             auto event_line = QString{reply->readLine()};
+            // qDebug() << "event_line=" <<event_line;
             if (event_line.startsWith("event: state"_L1))
             {
                 next_is_state = true;

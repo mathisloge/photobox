@@ -32,13 +32,6 @@ void to_json(json &j, const QPrinter &l)
     j = json{{"name", l.printerName()}, {"pageLayout", l.pageLayout()}, {"fullPage", l.fullPage()}};
 }
 
-void from_json(const json &j, QPageLayout &l)
-{
-    // j.at("name").get_to(p.name);
-    // j.at("address").get_to(p.address);
-    // j.at("age").get_to(p.age);
-}
-
 namespace Pbox
 {
 

@@ -5,7 +5,6 @@ target_link_libraries(CollageEditorApp PRIVATE
     Qt6::Gui
     Qt6::Qml
     Qt6::Quick
-    Qt6::PrintSupport
     PhotoboxCore
     PhotoboxCoreplugin
     PhotoboxGPhoto2
