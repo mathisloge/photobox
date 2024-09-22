@@ -1,10 +1,7 @@
 #include "CollageRenderer.hpp"
 #include <QDebug>
-#include <fstream>
 #include <mutex>
-#include <nlohmann/json.hpp>
 
-using json = nlohmann::json;
 namespace
 {
 
@@ -101,7 +98,7 @@ void CollageRenderer::render(QPainter *painter, float width, float height)
     painter->restore();
 }
 
-void CollageRenderer::renderToFile()
+void CollageRenderer::renderToFile(const std::filesystem::path &image_path)
 {
     if (document_ == nullptr)
     {
@@ -109,7 +106,7 @@ void CollageRenderer::renderToFile()
     }
 
     const auto bitmap = document_->renderToBitmap();
-    bitmap.writeToPng("collage.png");
+    bitmap.writeToPng(image_path);
 }
 
 const std::unordered_map<std::string, lunasvg::Element> &CollageRenderer::registeredImages() const
@@ -117,19 +114,8 @@ const std::unordered_map<std::string, lunasvg::Element> &CollageRenderer::regist
     return images_;
 }
 
-void CollageRenderer::saveConfiguration()
+const std::filesystem::path &CollageRenderer::getDocumentPath() const
 {
-    json collage_settings;
-
-    collage_settings["baseImage"] = base_image_file_path_;
-
-    auto &&json_images = collage_settings["images"];
-    for (auto &&k : images_)
-    {
-        json_images.emplace_back(k.first);
-    }
-
-    std::ofstream o("collage_settings.json");
-    o << std::setw(4) << collage_settings << std::endl;
+    return base_image_file_path_;
 }
 } // namespace Pbox

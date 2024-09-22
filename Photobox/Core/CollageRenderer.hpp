@@ -18,11 +18,10 @@ class CollageRenderer
 
     void updateLayout();
     void render(QPainter *painter, float width = -1, float height = -1);
-    void renderToFile();
+    void renderToFile(const std::filesystem::path &image_path);
 
     const std::unordered_map<std::string, lunasvg::Element> &registeredImages() const;
-
-    void saveConfiguration();
+    const std::filesystem::path &getDocumentPath() const;
 
   private:
     std::filesystem::path base_image_file_path_;

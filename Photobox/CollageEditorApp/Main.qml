@@ -65,7 +65,6 @@ ApplicationWindow {
                 model: image.model
 
                 delegate: Frame {
-                    //color: "salmon"
                     width: ListView.view.width
                     height: 50
 
@@ -73,7 +72,7 @@ ApplicationWindow {
                         anchors.top: parent.top
                         anchors.right: parent.right
                         onActivated: {
-                            image.model.removePhotoElement(model.elementId);
+                            image.model.removeElement(model.elementId);
                         }
                         icon.name: "edit-delete"
                     }
@@ -128,15 +127,15 @@ ApplicationWindow {
             anchors.fill: parent
 
             ToolButton {
+                text: "Load template"
+                onClicked: fileDialog.open()
+            }
+
+            ToolButton {
                 text: "Add image element"
                 onClicked: {
                     popup.open();
                 }
-            }
-
-            ToolButton {
-                text: "Load template"
-                onClicked: fileDialog.open()
             }
 
             ToolButton {

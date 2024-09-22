@@ -1,4 +1,5 @@
 #include "CaptureController.hpp"
+#include <fstream>
 #include "CameraImageProvider.hpp"
 #include "CollageRenderer.hpp"
 #include "ICamera.hpp"
@@ -15,43 +16,37 @@ CaptureController::CaptureController(std::unique_ptr<ImageStorage> image_storage
     Q_ASSERT(camera_ != nullptr);
     Q_ASSERT(collage_renderer_ != nullptr);
 
-    collage_renderer_->loadDocument("/home/mathis/Downloads/TestImage.svg");
-    collage_renderer_->addPhotoElement("image-1");
-    collage_renderer_->addPhotoElement("image-2");
-    collage_renderer_->addPhotoElement("image-3");
-    image_count_collage_ = static_cast<int>(collage_renderer_->registeredImages().size()) - 1;
-
     connect(camera_.get(), &ICamera::imageCaptured, image_storage_.get(), &ImageStorage::onImageCaptured);
     connect(camera_.get(), &ICamera::imageCaptured, this, [this](const QImage &image) {
-        const QString unique_image_name =
-            QStringLiteral("capture-%1-%2").arg(current_image_count_).arg(image_counter_++);
+        const QString unique_image_name = QStringLiteral("capture-%1-%2").arg(current_capture_).arg(image_counter_++);
 
         Q_EMIT imageCaptured(image, unique_image_name);
-        capture_model_.setImage(current_image_count_, unique_image_name);
-        qDebug() << "CAPTURE COUNT current_image_count_ =" << current_image_count_
-                 << "image_count_collage_ =" << image_count_collage_;
-        if (current_image_count_ == image_count_collage_)
+        capture_model_.setImage(current_capture_, unique_image_name);
+        qDebug() << "CAPTURE COUNT collage_finished_ =" << collage_finished_;
+        if (not collage_finished_)
         {
-            qDebug() << "capture complete";
-            Q_EMIT collageCaptureComplete();
-        }
-        else
-        {
-            current_image_count_++;
+            current_capture_++;
         }
     });
     connect(image_storage_.get(),
             &ImageStorage::imageSaved,
             this,
             [this](const std::filesystem::path &captured_image_path) {
-                collage_renderer_->setSourceOfPhoto(
-                    QStringLiteral("image-%1").arg(current_image_count_ + 1).toStdString(), captured_image_path);
-                if (current_image_count_ == image_count_collage_)
+                collage_renderer_->setSourceOfPhoto(QStringLiteral("image-%1").arg(current_capture_ + 1).toStdString(),
+                                                    captured_image_path);
+                if (collage_finished_)
                 {
                     collage_renderer_->updateLayout();
-                    collage_renderer_->renderToFile();
+                    collage_image_path_ =
+                        QStringLiteral(
+                            "/home/mathis/dev/photobox2/build/Photobox/CollageEditorApp/collage/collage_%1.png")
+                            .arg(image_counter_);
+                    collage_renderer_->renderToFile(collage_image_path_.toStdString());
+                    Q_EMIT collageCaptureComplete();
                 }
             });
+
+    loadSettings("/home/mathis/dev/photobox2/build/Photobox/CollageEditorApp/collage");
 }
 
 CaptureController::~CaptureController() = default;
@@ -59,12 +54,18 @@ CaptureController::~CaptureController() = default;
 void CaptureController::captureImage()
 {
     camera_->requestCapturePhoto();
+    if (current_capture_ == max_capture_count_)
+    {
+        collage_finished_ = true;
+        Q_EMIT collageCompletedChanged();
+    }
 }
 
 void CaptureController::reset()
 {
-    current_image_count_ = 0;
-    capture_model_.resetImageCount(image_count_collage_);
+    collage_finished_ = false;
+    current_capture_ = 0;
+    capture_model_.resetImageCount(max_capture_count_);
 }
 
 CaptureImageModel *CaptureController::getModel()
@@ -79,6 +80,31 @@ CameraImageProvider *CaptureController::createImageProvider()
     return image_provider;
 }
 
+bool CaptureController::isCollageComplete() const
+{
+    return collage_finished_;
+}
+
+QString CaptureController::getCollageImagePath()
+{
+    return collage_image_path_;
+}
+
+void CaptureController::loadSettings(const std::filesystem::path &collage_directory)
+{
+    std::ifstream settings_file{collage_directory / "collage_settings.json"};
+    nlohmann::json json;
+    settings_file >> json;
+    settings_ = json;
+
+    collage_renderer_->loadDocument(collage_directory / "collage.svg");
+    for (auto &&element : settings_.image_elements)
+    {
+        collage_renderer_->addPhotoElement(element);
+    }
+    max_capture_count_ = static_cast<int>(settings_.image_elements.size()) - 1;
+}
+
 int CaptureImageModel::rowCount(const QModelIndex & /*parent*/) const
 {
     return static_cast<int>(image_sources_.size());
@@ -86,7 +112,6 @@ int CaptureImageModel::rowCount(const QModelIndex & /*parent*/) const
 
 QVariant CaptureImageModel::data(const QModelIndex &index, int role) const
 {
-    qDebug() << "TEST" << index.row();
     if (!index.isValid() || index.row() >= image_sources_.size())
     {
         return {};

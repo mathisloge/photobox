@@ -184,6 +184,7 @@ ApplicationWindow {
                     id: idleState
 
                     onEntered: {
+                        stack.pop(null);
                         videoOutput.opacity = 1;
                         ApplicationState.triggerClient.playEffect(PhotoTriggerClient.Idle);
                     }
@@ -273,6 +274,7 @@ ApplicationWindow {
                         DSM.SignalTransition {
                             signal: window.capturedPreviewFinished
                             targetState: statePreview
+                            guard: !ApplicationState.captureController.collageComplete
                         }
 
                     }
@@ -282,9 +284,14 @@ ApplicationWindow {
 
                         id: stateShowCollageFinal
 
+                        onEntered: {
+                            window.currentImage = "file://" + ApplicationState.captureController.collageImagePath;
+                            stack.push(captureView);
+                        }
+
                         DSM.TimeoutTransition {
                             targetState: idleState
-                            timeout: 5000
+                            timeout: 10000
                         }
 
                     }
