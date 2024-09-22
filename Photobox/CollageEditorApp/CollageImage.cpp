@@ -50,7 +50,12 @@ void CollageImage::saveConfiguration()
 
     std::ofstream o(output_dir / "collage_settings.json");
     o << std::setw(4) << collage_json << std::endl;
+    const auto collage_svg_path = output_dir / "collage.svg";
 
-    std::filesystem::copy_file(renderer_.getDocumentPath(), output_dir / "collage.svg");
+    if (std::filesystem::exists(collage_svg_path))
+    {
+        std::filesystem::remove(collage_svg_path);
+    }
+    std::filesystem::copy_file(renderer_.getDocumentPath(), collage_svg_path);
 }
 } // namespace Pbox

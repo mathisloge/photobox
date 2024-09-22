@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
     std::shared_ptr<ICamera> camera = std::make_shared<MockCamera>();
 
     auto capture_controller = std::make_shared<CaptureController>(
+        "/home/mathis/dev/photobox2/build/Photobox/CollageEditorApp/collage",
         std::make_unique<ImageStorage>(std::filesystem::current_path()),
         camera,
         std::make_unique<CollagePrinter>(

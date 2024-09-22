@@ -17,6 +17,8 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(gphoto2 REQUIRED IMPORTED_TARGET libgphoto2)
 message(STATUS "Found gphoto2 ${gphoto2_VERSION}")
 
+find_package(fmt CONFIG REQUIRED)
+
 add_subdirectory(Photobox)
 
 if(BUILD_TESTING)

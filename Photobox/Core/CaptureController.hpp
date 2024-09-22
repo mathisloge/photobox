@@ -41,7 +41,8 @@ class CaptureController : public QObject
     Q_PROPERTY(QString collageImagePath READ getCollageImagePath NOTIFY collageCaptureComplete);
 
   public:
-    explicit CaptureController(std::unique_ptr<ImageStorage> image_storage,
+    explicit CaptureController(const std::filesystem::path &collage_directory,
+                               std::unique_ptr<ImageStorage> image_storage,
                                std::shared_ptr<ICamera> camera,
                                std::unique_ptr<CollagePrinter> printer);
     ~CaptureController() override;
@@ -58,6 +59,7 @@ class CaptureController : public QObject
     void loadSettings(const std::filesystem::path &collage_directory);
 
   Q_SIGNALS:
+    void captureComplete();
     void collageCompletedChanged();
     void collageCaptureComplete();
     void imageCaptured(const QImage &image, const QString &image_id);
@@ -72,7 +74,7 @@ class CaptureController : public QObject
     int current_capture_{0};
     int max_capture_count_{0};
     bool collage_finished_{false};
-    QString collage_image_path_;
+    std::filesystem::path collage_image_path_;
 
     // a counter to invalidate any image providers
     std::uint32_t image_counter_{0};

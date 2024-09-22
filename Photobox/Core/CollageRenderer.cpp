@@ -1,7 +1,9 @@
 #include "CollageRenderer.hpp"
 #include <QDebug>
+#include <QFile>
+#include <fstream>
 #include <mutex>
-
+#include <nlohmann/json.hpp>
 namespace
 {
 
@@ -9,10 +11,25 @@ void init_lunasvg()
 {
     static std::once_flag has_init;
     std::call_once(has_init, []() {
-        lunasvg_add_font_face_from_file("", false, false, "/home/mathis/dev/photobox2/test/Roboto-Regular.ttf");
-        lunasvg_add_font_face_from_file("", true, false, "/home/mathis/dev/photobox2/test/Roboto-Bold.ttf");
-        lunasvg_add_font_face_from_file("", false, true, "/home/mathis/dev/photobox2/test/Roboto-Italic.ttf");
-        lunasvg_add_font_face_from_file("", true, true, "/home/mathis/dev/photobox2/test/Roboto-BoldItalic.ttf");
+        // QFile great_vibes{":/qt/qml/Photobox/Core/Fonts/GreatVibes/GreatVibes-Regular.ttf"};
+        // if(not great_vibes.open(QFile::OpenModeFlag::ReadOnly)) {
+        //     qDebug() << "Could not open resource";
+        // }
+        // static const auto data = great_vibes.readAll();
+        // lunasvg_add_font_face_from_data("Great Vibes",false, false, data.data(), data.size(), [](void* closure){
+        //     qDebug() << "data loaded and can be deleted";
+        // }, nullptr);
+        lunasvg_add_font_face_from_file(
+            "Great Vibes",
+            false,
+            false,
+            "/home/mathis/dev/photobox2/Photobox/Core/Fonts/GreatVibes/GreatVibes-Regular.ttf");
+        // lunasvg_add_font_face_from_file("", false, false, "/home/mathis/dev/photobox2/test/Roboto-Regular.ttf");
+        // lunasvg_add_font_face_from_file("", false, false, "/home/mathis/dev/photobox2/test/Roboto-Regular.ttf");
+        // lunasvg_add_font_face_from_file("", true, false, "/home/mathis/dev/photobox2/test/Roboto-Bold.ttf");
+        // lunasvg_add_font_face_from_file("", false, true, "/home/mathis/dev/photobox2/test/Roboto-Italic.ttf");
+        // lunasvg_add_font_face_from_file("", true, true, "/home/mathis/dev/photobox2/test/Roboto-BoldItalic.ttf");
+        qDebug() << "finished";
     });
 }
 
@@ -64,7 +81,7 @@ void CollageRenderer::updateLayout()
     document_->updateLayout();
 }
 
-void CollageRenderer::render(QPainter *painter, float width, float height)
+void CollageRenderer::render(QPainter *painter, float width, float height) const
 {
     if (document_ == nullptr or painter == nullptr)
     {
@@ -98,7 +115,7 @@ void CollageRenderer::render(QPainter *painter, float width, float height)
     painter->restore();
 }
 
-void CollageRenderer::renderToFile(const std::filesystem::path &image_path)
+void CollageRenderer::renderToFile(const std::filesystem::path &image_path) const
 {
     if (document_ == nullptr)
     {
@@ -107,6 +124,20 @@ void CollageRenderer::renderToFile(const std::filesystem::path &image_path)
 
     const auto bitmap = document_->renderToBitmap();
     bitmap.writeToPng(image_path);
+}
+
+void CollageRenderer::dumpAsJson(const std::filesystem::path &json_path) const
+{
+    using nlohmann::json;
+
+    json j;
+    for (auto &&image : images_)
+    {
+        const auto image_path = image.second.getAttribute("href");
+        j[image.first] = image_path;
+    }
+    std::ofstream o{json_path};
+    o << std::setw(4) << j << std::endl;
 }
 
 const std::unordered_map<std::string, lunasvg::Element> &CollageRenderer::registeredImages() const

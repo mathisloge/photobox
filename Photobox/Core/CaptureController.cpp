@@ -1,5 +1,6 @@
 #include "CaptureController.hpp"
 #include <fstream>
+#include <fmt/format.h>
 #include "CameraImageProvider.hpp"
 #include "CollagePrinter.hpp"
 #include "CollageRenderer.hpp"
@@ -23,6 +24,7 @@ class CollageSaveWorkerThread : public QThread
     void run() override
     {
         renderer_.updateLayout();
+        renderer_.dumpAsJson(fmt::format("{}.json", file_path_.c_str()));
         renderer_.renderToFile(file_path_);
         printer_.print(renderer_);
     }
@@ -34,7 +36,8 @@ class CollageSaveWorkerThread : public QThread
 };
 } // namespace
 
-CaptureController::CaptureController(std::unique_ptr<ImageStorage> image_storage,
+CaptureController::CaptureController(const std::filesystem::path &collage_directory,
+                                     std::unique_ptr<ImageStorage> image_storage,
                                      std::shared_ptr<ICamera> camera,
                                      std::unique_ptr<CollagePrinter> printer)
     : image_storage_{std::move(image_storage)}
@@ -48,11 +51,13 @@ CaptureController::CaptureController(std::unique_ptr<ImageStorage> image_storage
 
     connect(camera_.get(), &ICamera::imageCaptured, image_storage_.get(), &ImageStorage::onImageCaptured);
     connect(camera_.get(), &ICamera::imageCaptured, this, [this](const QImage &image) {
-        const QString unique_image_name = QStringLiteral("capture-%1-%2").arg(current_capture_).arg(image_counter_++);
+        const auto unique_image_name =
+            QString::fromStdString(fmt::format("capture-{}-{}", current_capture_, image_counter_++));
 
         Q_EMIT imageCaptured(image, unique_image_name);
         capture_model_.setImage(current_capture_, unique_image_name);
-        qDebug() << "CAPTURE COUNT collage_finished_ =" << collage_finished_;
+    });
+    connect(this, &CaptureController::captureComplete, this, [this]() {
         if (not collage_finished_)
         {
             current_capture_++;
@@ -62,17 +67,15 @@ CaptureController::CaptureController(std::unique_ptr<ImageStorage> image_storage
             &ImageStorage::imageSaved,
             this,
             [this](const std::filesystem::path &captured_image_path) {
-                collage_renderer_->setSourceOfPhoto(QStringLiteral("image-%1").arg(current_capture_ + 1).toStdString(),
-                                                    captured_image_path);
+                const auto &element = settings_.image_elements.at(current_capture_);
+                collage_renderer_->setSourceOfPhoto(element, captured_image_path);
                 if (collage_finished_)
                 {
                     collage_image_path_ =
-                        QStringLiteral(
-                            "/home/mathis/dev/photobox2/build/Photobox/CollageEditorApp/collage/collage_%1.png")
-                            .arg(image_counter_);
+                        image_storage_->storageDir() / fmt::format("collage_{}.png", image_counter_++);
 
                     CollageSaveWorkerThread *worker_thread =
-                        new CollageSaveWorkerThread(collage_image_path_.toStdString(), *collage_renderer_, *printer_);
+                        new CollageSaveWorkerThread(collage_image_path_, *collage_renderer_, *printer_);
                     connect(worker_thread,
                             &CollageSaveWorkerThread::finished,
                             this,
@@ -80,9 +83,13 @@ CaptureController::CaptureController(std::unique_ptr<ImageStorage> image_storage
                     connect(worker_thread, &CollageSaveWorkerThread::finished, worker_thread, &QObject::deleteLater);
                     worker_thread->start();
                 }
+                else
+                {
+                    Q_EMIT captureComplete();
+                }
             });
 
-    loadSettings("/home/mathis/dev/photobox2/build/Photobox/CollageEditorApp/collage");
+    loadSettings(collage_directory);
 }
 
 CaptureController::~CaptureController() = default;
@@ -123,7 +130,7 @@ bool CaptureController::isCollageComplete() const
 
 QString CaptureController::getCollageImagePath()
 {
-    return collage_image_path_;
+    return QString::fromStdString(collage_image_path_);
 }
 
 void CaptureController::loadSettings(const std::filesystem::path &collage_directory)

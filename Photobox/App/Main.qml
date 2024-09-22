@@ -280,8 +280,6 @@ ApplicationWindow {
                     }
 
                     DSM.State {
-                        // todo: push collage image onto stack after everything was stored.
-
                         id: stateShowCollageFinal
 
                         onEntered: {

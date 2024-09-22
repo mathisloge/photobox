@@ -17,8 +17,9 @@ class CollageRenderer
     void setSourceOfPhoto(const std::string &element_id, const std::string &file_path);
 
     void updateLayout();
-    void render(QPainter *painter, float width = -1, float height = -1);
-    void renderToFile(const std::filesystem::path &image_path);
+    void render(QPainter *painter, float width = -1, float height = -1) const;
+    void renderToFile(const std::filesystem::path &image_path) const;
+    void dumpAsJson(const std::filesystem::path &json_path) const;
 
     const std::unordered_map<std::string, lunasvg::Element> &registeredImages() const;
     const std::filesystem::path &getDocumentPath() const;

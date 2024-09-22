@@ -72,5 +72,11 @@ void ImageStorage::onImageCaptured(const QImage &captured_image)
     connect(worker_thread, &StoreWorkerThread::finished, worker_thread, &QObject::deleteLater);
     worker_thread->start();
 }
+
+const std::filesystem::path &ImageStorage::storageDir() const
+{
+    return storage_dir_;
+}
+
 } // namespace Pbox
 #include "ImageStorage.moc"
