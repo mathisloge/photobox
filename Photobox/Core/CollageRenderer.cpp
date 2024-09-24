@@ -11,24 +11,30 @@ void init_lunasvg()
 {
     static std::once_flag has_init;
     std::call_once(has_init, []() {
-        // QFile great_vibes{":/qt/qml/Photobox/Core/Fonts/GreatVibes/GreatVibes-Regular.ttf"};
-        // if(not great_vibes.open(QFile::OpenModeFlag::ReadOnly)) {
-        //     qDebug() << "Could not open resource";
-        // }
-        // static const auto data = great_vibes.readAll();
-        // lunasvg_add_font_face_from_data("Great Vibes",false, false, data.data(), data.size(), [](void* closure){
-        //     qDebug() << "data loaded and can be deleted";
-        // }, nullptr);
-        lunasvg_add_font_face_from_file(
+        QFile great_vibes{":/qt/qml/Photobox/Core/Fonts/GreatVibes/GreatVibes-Regular.ttf"};
+        if (not great_vibes.open(QFile::OpenModeFlag::ReadOnly))
+        {
+            qDebug() << "Could not open resource";
+        }
+        static const auto data = great_vibes.readAll();
+        lunasvg_add_font_face_from_data(
             "Great Vibes",
             false,
             false,
-            "/home/mathis/dev/photobox2/Photobox/Core/Fonts/GreatVibes/GreatVibes-Regular.ttf");
-        // lunasvg_add_font_face_from_file("", false, false, "/home/mathis/dev/photobox2/test/Roboto-Regular.ttf");
-        // lunasvg_add_font_face_from_file("", false, false, "/home/mathis/dev/photobox2/test/Roboto-Regular.ttf");
-        // lunasvg_add_font_face_from_file("", true, false, "/home/mathis/dev/photobox2/test/Roboto-Bold.ttf");
-        // lunasvg_add_font_face_from_file("", false, true, "/home/mathis/dev/photobox2/test/Roboto-Italic.ttf");
-        // lunasvg_add_font_face_from_file("", true, true, "/home/mathis/dev/photobox2/test/Roboto-BoldItalic.ttf");
+            data.data(),
+            data.size(),
+            [](void *closure) { qDebug() << "data loaded and can be deleted"; },
+            nullptr);
+        // lunasvg_add_font_face_from_file(
+        //     "Great Vibes",
+        //     false,
+        //     false,
+        //     "/home/mathis/dev/photobox2/Photobox/Core/Fonts/GreatVibes/GreatVibes-Regular.ttf");
+        //  lunasvg_add_font_face_from_file("", false, false, "/home/mathis/dev/photobox2/test/Roboto-Regular.ttf");
+        //  lunasvg_add_font_face_from_file("", false, false, "/home/mathis/dev/photobox2/test/Roboto-Regular.ttf");
+        //  lunasvg_add_font_face_from_file("", true, false, "/home/mathis/dev/photobox2/test/Roboto-Bold.ttf");
+        //  lunasvg_add_font_face_from_file("", false, true, "/home/mathis/dev/photobox2/test/Roboto-Italic.ttf");
+        //  lunasvg_add_font_face_from_file("", true, true, "/home/mathis/dev/photobox2/test/Roboto-BoldItalic.ttf");
     });
 }
 

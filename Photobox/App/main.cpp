@@ -23,16 +23,40 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName(QStringLiteral("com.mathisloge.photobox"));
     QCoreApplication::setApplicationVersion(QStringLiteral(QT_VERSION_STR));
 
-    std::shared_ptr<PhotoTriggerClient> photo_trigger_client = std::make_shared<PhotoTriggerClient>();
-    std::shared_ptr<ICamera> camera = std::make_shared<GPhoto2Camera>();
-    // std::shared_ptr<ICamera> camera = std::make_shared<MockCamera>();
+    QCommandLineParser parser;
+    parser.addHelpOption();
+    parser.addVersionOption();
+    QCommandLineOption capture_directory_option(
+        QStringList() << "storage-dir", "the captured image storage dir", "path to dir", "captures");
+    parser.addOption(capture_directory_option);
 
-    auto capture_controller = std::make_shared<CaptureController>(
-        "/home/mathis/dev/photobox2/build/Photobox/CollageEditorApp/collage",
-        std::make_unique<ImageStorage>(std::filesystem::current_path()),
-        camera,
-        std::make_unique<CollagePrinter>(
-            "/home/mathis/dev/photobox2/build/Photobox/CollageEditorApp/printer_settings.json"));
+    QCommandLineOption collage_directory_option(
+        QStringList() << "collage-dir", "The dir with the collage settings", "path to dir", "collage");
+    parser.addOption(collage_directory_option);
+
+    QCommandLineOption printer_settings_option(
+        QStringList() << "printer-settings", "The printer_settings.json file", "path to file", "printer_settings.json");
+    parser.addOption(printer_settings_option);
+
+    parser.process(app);
+
+    const QString capture_directory = parser.value(capture_directory_option);
+    const QString collage_directory = parser.value(collage_directory_option);
+    const QString printer_settings = parser.value(printer_settings_option);
+
+    qDebug() << "capture_directory =" << capture_directory;
+    qDebug() << "collage_directory =" << collage_directory;
+    qDebug() << "printer_settings =" << printer_settings;
+
+    std::shared_ptr<PhotoTriggerClient> photo_trigger_client = std::make_shared<PhotoTriggerClient>();
+    // std::shared_ptr<ICamera> camera = std::make_shared<GPhoto2Camera>();
+    std::shared_ptr<ICamera> camera = std::make_shared<MockCamera>();
+
+    auto capture_controller =
+        std::make_shared<CaptureController>(collage_directory.toStdString(),
+                                            std::make_unique<ImageStorage>(capture_directory.toStdString()),
+                                            camera,
+                                            std::make_unique<CollagePrinter>(printer_settings.toStdString()));
 
     QQmlApplicationEngine engine;
 

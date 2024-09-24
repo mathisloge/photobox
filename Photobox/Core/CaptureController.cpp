@@ -131,7 +131,7 @@ bool CaptureController::isCollageComplete() const
 
 QString CaptureController::getCollageImagePath()
 {
-    return QString::fromStdString(collage_image_path_);
+    return QString::fromStdString(std::filesystem::absolute(collage_image_path_));
 }
 
 void CaptureController::loadSettings(const std::filesystem::path &collage_directory)
