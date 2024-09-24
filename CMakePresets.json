@@ -23,6 +23,7 @@
             "description": "The developer configuration",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
+                "BUILD_TESTING": true,
                 "QT_QML_DEBUG": true
             }
         },
@@ -59,6 +60,17 @@
         }
     ],
     "testPresets": [
+        {
+            "name": "developer",
+            "configurePreset": "developer",
+            "output": {
+                "outputOnFailure": true
+            },
+            "execution": {
+                "noTestsAction": "error",
+                "stopOnFailure": true
+            }
+        },
         {
             "name": "ci",
             "configurePreset": "ci",

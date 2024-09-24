@@ -1,12 +1,19 @@
 cmake_minimum_required(VERSION 3.28)
 project(photobox VERSION 0.0.1 LANGUAGES CXX)
 
+set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
 include(CTest)
 include(get_cpm)
 
-CPMAddPackage("gh:sammycage/lunasvg#167416671a68e63f2e0e8234518dbbdde0adf2a6")
+CPMAddPackage("gh:sammycage/lunasvg#6e138c0778b23964a33135e3015acb2a6ddec7d7")
 CPMAddPackage("gh:nlohmann/json@3.11.3")
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Qml Quick Network Multimedia PrintSupport SvgWidgets REQUIRED)
@@ -22,6 +29,10 @@ find_package(fmt CONFIG REQUIRED)
 add_subdirectory(Photobox)
 
 if(BUILD_TESTING)
+    CPMAddPackage("gh:catchorg/Catch2@3.7.1")
+    list(APPEND CMAKE_MODULE_PATH "${Catch2_SOURCE_DIR}/extras")
+
+    include(Catch)
     add_subdirectory(Tests)
 endif()
 

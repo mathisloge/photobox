@@ -29,7 +29,6 @@ void init_lunasvg()
         // lunasvg_add_font_face_from_file("", true, false, "/home/mathis/dev/photobox2/test/Roboto-Bold.ttf");
         // lunasvg_add_font_face_from_file("", false, true, "/home/mathis/dev/photobox2/test/Roboto-Italic.ttf");
         // lunasvg_add_font_face_from_file("", true, true, "/home/mathis/dev/photobox2/test/Roboto-BoldItalic.ttf");
-        qDebug() << "finished";
     });
 }
 

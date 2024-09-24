@@ -23,7 +23,6 @@ class CollageSaveWorkerThread : public QThread
   private:
     void run() override
     {
-        renderer_.updateLayout();
         renderer_.dumpAsJson(fmt::format("{}.json", file_path_.c_str()));
         renderer_.renderToFile(file_path_);
         printer_.print(renderer_);
@@ -73,7 +72,7 @@ CaptureController::CaptureController(const std::filesystem::path &collage_direct
                 {
                     collage_image_path_ =
                         image_storage_->storageDir() / fmt::format("collage_{}.png", image_counter_++);
-
+                    collage_renderer_->updateLayout();
                     CollageSaveWorkerThread *worker_thread =
                         new CollageSaveWorkerThread(collage_image_path_, *collage_renderer_, *printer_);
                     connect(worker_thread,
