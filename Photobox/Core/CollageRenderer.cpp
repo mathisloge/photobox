@@ -80,13 +80,8 @@ void CollageRenderer::updateLayout()
     document_->updateLayout();
 }
 
-void CollageRenderer::render(QPainter *painter, float width, float height) const
+lunasvg::Bitmap CollageRenderer::scaledBitmap(float width, float height) const
 {
-    if (document_ == nullptr or painter == nullptr)
-    {
-        return;
-    }
-
     if (width > 0 and height > 0)
     {
         const float scale_width = static_cast<float>(width) / document_->width();
@@ -103,9 +98,13 @@ void CollageRenderer::render(QPainter *painter, float width, float height) const
         height = static_cast<float>(document_->height());
     }
 
-    const auto bitmap = document_->renderToBitmap(static_cast<int>(width), static_cast<int>(height));
-    const QImage pixmap{
-        bitmap.data(), static_cast<int>(width), static_cast<int>(height), QImage::Format::Format_ARGB32_Premultiplied};
+    return document_->renderToBitmap(static_cast<int>(width), static_cast<int>(height));
+}
+
+void CollageRenderer::render(QPainter *painter, float width, float height) const
+{
+    const auto bitmap = scaledBitmap(width, height);
+    const QImage pixmap{bitmap.data(), bitmap.width(), bitmap.height(), QImage::Format::Format_ARGB32_Premultiplied};
 
     painter->save();
 
@@ -120,8 +119,7 @@ void CollageRenderer::renderToFile(const std::filesystem::path &image_path) cons
     {
         return;
     }
-
-    const auto bitmap = document_->renderToBitmap();
+    const auto bitmap = scaledBitmap(3840, 2160);
     bitmap.writeToPng(image_path);
 }
 

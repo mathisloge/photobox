@@ -24,8 +24,8 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationVersion(QStringLiteral(QT_VERSION_STR));
 
     std::shared_ptr<PhotoTriggerClient> photo_trigger_client = std::make_shared<PhotoTriggerClient>();
-    // std::shared_ptr<ICamera> camera = std::make_shared<GPhoto2Camera>();
-    std::shared_ptr<ICamera> camera = std::make_shared<MockCamera>();
+    std::shared_ptr<ICamera> camera = std::make_shared<GPhoto2Camera>();
+    // std::shared_ptr<ICamera> camera = std::make_shared<MockCamera>();
 
     auto capture_controller = std::make_shared<CaptureController>(
         "/home/mathis/dev/photobox2/build/Photobox/CollageEditorApp/collage",

@@ -2,7 +2,7 @@
 #include <QDebug>
 #include <QImage>
 #include <QThread>
-#include <qdatetime.h>
+#include <fmt/format.h>
 using namespace Qt::Literals::StringLiterals;
 
 namespace Pbox
@@ -13,9 +13,9 @@ class StoreWorkerThread : public QThread
 {
     Q_OBJECT
   public:
-    StoreWorkerThread(std::filesystem::path storage_dir, QString name, const QImage &image_to_save)
+    StoreWorkerThread(std::filesystem::path storage_dir, std::string image_name, const QImage &image_to_save)
         : storage_dir_{std::move(storage_dir)}
-        , name_{std::move(name)}
+        , image_name_{std::move(image_name)}
         , image_to_save_{image_to_save}
     {}
   Q_SIGNALS:
@@ -24,8 +24,7 @@ class StoreWorkerThread : public QThread
   private:
     void run() override
     {
-        const auto image_name = name_ + QStringLiteral(".png");
-        const auto image_path = storage_dir_ / image_name.toStdString();
+        const auto image_path = storage_dir_ / image_name_;
         qDebug() << "Saving image to " << image_path.c_str();
         if (not image_to_save_.save(QString::fromStdString(image_path)))
         {
@@ -37,7 +36,7 @@ class StoreWorkerThread : public QThread
 
   private:
     std::filesystem::path storage_dir_;
-    QString name_;
+    std::string image_name_;
     QImage image_to_save_;
 };
 } // namespace
@@ -65,12 +64,16 @@ ImageStorage::ImageStorage(std::filesystem::path storage_dir)
 
 void ImageStorage::onImageCaptured(const QImage &captured_image)
 {
-    static const QString kNameTemplate = QStringLiteral("capture_%1");
-    StoreWorkerThread *worker_thread =
-        new StoreWorkerThread(storage_dir_, kNameTemplate.arg(image_counter_++), captured_image);
+    StoreWorkerThread *worker_thread = new StoreWorkerThread(storage_dir_, generateNewImageFilePath(), captured_image);
     connect(worker_thread, &StoreWorkerThread::imageSaved, this, &ImageStorage::imageSaved);
     connect(worker_thread, &StoreWorkerThread::finished, worker_thread, &QObject::deleteLater);
     worker_thread->start();
+}
+
+std::string ImageStorage::generateNewImageFilePath()
+{
+    constexpr std::string_view kNameTemplate = "capture";
+    return fmt::format("{}_{}.png", kNameTemplate, image_counter_++);
 }
 
 const std::filesystem::path &ImageStorage::storageDir() const

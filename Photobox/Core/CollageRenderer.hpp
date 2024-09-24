@@ -25,6 +25,9 @@ class CollageRenderer
     const std::filesystem::path &getDocumentPath() const;
 
   private:
+    lunasvg::Bitmap scaledBitmap(float width, float height) const;
+
+  private:
     std::filesystem::path base_image_file_path_;
     std::unique_ptr<lunasvg::Document> document_;
     std::unordered_map<std::string, lunasvg::Element> images_;
