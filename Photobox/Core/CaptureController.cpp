@@ -55,6 +55,7 @@ CaptureController::CaptureController(const std::filesystem::path &collage_direct
 
         Q_EMIT imageCaptured(image, unique_image_name);
         capture_model_.setImage(current_capture_, unique_image_name);
+        Q_EMIT capturedImageReady();
     });
     connect(this, &CaptureController::captureComplete, this, [this]() {
         if (not collage_finished_)
@@ -196,6 +197,15 @@ void CaptureImageModel::setImage(int element_index, QString source)
         image_sources_.at(element_index) = std::move(source);
         Q_EMIT dataChanged(index(element_index), index(element_index));
     }
+}
+
+QString CaptureImageModel::sourceOfLastItem() const
+{
+    if (image_sources_.empty())
+    {
+        return "";
+    }
+    return image_sources_.back();
 }
 } // namespace Pbox
 #include "CaptureController.moc"

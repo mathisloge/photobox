@@ -22,34 +22,21 @@ ApplicationWindow {
         anchors.fill: parent
 
         pushEnter: Transition {
-            ParallelAnimation {
-                NumberAnimation {
-                    property: "rotation"
-                    from: 270
-                    to: 0
-                    duration: 1000
-                    easing.type: Easing.InCubic
-                }
-
-                NumberAnimation {
-                    property: "scale"
-                    from: 0
-                    to: 1
-                    duration: 1000
-                    easing.type: Easing.InCubic
-                }
-
+            PropertyAnimation {
+                property: "opacity"
+                from: 0
+                to: 1
+                duration: 500
             }
 
         }
 
         pushExit: Transition {
-            NumberAnimation {
-                property: "scale"
+            PropertyAnimation {
+                property: "opacity"
                 from: 1
-                to: 1
-                duration: 1000
-                easing.type: Easing.InCubic
+                to: 0
+                duration: 500
             }
 
         }
@@ -59,7 +46,7 @@ ApplicationWindow {
                 property: "opacity"
                 from: 0
                 to: 1
-                duration: 200
+                duration: 500
             }
 
         }
@@ -69,7 +56,7 @@ ApplicationWindow {
                 property: "opacity"
                 from: 1
                 to: 0
-                duration: 200
+                duration: 500
             }
 
         }
@@ -123,29 +110,6 @@ ApplicationWindow {
                         PropertyAction {
                             property: "x"
                             value: -previewAddTransition.ViewTransition.item.width
-                        }
-
-                        ScriptAction {
-                            script: {
-                                window.currentImage = previewAddTransition.ViewTransition.item.source;
-                                stack.push(captureView);
-                            }
-                        }
-
-                        PauseAnimation {
-                            duration: 5000
-                        }
-
-                        ScriptAction {
-                            script: stack.pop(null)
-                        }
-
-                        PauseAnimation {
-                            duration: 500
-                        }
-
-                        ScriptAction {
-                            script: window.capturedPreviewFinished()
                         }
 
                         NumberAnimation {
@@ -213,6 +177,7 @@ ApplicationWindow {
                         id: statePreview
 
                         onEntered: {
+                            stack.pop(null);
                             videoOutput.opacity = 1;
                             ApplicationState.triggerClient.playEffect(PhotoTriggerClient.Idle);
                         }
@@ -267,14 +232,22 @@ ApplicationWindow {
                         }
 
                         DSM.SignalTransition {
-                            signal: ApplicationState.captureController.collageCaptureComplete
-                            targetState: stateShowCollageFinal
+                            signal: ApplicationState.captureController.capturedImageReady
+                            targetState: stateShowCapturedImage
                         }
 
-                        DSM.SignalTransition {
-                            signal: window.capturedPreviewFinished
-                            targetState: statePreview
-                            guard: !ApplicationState.captureController.collageComplete
+                    }
+
+                    DSM.State {
+                        id: stateShowCapturedImage
+
+                        onEntered: {
+                            stack.push(captureView);
+                        }
+
+                        DSM.TimeoutTransition {
+                            targetState: ApplicationState.captureController.collageComplete ? stateShowCollageFinal : statePreview
+                            timeout: 5000
                         }
 
                     }
@@ -283,8 +256,7 @@ ApplicationWindow {
                         id: stateShowCollageFinal
 
                         onEntered: {
-                            window.currentImage = "file://" + ApplicationState.captureController.collageImagePath;
-                            stack.push(captureView);
+                            stack.push(collageView);
                         }
 
                         DSM.TimeoutTransition {
@@ -306,7 +278,16 @@ ApplicationWindow {
         id: captureView
 
         PreviewImage {
-            source: window.currentImage
+            source: "image://camera/" + ApplicationState.captureController.model.sourceOfLastItem()
+        }
+
+    }
+
+    Component {
+        id: collageView
+
+        PreviewImage {
+            source: "file://" + ApplicationState.captureController.collageImagePath
         }
 
     }

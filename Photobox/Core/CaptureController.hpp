@@ -21,6 +21,8 @@ class CaptureImageModel : public QAbstractListModel
         ImageSource = Qt::DisplayRole + 1,
     };
 
+    Q_INVOKABLE QString sourceOfLastItem() const;
+
     int rowCount(const QModelIndex &parent = QModelIndex{}) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     QHash<int, QByteArray> roleNames() const override;
@@ -63,6 +65,7 @@ class CaptureController : public QObject
     void collageCompletedChanged();
     void collageCaptureComplete();
     void imageCaptured(const QImage &image, const QString &image_id);
+    void capturedImageReady();
 
   private:
     std::unique_ptr<ImageStorage> image_storage_;
