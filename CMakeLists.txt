@@ -15,16 +15,15 @@ include(get_cpm)
 
 CPMAddPackage("gh:sammycage/lunasvg#6e138c0778b23964a33135e3015acb2a6ddec7d7")
 CPMAddPackage("gh:nlohmann/json@3.11.3")
+CPMAddPackage("gh:fmtlib/fmt#11.0.2")
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Qml Quick Network Multimedia PrintSupport SvgWidgets REQUIRED)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Qml Quick Network Multimedia PrintSupport REQUIRED)
 qt_policy(SET QTP0001 NEW)
 qt_standard_project_setup()
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(gphoto2 REQUIRED IMPORTED_TARGET libgphoto2)
 message(STATUS "Found gphoto2 ${gphoto2_VERSION}")
-
-find_package(fmt CONFIG REQUIRED)
 
 add_subdirectory(Photobox)
 
