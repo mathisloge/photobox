@@ -1,6 +1,6 @@
 #pragma once
 #include <QThread>
-#include "GPhoto2CameraX.hpp"
+#include "GPhoto2CameraImpl.hpp"
 
 namespace Pbox
 {
@@ -23,6 +23,6 @@ class GPhoto2Worker : public QThread
   private:
     bool running_{true};
     std::atomic_bool capture_requested_{false};
-    GPhoto2CameraX camera_;
+    GPhoto2CameraImpl camera_;
 };
 } // namespace Pbox

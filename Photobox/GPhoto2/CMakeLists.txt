@@ -14,8 +14,8 @@ target_link_libraries(PhotoboxGPhoto2 PUBLIC
 target_include_directories(PhotoboxGPhoto2 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_sources(PhotoboxGPhoto2 PRIVATE
-    GPhoto2CameraX.cpp
-    GPhoto2CameraX.hpp
+    GPhoto2CameraImpl.cpp
+    GPhoto2CameraImpl.hpp
     GPhoto2Context.cpp
     GPhoto2Context.hpp
     GPhoto2List.cpp

@@ -21,12 +21,12 @@ CameraUniquePtr make_gphoto2_camera();
 using GPPortInfoListUniquePtr = std::unique_ptr<GPPortInfoList, decltype(&gp_port_info_list_free)>;
 GPPortInfoListUniquePtr make_gphoto2_port_info_list();
 
-class GPhoto2CameraX
+class GPhoto2CameraImpl
 {
   public:
-    GPhoto2CameraX();
-    ~GPhoto2CameraX();
-    Q_DISABLE_COPY_MOVE(GPhoto2CameraX);
+    GPhoto2CameraImpl();
+    ~GPhoto2CameraImpl();
+    Q_DISABLE_COPY_MOVE(GPhoto2CameraImpl);
 
     GPContext *context();
     Camera *camera();
@@ -38,6 +38,6 @@ class GPhoto2CameraX
     CameraAbilitiesListUniquePtr camera_abilities_list_{make_camera_abilities_list()};
     GPPortInfoListUniquePtr port_list_{make_gphoto2_port_info_list()};
     CameraUniquePtr camera_{nullptr, CameraDeleter{context_}};
-    CameraAbilities camera_abilities_;
+    CameraAbilities camera_abilities_{};
 };
 } // namespace Pbox

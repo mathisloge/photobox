@@ -1,10 +1,10 @@
-#include "GPhoto2CameraX.hpp"
+#include "GPhoto2CameraImpl.hpp"
 #include <QDebug>
 #include "GPhoto2List.hpp"
 namespace Pbox
 {
 
-GPhoto2CameraX::GPhoto2CameraX()
+GPhoto2CameraImpl::GPhoto2CameraImpl()
 {
     Q_ASSERT(context_ != nullptr);
     Q_ASSERT(camera_abilities_list_ != nullptr);
@@ -15,9 +15,9 @@ GPhoto2CameraX::GPhoto2CameraX()
     }
 }
 
-GPhoto2CameraX::~GPhoto2CameraX() = default;
+GPhoto2CameraImpl::~GPhoto2CameraImpl() = default;
 
-bool GPhoto2CameraX::autodetectAndConnectCamera()
+bool GPhoto2CameraImpl::autodetectAndConnectCamera()
 {
     auto cam_list = make_camera_list();
     const auto auto_detect_count = gp_camera_autodetect(cam_list.get(), context_.get());
@@ -92,17 +92,17 @@ bool GPhoto2CameraX::autodetectAndConnectCamera()
     return true;
 }
 
-void GPhoto2CameraX::closeCamera()
+void GPhoto2CameraImpl::closeCamera()
 {
     camera_ = nullptr;
 }
 
-GPContext *GPhoto2CameraX::context()
+GPContext *GPhoto2CameraImpl::context()
 {
     return context_.get();
 }
 
-Camera *GPhoto2CameraX::camera()
+Camera *GPhoto2CameraImpl::camera()
 {
     return camera_.get();
 }
