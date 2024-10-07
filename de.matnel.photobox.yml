@@ -30,6 +30,9 @@ modules:
     buildsystem: cmake-ninja
     config-opts:
       - -DCMAKE_BUILD_TYPE=Release
+      - -DFMT_TEST=OFF
+      - -DFMT_DOC=OFF
+      - -DFMT_INSTALL=ON
     sources:
       - type: git
         url: https://github.com/fmtlib/fmt
@@ -39,6 +42,8 @@ modules:
     buildsystem: cmake-ninja
     config-opts:
       - -DCMAKE_BUILD_TYPE=Release
+      - -DJSON_BuildTests=OFF
+      - -DJSON_Install=ON
     sources:
       - type: git
         url: https://github.com/nlohmann/json
