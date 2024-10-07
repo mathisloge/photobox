@@ -21,6 +21,7 @@
             "installDir": "${sourceDir}/dist",
             "displayName": "Developer Config",
             "description": "The developer configuration",
+            "toolchainFile": "/home/mathis/dev/vcpkg/scripts/buildsystems/vcpkg.cmake",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
                 "BUILD_TESTING": true,

@@ -1,0 +1,10 @@
+{
+    "name": "photobox",
+    "version-string": "main",
+    "dependencies": [
+        "fmt",
+        "lunasvg",
+        "catch2",
+        "nlohmann-json"
+    ]
+}
