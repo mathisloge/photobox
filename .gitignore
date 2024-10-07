@@ -4,3 +4,6 @@ venv
 .esphome
 outdir
 dist
+flatpak-build
+.flatpak-builder
+compile_commands.json

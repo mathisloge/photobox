@@ -10,10 +10,10 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
+include(CPM)
 include(CTest)
-include(get_cpm)
 
-CPMAddPackage("gh:sammycage/lunasvg#6e138c0778b23964a33135e3015acb2a6ddec7d7")
+CPMAddPackage(NAME GITHUB_REPOSITORY "sammycage/lunasvg" GIT_TAG "6e138c0778b23964a33135e3015acb2a6ddec7d7" FIND_PACKAGE_ARGUMENTS "CONFIG" VERSION 2)
 CPMAddPackage("gh:nlohmann/json@3.11.3")
 CPMAddPackage("gh:fmtlib/fmt#11.0.2")
 

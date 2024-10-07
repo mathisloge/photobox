@@ -1,0 +1,37 @@
+id: de.matnel.photobox
+runtime: org.kde.Platform
+runtime-version: "6.7"
+sdk: org.kde.Sdk
+command: PhotoboxApp
+finish-args:
+  - --share=ipc
+  - --share=network
+  - --socket=fallback-x11
+  - --socket=wayland
+  - --device=all
+  - --filesystem=host
+modules:
+  - name: lunasvg
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DFETCHCONTENT_FULLY_DISCONNECTED=ON
+      - -DFETCHCONTENT_SOURCE_DIR_PLUTOVG=deps/plutovg
+    sources:
+      - type: git
+        url: https://github.com/sammycage/plutovg.git
+        commit: 2bc7f706d7451b3697c9afba49a69954e80dfae4
+        dest: deps/plutovg
+      - type: git
+        url: https://github.com/sammycage/lunasvg.git
+        commit: 6e138c0778b23964a33135e3015acb2a6ddec7d7
+
+  - name: DigitalerApp
+    buildsystem: cmake
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=RelWithDebInfo
+      - -DBUILD_TESTING=OFF
+      - -DCPM_LOCAL_PACKAGES_ONLY=ON
+    sources:
+      - type: dir
+        path: .

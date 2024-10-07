@@ -1,0 +1,9 @@
+[Flatpak Ref]
+Title=Photobox
+Name=de.matnel.photobox
+Branch=master
+Url=https://digitaler-flatpak-digitaler-74fcfc965b1ecda106712bf9c80c7c5a0ca.pages.ssc-os.local/
+SuggestRemoteName=de.matnel.photobox
+Homepage=https://gitlab.ssc-os.local/digitaler/digitaler-device
+RuntimeRepo=https://dl.flathub.org/repo/flathub.flatpakrepo
+IsRuntime=false
