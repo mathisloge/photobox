@@ -38,19 +38,31 @@ int main(int argc, char *argv[])
         QStringList() << "printer-settings", "The printer_settings.json file", "path to file", "printer_settings.json");
     parser.addOption(printer_settings_option);
 
+    QCommandLineOption developer_option(QStringList{"dev"}, "Use developer mode");
+    parser.addOption(developer_option);
+
     parser.process(app);
 
     const QString capture_directory = parser.value(capture_directory_option);
     const QString collage_directory = parser.value(collage_directory_option);
     const QString printer_settings = parser.value(printer_settings_option);
+    const bool developer_mode = parser.isSet(developer_option);
 
     qDebug() << "capture_directory =" << capture_directory;
     qDebug() << "collage_directory =" << collage_directory;
     qDebug() << "printer_settings =" << printer_settings;
+    qDebug() << "developer_mode" << developer_mode;
 
     std::shared_ptr<PhotoTriggerClient> photo_trigger_client = std::make_shared<PhotoTriggerClient>();
-    // std::shared_ptr<ICamera> camera = std::make_shared<GPhoto2Camera>();
-    std::shared_ptr<ICamera> camera = std::make_shared<MockCamera>();
+    std::shared_ptr<ICamera> camera;
+    if (not developer_mode)
+    {
+        camera = std::make_shared<GPhoto2Camera>();
+    }
+    else
+    {
+        camera = std::make_shared<MockCamera>();
+    }
 
     auto capture_controller =
         std::make_shared<CaptureController>(collage_directory.toStdString(),

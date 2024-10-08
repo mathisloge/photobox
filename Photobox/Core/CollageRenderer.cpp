@@ -88,6 +88,11 @@ void CollageRenderer::updateLayout()
 
 lunasvg::Bitmap CollageRenderer::scaledBitmap(float width, float height) const
 {
+    if (not document_)
+    {
+        return lunasvg::Bitmap{};
+    }
+
     if (width > 0 and height > 0)
     {
         const float scale_width = static_cast<float>(width) / document_->width();
@@ -110,6 +115,10 @@ lunasvg::Bitmap CollageRenderer::scaledBitmap(float width, float height) const
 void CollageRenderer::render(QPainter *painter, float width, float height) const
 {
     const auto bitmap = scaledBitmap(width, height);
+    if (bitmap.isNull())
+    {
+        return;
+    }
     const QImage pixmap{bitmap.data(), bitmap.width(), bitmap.height(), QImage::Format::Format_ARGB32_Premultiplied};
 
     painter->save();

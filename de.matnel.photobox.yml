@@ -2,7 +2,7 @@ id: de.matnel.photobox
 runtime: org.kde.Platform
 runtime-version: "6.7"
 sdk: org.kde.Sdk
-command: PhotoboxApp
+command: launcher.sh
 finish-args:
   - --share=ipc
   - --share=network
@@ -20,11 +20,11 @@ modules:
     sources:
       - type: git
         url: https://github.com/sammycage/plutovg.git
-        commit: 2bc7f706d7451b3697c9afba49a69954e80dfae4
+        commit: 0d4773ba43116a79fa92f6dc0db07120ba9dce9b
         dest: deps/plutovg
       - type: git
         url: https://github.com/sammycage/lunasvg.git
-        commit: 6e138c0778b23964a33135e3015acb2a6ddec7d7
+        commit: 80acde9b87980d35a57b21defcc81b0fdd5835ea
 
   - name: fmt
     buildsystem: cmake-ninja
