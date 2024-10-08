@@ -11,6 +11,35 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
 include(CTest)
+include(FetchContent)
+FetchContent_Declare(
+  lunasvg
+  GIT_REPOSITORY https://github.com/sammycage/lunasvg.git
+  GIT_TAG        6e138c0778b23964a33135e3015acb2a6ddec7d7
+  FIND_PACKAGE_ARGS
+)
+FetchContent_Declare(
+  fmt
+  GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+  GIT_TAG        11.0.2
+  FIND_PACKAGE_ARGS
+)
+FetchContent_Declare(
+    nlohmann_json
+    GIT_REPOSITORY https://github.com/nlohmann/json.git
+    GIT_TAG        v3.11.3
+    FIND_PACKAGE_ARGS
+)
+if(BUILD_TESTING)
+    FetchContent_Declare(
+    Catch2
+    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+    GIT_TAG        v3.7.1
+    FIND_PACKAGE_ARGS
+    )
+endif()
+FetchContent_MakeAvailable(lunasvg fmt nlohmann_json)
+
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Qml Quick Network Multimedia PrintSupport REQUIRED)
 qt_policy(SET QTP0001 NEW)
@@ -26,7 +55,8 @@ message(STATUS "Found gphoto2 ${gphoto2_VERSION}")
 add_subdirectory(Photobox)
 
 if(BUILD_TESTING)
-    CPMAddPackage("gh:catchorg/Catch2@3.7.1")
+    FetchContent_MakeAvailable(Catch2)
+    find_package(Catch2 CONFIG REQUIRED)
     list(APPEND CMAKE_MODULE_PATH "${Catch2_SOURCE_DIR}/extras")
 
     include(Catch)

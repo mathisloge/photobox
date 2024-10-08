@@ -62,8 +62,8 @@ modules:
     buildsystem: cmake-ninja
     config-opts:
       - -DCMAKE_BUILD_TYPE=RelWithDebInfo
+      - -DFETCHCONTENT_FULLY_DISCONNECTED=ON
       - -DBUILD_TESTING=OFF
-      - -DCPM_LOCAL_PACKAGES_ONLY=ON
     sources:
       - type: dir
         path: .
