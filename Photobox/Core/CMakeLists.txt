@@ -34,7 +34,7 @@ target_link_libraries(PhotoboxCore PUBLIC
     Qt6::Quick
     Qt6::PrintSupport
     Qt6::Multimedia
-    lunasvg
+    lunasvg::lunasvg
     nlohmann_json::nlohmann_json
     fmt::fmt
 )
