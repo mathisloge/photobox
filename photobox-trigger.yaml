@@ -15,8 +15,8 @@ ota:
     password: ""
 
 wifi:
-  ssid: "Vodafone-DC33"
-  password: "tc7BP8nAdqQ7TmuF"
+  ssid: "photobox"
+  password: "photobox4matnel"
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:

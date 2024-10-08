@@ -19,7 +19,7 @@ class PhotoTriggerClient : public QObject
     };
     Q_ENUM(Effect);
 
-    PhotoTriggerClient();
+    PhotoTriggerClient(QUrl base_url);
     ~PhotoTriggerClient() override;
     Q_DISABLE_COPY_MOVE(PhotoTriggerClient);
 
@@ -34,6 +34,7 @@ class PhotoTriggerClient : public QObject
     void setupRequestReply(QNetworkReply *reply);
 
   private:
+    QUrl base_url_;
     bool trigger_state_{false};
     QNetworkAccessManager net_manager_;
 };

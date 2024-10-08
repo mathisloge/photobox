@@ -18,11 +18,11 @@ QNetworkRequest prepareRequest(const QUrl &url)
 }
 } // namespace
 
-PhotoTriggerClient::PhotoTriggerClient()
+PhotoTriggerClient::PhotoTriggerClient(QUrl base_url)
+    : base_url_{std::move(base_url)}
 {
     net_manager_.setAutoDeleteReplies(true);
-
-    QNetworkRequest request = prepareRequest(QUrl("http://192.168.0.31/events"));
+    QNetworkRequest request = prepareRequest(base_url_.resolved(QStringLiteral("events")));
     auto *reply = net_manager_.get(request);
 
     connect(reply, &QNetworkReply::readyRead, this, [this, reply]() {
@@ -91,7 +91,7 @@ void PhotoTriggerClient::playEffect(Effect new_effect)
     {
         return;
     }
-    QNetworkRequest req{QStringLiteral("http://192.168.0.31/light/statuslight/turn_on?effect=%1").arg(it->second)};
+    QNetworkRequest req{base_url_.resolved(QStringLiteral("light/statuslight/turn_on?effect=%1").arg(it->second))};
     qDebug() << "Request" << req.url();
     req.setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader, "text/plain;charset=UTF-8"_L1);
     auto &&reply = net_manager_.post(req, QByteArray{});
