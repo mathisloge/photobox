@@ -15,8 +15,9 @@ ota:
     password: ""
 
 wifi:
-  ssid: "photobox"
-  password: "photobox4matnel"
+  ssid: "photobox.matnel.de"
+  password: "photobox"
+  fast_connect: true
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
@@ -40,10 +41,6 @@ binary_sensor:
     filters:
       - delayed_on: 10ms
       - delayed_off: 10ms
-
-status_led:
-  pin:
-    number: GPIO8
 
 light:
   - platform: esp32_rmt_led_strip
