@@ -129,7 +129,7 @@ ApplicationWindow {
 
                 anchors.fill: parent
                 visible: running
-                initialCount: 10
+                initialCount: 1
             }
 
             MouseArea {
@@ -229,6 +229,7 @@ ApplicationWindow {
 
                         onEntered: {
                             ApplicationState.captureController.captureImage();
+                            stack.push(busyComponent);
                         }
 
                         DSM.SignalTransition {
@@ -246,8 +247,28 @@ ApplicationWindow {
                         }
 
                         DSM.TimeoutTransition {
-                            targetState: ApplicationState.captureController.collageComplete ? stateShowCollageFinal : statePreview
+                            targetState: ApplicationState.captureController.collageComplete ? stateBusyCaptureWait : statePreview
                             timeout: 5000
+                        }
+
+                        DSM.SignalTransition {
+                            signal: ApplicationState.captureController.collageCaptureComplete
+                            guard: ApplicationState.captureController.collageComplete
+                            targetState: stateShowCollageFinal
+                        }
+
+                    }
+
+                    DSM.State {
+                        id: stateBusyCaptureWait
+
+                        onEntered: {
+                            stack.push(busyComponent);
+                        }
+
+                        DSM.SignalTransition {
+                            signal: ApplicationState.captureController.collageCaptureComplete
+                            targetState: stateShowCollageFinal
                         }
 
                     }
@@ -288,6 +309,14 @@ ApplicationWindow {
 
         PreviewImage {
             source: "file://" + ApplicationState.captureController.collageImagePath
+        }
+
+    }
+
+    Component {
+        id: busyComponent
+
+        BusyPage {
         }
 
     }

@@ -5,6 +5,7 @@ qt_add_qml_module(
     QML_FILES
         Countdown.qml
         PreviewImage.qml
+        BusyPage.qml
     RESOURCES
         ImageBorder.svg
 )
