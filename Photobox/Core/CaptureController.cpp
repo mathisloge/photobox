@@ -131,6 +131,10 @@ bool CaptureController::isCollageComplete() const
 
 QString CaptureController::getCollageImagePath()
 {
+    if (collage_image_path_.empty())
+    {
+        return "";
+    }
     return QString::fromStdString(std::filesystem::absolute(collage_image_path_));
 }
 

@@ -31,7 +31,15 @@ void from_json(const json &j, QPageLayout &l)
 
 void from_json(const json &j, QPrinter &l)
 {
-    l.setPrinterName(QString::fromStdString(j.at("name").get<std::string>()));
+    const auto name = j.at("name").get<std::string>();
+    if (name.empty())
+    {
+        l.setOutputFileName("collage.pdf");
+    }
+    else
+    {
+        l.setPrinterName(QString::fromStdString(name));
+    }
     QPageLayout layout;
     j.at("pageLayout").get_to(layout);
     l.setPageLayout(layout);
@@ -49,8 +57,6 @@ CollagePrinter::CollagePrinter(const std::filesystem::path &settings)
     settings_file >> json;
 
     json.get_to(*printer_);
-
-    printer_->setOutputFileName("collage.pdf");
     printer_->setResolution(1000);
 }
 

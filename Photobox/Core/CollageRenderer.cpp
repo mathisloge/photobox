@@ -18,7 +18,7 @@ void init_lunasvg()
         }
         static const auto data = great_vibes.readAll();
         lunasvg_add_font_face_from_data(
-            "Great Vibes",
+            "",
             false,
             false,
             data.data(),
@@ -30,11 +30,12 @@ void init_lunasvg()
         //     false,
         //     false,
         //     "/home/mathis/dev/photobox2/Photobox/Core/Fonts/GreatVibes/GreatVibes-Regular.ttf");
-        //  lunasvg_add_font_face_from_file("", false, false, "/home/mathis/dev/photobox2/test/Roboto-Regular.ttf");
-        //  lunasvg_add_font_face_from_file("", false, false, "/home/mathis/dev/photobox2/test/Roboto-Regular.ttf");
-        //  lunasvg_add_font_face_from_file("", true, false, "/home/mathis/dev/photobox2/test/Roboto-Bold.ttf");
-        //  lunasvg_add_font_face_from_file("", false, true, "/home/mathis/dev/photobox2/test/Roboto-Italic.ttf");
-        //  lunasvg_add_font_face_from_file("", true, true, "/home/mathis/dev/photobox2/test/Roboto-BoldItalic.ttf");
+        //  lunasvg_add_font_face_from_file("Roboto", false, false,
+        //  "/home/mathis/dev/photobox2/test/Roboto-Regular.ttf"); lunasvg_add_font_face_from_file("", false, false,
+        //  "/home/mathis/dev/photobox2/test/Roboto-Regular.ttf"); lunasvg_add_font_face_from_file("", true, false,
+        //  "/home/mathis/dev/photobox2/test/Roboto-Bold.ttf"); lunasvg_add_font_face_from_file("", false, true,
+        //  "/home/mathis/dev/photobox2/test/Roboto-Italic.ttf"); lunasvg_add_font_face_from_file("", true, true,
+        //  "/home/mathis/dev/photobox2/test/Roboto-BoldItalic.ttf");
     });
 }
 
