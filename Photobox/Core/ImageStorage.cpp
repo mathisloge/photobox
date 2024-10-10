@@ -58,7 +58,15 @@ ImageStorage::ImageStorage(std::filesystem::path storage_dir)
     }
     else
     {
-        std::filesystem::create_directories(storage_dir_);
+        try
+        {
+            std::filesystem::create_directories(storage_dir_);
+            image_counter_ = 1;
+        }
+        catch (const std::exception &exception)
+        {
+            qCritical() << exception.what();
+        }
     }
 }
 
