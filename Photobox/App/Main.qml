@@ -129,7 +129,7 @@ ApplicationWindow {
 
                 anchors.fill: parent
                 visible: running
-                initialCount: 1
+                initialCount: 10
             }
 
             MouseArea {
