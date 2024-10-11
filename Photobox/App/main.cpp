@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlExtensionPlugin>
+#include <QWindow>
 #include <ApplicationState.hpp>
 #include <CameraImageProvider.hpp>
 #include <CaptureController.hpp>
@@ -45,6 +46,10 @@ int main(int argc, char *argv[])
         QStringList() << "trigger-btn", "The hostname of the trigger button", "url", "http://192.168.0.31");
     parser.addOption(trigger_button_host_option);
 
+    QCommandLineOption fullscreen_option{QStringList{QStringLiteral("f"), QStringLiteral("fullscreen")},
+                                         QStringLiteral("shows the application in fullscreen mode")};
+    parser.addOption(fullscreen_option);
+
     parser.process(app);
 
     const QString capture_directory = parser.value(capture_directory_option);
@@ -52,12 +57,15 @@ int main(int argc, char *argv[])
     const QString printer_settings = parser.value(printer_settings_option);
     const bool developer_mode = parser.isSet(developer_option);
     const QString trigger_button_host = parser.value(trigger_button_host_option);
+    const QWindow::Visibility window_mode =
+        parser.isSet(fullscreen_option) ? QWindow::Visibility::FullScreen : QWindow::Visibility::Windowed;
 
     qDebug() << "capture_directory =" << capture_directory;
     qDebug() << "collage_directory =" << collage_directory;
     qDebug() << "printer_settings =" << printer_settings;
-    qDebug() << "developer_mode" << developer_mode;
-    qDebug() << "trigger_button_host" << trigger_button_host;
+    qDebug() << "developer_mode=" << developer_mode;
+    qDebug() << "trigger_button_host=" << trigger_button_host;
+    qDebug() << "window_mode=" << window_mode;
 
     std::shared_ptr<PhotoTriggerClient> photo_trigger_client =
         std::make_shared<PhotoTriggerClient>(trigger_button_host);
@@ -79,6 +87,9 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
 
+    engine.setInitialProperties({
+        {"visibility", window_mode},
+    });
     auto &&app_state = engine.singletonInstance<ApplicationState *>("Photobox.Core", "ApplicationState");
     Q_ASSERT(app_state != nullptr);
 
