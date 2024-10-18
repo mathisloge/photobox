@@ -2,7 +2,7 @@
 #include <QObject>
 #include <QtQmlIntegration>
 #include <ICamera.hpp>
-#include <PhotoTriggerClient.hpp>
+#include <RemoteTrigger.hpp>
 #include "CaptureController.hpp"
 
 namespace Pbox
@@ -13,18 +13,18 @@ class ApplicationState : public QObject
     QML_ELEMENT
     QML_SINGLETON
 
-    Q_PROPERTY(ICamera *camera READ getCamera CONSTANT)
-    Q_PROPERTY(PhotoTriggerClient *triggerClient READ getTriggerClient CONSTANT)
-    Q_PROPERTY(CaptureController *captureController READ getCaptureController CONSTANT)
+    Q_PROPERTY(Pbox::ICamera *camera READ getCamera CONSTANT)
+    Q_PROPERTY(Pbox::RemoteTrigger *remoteTrigger READ getRemoteTrigger CONSTANT)
+    Q_PROPERTY(Pbox::CaptureController *captureController READ getCaptureController CONSTANT)
   public:
     ICamera *getCamera()
     {
         return camera.get();
     }
 
-    PhotoTriggerClient *getTriggerClient()
+    RemoteTrigger *getRemoteTrigger() const
     {
-        return trigger_client.get();
+        return remote_trigger;
     }
 
     CaptureController *getCaptureController()
@@ -35,6 +35,6 @@ class ApplicationState : public QObject
   public:
     std::shared_ptr<CaptureController> capture_controller;
     std::shared_ptr<ICamera> camera;
-    std::shared_ptr<PhotoTriggerClient> trigger_client;
+    RemoteTrigger *remote_trigger;
 };
 } // namespace Pbox

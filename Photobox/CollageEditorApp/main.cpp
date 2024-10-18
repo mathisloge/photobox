@@ -1,4 +1,7 @@
 #include <QApplication>
+#include <QPainter>
+#include <QPrintDialog>
+#include <QPrinter>
 #include <QQmlApplicationEngine>
 #include <QQmlExtensionPlugin>
 #include <ApplicationState.hpp>
@@ -7,12 +10,6 @@
 #include <ICamera.hpp>
 #include <ImageStorage.hpp>
 #include <MockCamera.hpp>
-#include <PhotoTriggerClient.hpp>
-
-#include <QPainter>
-#include <QPrintDialog>
-#include <QPrinter>
-#include "CollageRenderer.hpp"
 
 Q_IMPORT_QML_PLUGIN(Photobox_CorePlugin)
 Q_IMPORT_QML_PLUGIN(Photobox_UiPlugin)

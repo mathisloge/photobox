@@ -12,8 +12,6 @@ qt_add_qml_module(
         ImageStorage.hpp
         ImageStorage.cpp
         ApplicationState.hpp
-        PhotoTriggerClient.cpp
-        PhotoTriggerClient.hpp
         CollageRenderer.hpp
         CollageRenderer.cpp
         CaptureController.hpp
@@ -21,6 +19,8 @@ qt_add_qml_module(
         CollageSettings.hpp
         CollagePrinter.hpp
         CollagePrinter.cpp
+        RemoteTrigger.cpp
+        RemoteTrigger.hpp
     RESOURCES
         Fonts/GreatVibes/GreatVibes-Regular.ttf
         Fonts/Roboto/Roboto-Bold.ttf
