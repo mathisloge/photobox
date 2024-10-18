@@ -12,6 +12,9 @@ jobs:
       matrix:
         branch: [main] # list all branches to check
 
+    permissions:
+      pull-requests: write
+
     steps:
       - uses: actions/checkout@v4
         with:
