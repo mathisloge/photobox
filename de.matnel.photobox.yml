@@ -23,10 +23,12 @@ modules:
       - type: git
         url: https://github.com/sammycage/plutovg.git
         commit: 0d4773ba43116a79fa92f6dc0db07120ba9dce9b
+        branch: main
         dest: deps/plutovg
       - type: git
         url: https://github.com/sammycage/lunasvg.git
         commit: 80acde9b87980d35a57b21defcc81b0fdd5835ea
+        branch: master
 
   - name: fmt
     buildsystem: cmake-ninja
