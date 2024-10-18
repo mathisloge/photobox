@@ -6,11 +6,12 @@
 #include <CameraImageProvider.hpp>
 #include <CaptureController.hpp>
 #include <CollagePrinter.hpp>
+#include <EspHomeClient.hpp>
+#include <EspHomeRemoteTrigger.hpp>
 #include <GPhoto2Camera.hpp>
 #include <ICamera.hpp>
 #include <ImageStorage.hpp>
 #include <MockCamera.hpp>
-#include <PhotoTriggerClient.hpp>
 
 Q_IMPORT_QML_PLUGIN(Photobox_CorePlugin)
 Q_IMPORT_QML_PLUGIN(Photobox_UiPlugin)
@@ -67,8 +68,8 @@ int main(int argc, char *argv[])
     qDebug() << "trigger_button_host=" << trigger_button_host;
     qDebug() << "window_mode=" << window_mode;
 
-    std::shared_ptr<PhotoTriggerClient> photo_trigger_client =
-        std::make_shared<PhotoTriggerClient>(trigger_button_host);
+    std::unique_ptr<RemoteTrigger> remote_trigger =
+        std::make_unique<EspHomeRemoteTrigger>(std::make_unique<EspHomeClient>(trigger_button_host));
     std::shared_ptr<ICamera> camera;
     if (not developer_mode)
     {
@@ -94,7 +95,7 @@ int main(int argc, char *argv[])
     Q_ASSERT(app_state != nullptr);
 
     app_state->camera = camera;
-    app_state->trigger_client = photo_trigger_client;
+    app_state->remote_trigger = remote_trigger.get();
     app_state->capture_controller = capture_controller;
 
     engine.loadFromModule("Photobox.App", "Main");

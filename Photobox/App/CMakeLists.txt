@@ -11,6 +11,7 @@ target_link_libraries(PhotoboxApp PRIVATE
     PhotoboxGPhoto2
     PhotoboxGPhoto2plugin
     PhotoboxUiplugin
+    PhotoboxPeripheral
 )
 
 qt_add_qml_module(PhotoboxApp

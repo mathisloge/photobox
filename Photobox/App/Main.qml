@@ -150,11 +150,11 @@ ApplicationWindow {
                     onEntered: {
                         stack.pop(null);
                         videoOutput.opacity = 1;
-                        ApplicationState.triggerClient.playEffect(PhotoTriggerClient.Idle);
+                        ApplicationState.remoteTrigger.playEffect(RemoteTrigger.Idle);
                     }
 
                     DSM.SignalTransition {
-                        signal: ApplicationState.triggerClient.triggered
+                        signal: ApplicationState.remoteTrigger.triggered
                         targetState: collageCapture
                     }
 
@@ -179,11 +179,11 @@ ApplicationWindow {
                         onEntered: {
                             stack.pop(null);
                             videoOutput.opacity = 1;
-                            ApplicationState.triggerClient.playEffect(PhotoTriggerClient.Idle);
+                            ApplicationState.remoteTrigger.playEffect(RemoteTrigger.Idle);
                         }
 
                         DSM.SignalTransition {
-                            signal: ApplicationState.triggerClient.triggered
+                            signal: ApplicationState.remoteTrigger.triggered
                             targetState: stateBeginCountdown
                         }
 
@@ -199,7 +199,7 @@ ApplicationWindow {
 
                         onEntered: {
                             countdown.running = true;
-                            ApplicationState.triggerClient.playEffect(PhotoTriggerClient.Countdown);
+                            ApplicationState.remoteTrigger.playEffect(RemoteTrigger.Countdown);
                         }
 
                         DSM.SignalTransition {
