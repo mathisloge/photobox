@@ -14,7 +14,7 @@ class EspHomeClient : public IEspHomeClient
     void post(std::string_view url_request) override;
 
   private:
-    void subsribeEvents();
+    void subscribeEvents();
     void readEventReply(QNetworkReply &reply);
 
   private:

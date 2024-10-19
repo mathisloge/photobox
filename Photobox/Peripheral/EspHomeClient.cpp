@@ -22,7 +22,7 @@ EspHomeClient::EspHomeClient(QUrl base_url)
     : base_url_{std::move(base_url)}
 {
     net_manager_.setAutoDeleteReplies(true);
-    subsribeEvents();
+    subscribeEvents();
 }
 
 EspHomeClient::~EspHomeClient() = default;
@@ -38,7 +38,7 @@ void EspHomeClient::post(std::string_view url_request)
     connect(reply, &QNetworkReply::sslErrors, this, []() { qDebug() << "ssl error"; });
 }
 
-void EspHomeClient::subsribeEvents()
+void EspHomeClient::subscribeEvents()
 {
     QNetworkRequest request = prepareRequest(base_url_.resolved(QStringLiteral("events")));
     auto *reply = net_manager_.get(request);
@@ -46,7 +46,7 @@ void EspHomeClient::subsribeEvents()
     connect(reply, &QNetworkReply::readyRead, this, [this, reply]() { readEventReply(*reply); });
     connect(reply, &QNetworkReply::errorOccurred, this, [this](QNetworkReply::NetworkError error_code) {
         qDebug() << "error for event stream: " << error_code << ". Try to reestablishing connection in 500ms";
-        QTimer::singleShot(std::chrono::milliseconds{500}, this, &EspHomeClient::subsribeEvents);
+        QTimer::singleShot(std::chrono::milliseconds{500}, this, &EspHomeClient::subscribeEvents);
     });
 }
 

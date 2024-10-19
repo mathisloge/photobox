@@ -15,7 +15,7 @@ include(FetchContent)
 FetchContent_Declare(
   lunasvg
   GIT_REPOSITORY https://github.com/sammycage/lunasvg.git
-  GIT_TAG        6e138c0778b23964a33135e3015acb2a6ddec7d7
+  GIT_TAG        3769b62f762414f236a4886d08cb1d50ae1e5b36
   FIND_PACKAGE_ARGS
 )
 FetchContent_Declare(
