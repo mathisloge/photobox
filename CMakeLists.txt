@@ -44,6 +44,7 @@ FetchContent_Declare(
   FIND_PACKAGE_ARGS
 )
 if(BUILD_TESTING)
+    set(CATCH_INSTALL_DOCS OFF)
     FetchContent_Declare(
         Catch2
         GIT_REPOSITORY https://github.com/catchorg/Catch2.git
