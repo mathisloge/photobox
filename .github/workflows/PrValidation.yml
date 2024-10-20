@@ -10,7 +10,7 @@ jobs:
 
     steps:
       - name: Install deps
-        run: sudo apt update && sudo apt install -y ninja-build libgphoto2
+        run: sudo apt update && sudo apt install -y ninja-build libgphoto2-dev
 
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
