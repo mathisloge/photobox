@@ -19,6 +19,7 @@ jobs:
           install-deps: true
           set-env: true
           cache: true
+          modules: 'qtqml qtnetwork qtmultimedia qtprintsupport'
 
       - uses: actions/checkout@v4
       - name: Run workflow
