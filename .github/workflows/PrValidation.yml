@@ -9,8 +9,12 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
+      - uses: actions/checkout@v4
+
       - name: Install deps
         run: sudo apt update && sudo apt install -y ninja-build libgphoto2-dev
+
+      - uses: hendrikmuhs/ccache-action@v1.2
 
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
@@ -21,6 +25,5 @@ jobs:
           cache: true
           modules: 'qtscxml qtmultimedia'
 
-      - uses: actions/checkout@v4
       - name: Run workflow
-        run: cmake --workflow --preset ci
+        run: cmake --workflow --preset ci -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
