@@ -5,6 +5,8 @@ add_executable(tests
     main.cpp
     CollageRendererTest.cpp
     TestEspHomeRemoteTrigger.cpp
+    pixel_match.cpp
+    pixel_match.hpp
 )
 target_link_libraries(tests PRIVATE
     Qt6::Test
@@ -12,4 +14,8 @@ target_link_libraries(tests PRIVATE
     PhotoboxCore
     PhotoboxPeripheral
 )
+target_include_directories(tests PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
 catch_discover_tests(tests)
+
+set(asset_path "${CMAKE_CURRENT_SOURCE_DIR}/assets")
+configure_file(TestAssets.hpp.in TestAssets.hpp)

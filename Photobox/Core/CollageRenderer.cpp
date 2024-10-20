@@ -16,13 +16,28 @@ void init_lunasvg()
         {
             qDebug() << "Could not open resource";
         }
-        static const auto data = great_vibes.readAll();
+        static const auto great_vibes_data = great_vibes.readAll();
         lunasvg_add_font_face_from_data(
-            "",
+            "Great Vibes",
             false,
             false,
-            data.data(),
-            data.size(),
+            great_vibes_data.data(),
+            great_vibes_data.size(),
+            [](void *closure) { qDebug() << "data loaded and can be deleted"; },
+            nullptr);
+
+        QFile roboto{":/qt/qml/Photobox/Core/Fonts/Roboto/Roboto-Regular.ttf"};
+        if (not roboto.open(QFile::OpenModeFlag::ReadOnly))
+        {
+            qDebug() << "Could not open resource";
+        }
+        static const auto roboto_data = roboto.readAll();
+        lunasvg_add_font_face_from_data(
+            "Roboto",
+            false,
+            false,
+            roboto_data.data(),
+            roboto_data.size(),
             [](void *closure) { qDebug() << "data loaded and can be deleted"; },
             nullptr);
         // lunasvg_add_font_face_from_file(
