@@ -9,7 +9,8 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - uses: seanmiddleditch/gha-setup-ninja@v5
+      - name: Install deps
+        run: sudo apt install -y ninja-build
 
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
