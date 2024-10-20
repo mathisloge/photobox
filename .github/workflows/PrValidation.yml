@@ -8,7 +8,7 @@ jobs:
   build-test:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/${{ github.repository }}/build-context
+      image: ghcr.io/${{ github.repository }}/build-context:main
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
