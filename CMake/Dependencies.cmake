@@ -1,0 +1,43 @@
+macro(declare_photobox_dependencies)
+    set(LUNASVG_BUILD_EXAMPLES OFF)
+    FetchContent_Declare(
+    lunasvg
+    GIT_REPOSITORY https://github.com/sammycage/lunasvg.git
+    GIT_TAG        3769b62f762414f236a4886d08cb1d50ae1e5b36
+    FIND_PACKAGE_ARGS
+    )
+    set(FMT_INSTALL OFF)
+    set(FMT_TEST OFF)
+    FetchContent_Declare(
+    fmt
+    GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+    GIT_TAG        11.0.2
+    FIND_PACKAGE_ARGS
+    )
+    set(JSON_BuildTests OFF)
+    set(JSON_Install OFF)
+    FetchContent_Declare(
+        nlohmann_json
+        GIT_REPOSITORY https://github.com/nlohmann/json.git
+        GIT_TAG        v3.11.3
+        FIND_PACKAGE_ARGS
+    )
+    set(STDEXEC_BUILD_TESTS OFF)
+    set(STDEXEC_BUILD_EXAMPLES OFF)
+    FetchContent_Declare(
+    stdexec
+    GIT_REPOSITORY https://github.com/NVIDIA/stdexec.git
+    GIT_TAG        4d8d1944126fbc17d15894341f92838ef5db66cc
+    FIND_PACKAGE_ARGS
+    )
+    if(BUILD_TESTING)
+        set(CATCH_INSTALL_DOCS OFF)
+        FetchContent_Declare(
+            Catch2
+            GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+            GIT_TAG        v3.7.1
+            FIND_PACKAGE_ARGS
+        )
+    endif()
+    FetchContent_MakeAvailable(stdexec lunasvg fmt nlohmann_json)
+endmacro()
