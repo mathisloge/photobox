@@ -19,6 +19,8 @@ modules:
       - -DCMAKE_BUILD_TYPE=Release
       - -DFETCHCONTENT_FULLY_DISCONNECTED=ON
       - -DFETCHCONTENT_SOURCE_DIR_PLUTOVG=deps/plutovg
+      - -DLUNASVG_BUILD_EXAMPLES=OFF
+      - -DPLUTOVG_BUILD_EXAMPLES=OFF
     sources:
       - type: git
         url: https://github.com/sammycage/plutovg.git
