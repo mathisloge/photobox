@@ -28,4 +28,4 @@ jobs:
           modules: 'qtscxml qtmultimedia'
 
       - name: Run workflow
-        run: cmake --workflow --preset ci -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+        run: cmake --workflow --preset ci
