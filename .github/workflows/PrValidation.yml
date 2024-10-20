@@ -1,0 +1,15 @@
+name: Build and test
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ github.repository }}/build-context
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run workflow
+        run: cmake --workflow --preset ci
