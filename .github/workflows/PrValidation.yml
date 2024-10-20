@@ -1,0 +1,31 @@
+name: Build and test
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install deps
+        run: sudo apt update && sudo apt install -y ninja-build libgphoto2-dev
+
+      - uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          create-symlink: true
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.7.2'
+          install-deps: true
+          set-env: true
+          cache: true
+          modules: 'qtscxml qtmultimedia'
+
+      - name: Run workflow
+        run: cmake --workflow --preset ci

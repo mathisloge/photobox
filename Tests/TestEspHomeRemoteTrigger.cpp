@@ -26,7 +26,7 @@ class EspHomeClientMock : public IEspHomeClient
 };
 } // namespace
 
-TEST_CASE("CollageRenderer save as png", "[RemoteTrigger]")
+TEST_CASE("Test RemoteTrigger", "[RemoteTrigger]")
 {
     auto mock_obj_dont_use = std::make_unique<EspHomeClientMock>();
     auto *mock_ptr = mock_obj_dont_use.get();

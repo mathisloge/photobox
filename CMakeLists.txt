@@ -32,10 +32,10 @@ FetchContent_Declare(
 )
 if(BUILD_TESTING)
     FetchContent_Declare(
-    Catch2
-    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-    GIT_TAG        v3.7.1
-    FIND_PACKAGE_ARGS
+        Catch2
+        GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+        GIT_TAG        v3.7.1
+        FIND_PACKAGE_ARGS
     )
 endif()
 FetchContent_MakeAvailable(lunasvg fmt nlohmann_json)

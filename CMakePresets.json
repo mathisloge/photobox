@@ -32,16 +32,10 @@
             "displayName": "CI configuration",
             "inherits": "default",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
-            }
-        },
-        {
-            "name": "release",
-            "displayName": "Release configuration",
-            "inherits": "default",
-            "cacheVariables": {
-                "BUILD_TESTING": "OFF",
-                "CMAKE_BUILD_TYPE": "Release"
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+                "BUILD_TESTING": true,
+                "CMAKE_C_COMPILER_LAUNCHER": "ccache",
+                "CMAKE_CXX_COMPILER_LAUNCHER": "ccache"
             }
         }
     ],
@@ -53,10 +47,6 @@
         {
             "name": "ci",
             "configurePreset": "ci"
-        },
-        {
-            "name": "release",
-            "configurePreset": "release"
         }
     ],
     "testPresets": [
@@ -83,18 +73,6 @@
             }
         }
     ],
-    "packagePresets": [
-        {
-            "name": "ci",
-            "configurePreset": "ci",
-            "generators": ["RPM"]
-        },
-        {
-            "name": "release",
-            "configurePreset": "release",
-            "generators": ["RPM"]
-        }
-    ],
     "workflowPresets": [
         {
             "name": "ci",
@@ -110,27 +88,6 @@
                 {
                     "type": "test",
                     "name": "ci"
-                },
-                {
-                    "type": "package",
-                    "name": "ci"
-                }
-            ]
-        },
-        {
-            "name": "release",
-            "steps": [
-                {
-                    "type": "configure",
-                    "name": "release"
-                },
-                {
-                    "type": "build",
-                    "name": "release"
-                },
-                {
-                    "type": "package",
-                    "name": "release"
                 }
             ]
         }
