@@ -32,7 +32,8 @@
             "displayName": "CI configuration",
             "inherits": "default",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+                "BUILD_TESTING": true
             }
         },
         {
