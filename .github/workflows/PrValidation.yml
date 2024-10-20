@@ -7,17 +7,12 @@ on:
 jobs:
   build-test:
     runs-on: ubuntu-24.04
-    container:
-      image: ghcr.io/${{ github.repository }}/build-context:main
-      credentials:
-        username: ${{ github.actor }}
-        password: ${{ secrets.github_token }}
+
     steps:
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:
           version: '6.7'
-          dir: '${{ github.workspace }}/example/'
           install-deps: true
           cache: true
 
