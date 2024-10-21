@@ -21,6 +21,8 @@ qt_add_qml_module(
         CollagePrinter.cpp
         RemoteTrigger.cpp
         RemoteTrigger.hpp
+        CameraLed.cpp
+        CameraLed.hpp
         SvgFontCache.hpp
         SvgFontCache.cpp
     RESOURCES

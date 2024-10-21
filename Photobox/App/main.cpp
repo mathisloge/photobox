@@ -6,6 +6,7 @@
 #include <CameraImageProvider.hpp>
 #include <CaptureController.hpp>
 #include <CollagePrinter.hpp>
+#include <EspHomeCameraLed.hpp>
 #include <EspHomeClient.hpp>
 #include <EspHomeRemoteTrigger.hpp>
 #include <GPhoto2Camera.hpp>
@@ -47,6 +48,10 @@ int main(int argc, char *argv[])
         QStringList() << "trigger-btn", "The hostname of the trigger button", "url", "http://192.168.0.31");
     parser.addOption(trigger_button_host_option);
 
+    QCommandLineOption camera_led_host_option(
+        QStringList() << "camera-led", "The hostname of the camera led controller", "url", "http://192.168.0.31");
+    parser.addOption(camera_led_host_option);
+
     QCommandLineOption fullscreen_option{QStringList{QStringLiteral("f"), QStringLiteral("fullscreen")},
                                          QStringLiteral("shows the application in fullscreen mode")};
     parser.addOption(fullscreen_option);
@@ -58,6 +63,7 @@ int main(int argc, char *argv[])
     const QString printer_settings = parser.value(printer_settings_option);
     const bool developer_mode = parser.isSet(developer_option);
     const QString trigger_button_host = parser.value(trigger_button_host_option);
+    const QString camera_led_host = parser.value(camera_led_host_option);
     const QWindow::Visibility window_mode =
         parser.isSet(fullscreen_option) ? QWindow::Visibility::FullScreen : QWindow::Visibility::Windowed;
 
@@ -66,10 +72,13 @@ int main(int argc, char *argv[])
     qDebug() << "printer_settings =" << printer_settings;
     qDebug() << "developer_mode=" << developer_mode;
     qDebug() << "trigger_button_host=" << trigger_button_host;
+    qDebug() << "camera_led_host=" << camera_led_host;
     qDebug() << "window_mode=" << window_mode;
 
     std::unique_ptr<RemoteTrigger> remote_trigger =
         std::make_unique<EspHomeRemoteTrigger>(std::make_unique<EspHomeClient>(trigger_button_host));
+    std::unique_ptr<CameraLed> camera_led =
+        std::make_unique<EspHomeCameraLed>(std::make_unique<EspHomeClient>(camera_led_host));
     std::shared_ptr<ICamera> camera;
     if (not developer_mode)
     {
@@ -97,6 +106,7 @@ int main(int argc, char *argv[])
     app_state->camera = camera;
     app_state->remote_trigger = remote_trigger.get();
     app_state->capture_controller = capture_controller;
+    app_state->camera_led = camera_led.get();
 
     engine.loadFromModule("Photobox.App", "Main");
     engine.addImageProvider(QLatin1String("camera"), capture_controller->createImageProvider());
