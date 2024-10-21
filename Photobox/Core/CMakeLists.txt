@@ -21,6 +21,8 @@ qt_add_qml_module(
         CollagePrinter.cpp
         RemoteTrigger.cpp
         RemoteTrigger.hpp
+        SvgFontCache.hpp
+        SvgFontCache.cpp
     RESOURCES
         Fonts/GreatVibes/GreatVibes-Regular.ttf
         Fonts/Roboto/Roboto-Bold.ttf

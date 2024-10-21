@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QtQmlIntegration>
 #include "CollageSettings.hpp"
+#include "SvgFontCache.hpp"
 namespace Pbox
 {
 class ICamera;
@@ -68,6 +69,7 @@ class CaptureController : public QObject
     void capturedImageReady();
 
   private:
+    SvgFontCache font_cache_;
     std::unique_ptr<ImageStorage> image_storage_;
     std::shared_ptr<ICamera> camera_;
     std::unique_ptr<CollagePrinter> printer_;

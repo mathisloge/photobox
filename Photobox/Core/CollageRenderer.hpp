@@ -1,15 +1,16 @@
 #pragma once
-#include <QPainter>
 #include <filesystem>
 #include <unordered_map>
 #include <lunasvg.h>
 
+class QPainter;
 namespace Pbox
 {
+class SvgFontCache;
 class CollageRenderer
 {
   public:
-    CollageRenderer();
+    explicit CollageRenderer(SvgFontCache &font_cache);
     void loadDocument(const std::string &file_path);
     void addPhotoElement(const std::string &element_id);
     void removePhotoElement(const std::string &element_id);

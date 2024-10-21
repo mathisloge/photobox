@@ -6,6 +6,7 @@
 #include "CollageRenderer.hpp"
 #include "ICamera.hpp"
 #include "ImageStorage.hpp"
+
 namespace Pbox
 {
 namespace
@@ -43,7 +44,7 @@ CaptureController::CaptureController(const std::filesystem::path &collage_direct
     : image_storage_{std::move(image_storage)}
     , camera_{std::move(camera)}
     , printer_{std::move(printer)}
-    , collage_renderer_{std::make_unique<CollageRenderer>()}
+    , collage_renderer_{std::make_unique<CollageRenderer>(font_cache_)}
 {
     Q_ASSERT(image_storage_ != nullptr);
     Q_ASSERT(camera_ != nullptr);
