@@ -24,7 +24,6 @@ find_package(fmt CONFIG REQUIRED)
 find_package(lunasvg CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(PkgConfig REQUIRED)
-find_package(stdexec CONFIG REQUIRED)
 pkg_check_modules(gphoto2 REQUIRED IMPORTED_TARGET libgphoto2)
 message(STATUS "Found gphoto2 ${gphoto2_VERSION}")
 
