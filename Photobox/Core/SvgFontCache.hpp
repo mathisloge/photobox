@@ -1,5 +1,7 @@
 #pragma once
 #include <QByteArray>
+#include <span>
+#include <vector>
 
 namespace Pbox
 {
