@@ -1,0 +1,56 @@
+esphome:
+  name: photobox-camera
+
+esp32:
+  board: esp32-c3-devkitm-1
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+ota:
+  - platform: esphome
+    password: ""
+
+wifi:
+  ssid: "photobox"
+  password: "photobox-matnel"
+  on_connect:
+    - light.addressable_set: 
+        id: cameraLensLed
+        red: 0%
+        green: 20%
+        blue: 0%
+
+  on_disconnect:
+    - light.addressable_set: 
+        id: cameraLensLed
+        red: 20%
+        green: 0%
+        blue: 0%
+
+web_server:
+  port: 80
+
+light:
+  - platform: esp32_rmt_led_strip
+    rgb_order: GRB
+    pin: GPIO10
+    num_leds: 24
+    rmt_channel: 0
+    chipset: ws2812
+    name: "CameraLensLight"
+    id: cameraLensLed
+    effects:
+      - pulse:
+          name: Pulsate
+          transition_length: 0.2s
+          update_interval: 0.2s
+          min_brightness: 0%
+          max_brightness: 100%
+      - addressable_scan:
+          name: Capture
+          scan_width: 3
+          move_interval: 50ms

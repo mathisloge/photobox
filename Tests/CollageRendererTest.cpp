@@ -1,4 +1,5 @@
 #include <CollageRenderer.hpp>
+#include <SvgFontCache.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include "TestAssets.hpp"
 #include "pixel_match.hpp"
@@ -7,7 +8,8 @@ using namespace Pbox;
 TEST_CASE("CollageRenderer save as png", "[CollageRenderer]")
 {
     const auto asset_path = std::filesystem::path{kAssetsPath};
-    CollageRenderer renderer{};
+    SvgFontCache font_cache;
+    CollageRenderer renderer{font_cache};
 
     renderer.loadDocument(asset_path / "Collage.svg");
     renderer.addPhotoElement("image-1");

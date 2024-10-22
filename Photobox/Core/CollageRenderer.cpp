@@ -1,56 +1,29 @@
 #include "CollageRenderer.hpp"
 #include <QDebug>
 #include <QFile>
+#include <QPainter>
 #include <fstream>
 #include <mutex>
 #include <nlohmann/json.hpp>
+#include "SvgFontCache.hpp"
 namespace
 {
 
-void init_lunasvg()
+void init_lunasvg(Pbox::SvgFontCache &font_cache)
 {
     static std::once_flag has_init;
-    std::call_once(has_init, []() {
-        QFile great_vibes{":/qt/qml/Photobox/Core/Fonts/GreatVibes/GreatVibes-Regular.ttf"};
-        if (not great_vibes.open(QFile::OpenModeFlag::ReadOnly))
+    std::call_once(has_init, [&font_cache]() {
+        for (auto &&font : font_cache.getFonts())
         {
-            qDebug() << "Could not open resource";
+            lunasvg_add_font_face_from_data(
+                font.name.c_str(),
+                font.bold,
+                font.italic,
+                font.font_data.data(),
+                font.font_data.size(),
+                [](void * /*closure*/) {},
+                nullptr);
         }
-        static const auto great_vibes_data = great_vibes.readAll();
-        lunasvg_add_font_face_from_data(
-            "Great Vibes",
-            false,
-            false,
-            great_vibes_data.data(),
-            great_vibes_data.size(),
-            [](void *closure) { qDebug() << "data loaded and can be deleted"; },
-            nullptr);
-
-        QFile roboto{":/qt/qml/Photobox/Core/Fonts/Roboto/Roboto-Regular.ttf"};
-        if (not roboto.open(QFile::OpenModeFlag::ReadOnly))
-        {
-            qDebug() << "Could not open resource";
-        }
-        static const auto roboto_data = roboto.readAll();
-        lunasvg_add_font_face_from_data(
-            "Roboto",
-            false,
-            false,
-            roboto_data.data(),
-            roboto_data.size(),
-            [](void *closure) { qDebug() << "data loaded and can be deleted"; },
-            nullptr);
-        // lunasvg_add_font_face_from_file(
-        //     "Great Vibes",
-        //     false,
-        //     false,
-        //     "/home/mathis/dev/photobox2/Photobox/Core/Fonts/GreatVibes/GreatVibes-Regular.ttf");
-        //  lunasvg_add_font_face_from_file("Roboto", false, false,
-        //  "/home/mathis/dev/photobox2/test/Roboto-Regular.ttf"); lunasvg_add_font_face_from_file("", false, false,
-        //  "/home/mathis/dev/photobox2/test/Roboto-Regular.ttf"); lunasvg_add_font_face_from_file("", true, false,
-        //  "/home/mathis/dev/photobox2/test/Roboto-Bold.ttf"); lunasvg_add_font_face_from_file("", false, true,
-        //  "/home/mathis/dev/photobox2/test/Roboto-Italic.ttf"); lunasvg_add_font_face_from_file("", true, true,
-        //  "/home/mathis/dev/photobox2/test/Roboto-BoldItalic.ttf");
     });
 }
 
@@ -58,9 +31,9 @@ void init_lunasvg()
 namespace Pbox
 {
 
-CollageRenderer::CollageRenderer()
+CollageRenderer::CollageRenderer(SvgFontCache &font_cache)
 {
-    init_lunasvg();
+    init_lunasvg(font_cache);
 }
 
 void CollageRenderer::loadDocument(const std::string &file_path)

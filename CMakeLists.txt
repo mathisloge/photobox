@@ -12,34 +12,9 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
 include(CTest)
 include(FetchContent)
-FetchContent_Declare(
-  lunasvg
-  GIT_REPOSITORY https://github.com/sammycage/lunasvg.git
-  GIT_TAG        2246b6a171bb4e64a20d793861de8f44862fed53
-  FIND_PACKAGE_ARGS
-)
-FetchContent_Declare(
-  fmt
-  GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-  GIT_TAG        11.0.2
-  FIND_PACKAGE_ARGS
-)
-FetchContent_Declare(
-    nlohmann_json
-    GIT_REPOSITORY https://github.com/nlohmann/json.git
-    GIT_TAG        v3.11.3
-    FIND_PACKAGE_ARGS
-)
-if(BUILD_TESTING)
-    FetchContent_Declare(
-        Catch2
-        GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-        GIT_TAG        v3.7.1
-        FIND_PACKAGE_ARGS
-    )
-endif()
-FetchContent_MakeAvailable(lunasvg fmt nlohmann_json)
+include(Dependencies)
 
+declare_photobox_dependencies()
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Qml Quick Network Multimedia PrintSupport REQUIRED)
 qt_policy(SET QTP0001 NEW)
@@ -64,8 +39,3 @@ if(BUILD_TESTING)
 endif()
 
 install(PROGRAMS launcher.sh TYPE BIN)
-
-set(CPACK_PACKAGE_CONTACT "Mathis")
-set(CPACK_PACKAGE_FILE_NAME "photobox")
-set(CPACK_RPM_SPEC_MORE_DEFINE "%define _build_id_links none")
-include(CPack)

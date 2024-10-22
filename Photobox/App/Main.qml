@@ -129,7 +129,7 @@ ApplicationWindow {
 
                 anchors.fill: parent
                 visible: running
-                initialCount: 10
+                initialCount: 4
             }
 
             MouseArea {
@@ -151,6 +151,7 @@ ApplicationWindow {
                         stack.pop(null);
                         videoOutput.opacity = 1;
                         ApplicationState.remoteTrigger.playEffect(RemoteTrigger.Idle);
+                        ApplicationState.cameraLed.turnOff();
                     }
 
                     DSM.SignalTransition {
@@ -180,6 +181,7 @@ ApplicationWindow {
                             stack.pop(null);
                             videoOutput.opacity = 1;
                             ApplicationState.remoteTrigger.playEffect(RemoteTrigger.Idle);
+                            ApplicationState.cameraLed.turnOff();
                         }
 
                         DSM.SignalTransition {
@@ -215,6 +217,7 @@ ApplicationWindow {
 
                         onEntered: {
                             videoOutput.opacity = 0;
+                            ApplicationState.cameraLed.playEffect(CameraLed.Pulsate);
                         }
 
                         DSM.SignalTransition {
@@ -228,8 +231,8 @@ ApplicationWindow {
                         id: stateCapturePhoto
 
                         onEntered: {
+                            ApplicationState.cameraLed.playEffect(CameraLed.Capture);
                             ApplicationState.captureController.captureImage();
-                            stack.push(busyComponent);
                         }
 
                         DSM.SignalTransition {
@@ -244,6 +247,7 @@ ApplicationWindow {
 
                         onEntered: {
                             stack.push(captureView);
+                            ApplicationState.cameraLed.turnOff();
                         }
 
                         DSM.TimeoutTransition {

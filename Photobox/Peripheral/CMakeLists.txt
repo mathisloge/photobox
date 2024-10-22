@@ -5,6 +5,8 @@ target_sources(PhotoboxPeripheral PRIVATE
     EspHomeClient.hpp
     EspHomeRemoteTrigger.cpp
     EspHomeRemoteTrigger.hpp
+    EspHomeCameraLed.cpp
+    EspHomeCameraLed.hpp
     IEspHomeClient.hpp
 )
 
