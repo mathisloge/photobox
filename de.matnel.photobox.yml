@@ -27,7 +27,7 @@ modules:
         dest: deps/plutovg
       - type: git
         url: https://github.com/sammycage/lunasvg.git
-        commit: 3769b62f762414f236a4886d08cb1d50ae1e5b36
+        commit: 158b84b030d886b6605f6769574813efe39bc15f
         branch: master
 
   - name: fmt
