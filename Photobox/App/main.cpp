@@ -87,11 +87,6 @@ void warmup_cpptrace()
 
 } // namespace
 
-void trace()
-{
-    *(volatile char *)0 = 2;
-}
-
 int main(int argc, char *argv[])
 {
     cpptrace::absorb_trace_exceptions(false);
@@ -196,8 +191,6 @@ int main(int argc, char *argv[])
 
     engine.loadFromModule("Photobox.App", "Main");
     engine.addImageProvider(QLatin1String("camera"), capture_controller->createImageProvider());
-
-    trace();
 
     return app.exec();
 }
