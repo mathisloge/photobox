@@ -6,7 +6,6 @@ target_link_libraries(PhotoboxApp PRIVATE
     Qt6::Qml
     Qt6::Quick
     Qt6::PrintSupport
-    cpptrace::cpptrace
     PhotoboxCore
     PhotoboxCoreplugin
     PhotoboxGPhoto2

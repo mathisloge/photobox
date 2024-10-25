@@ -25,6 +25,8 @@ qt_add_qml_module(
         CameraLed.hpp
         SvgFontCache.hpp
         SvgFontCache.cpp
+        CrashCollection.cpp
+        CrashCollection.hpp
     RESOURCES
         Fonts/GreatVibes/GreatVibes-Regular.ttf
         Fonts/Roboto/Roboto-Bold.ttf
@@ -38,6 +40,7 @@ target_link_libraries(PhotoboxCore PUBLIC
     Qt6::Quick
     Qt6::PrintSupport
     Qt6::Multimedia
+    cpptrace::cpptrace
     lunasvg::lunasvg
     nlohmann_json::nlohmann_json
     fmt::fmt
