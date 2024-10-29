@@ -22,6 +22,15 @@ macro(declare_photobox_dependencies)
         GIT_TAG        v3.11.3
         FIND_PACKAGE_ARGS
     )
+
+    set(CPPTRACE_UNWIND_WITH_LIBUNWIND ON)
+    FetchContent_Declare(
+        cpptrace
+        GIT_REPOSITORY https://github.com/jeremy-rifkin/cpptrace.git
+        GIT_TAG        v0.7.2
+        FIND_PACKAGE_ARGS
+    )
+
     if(BUILD_TESTING)
         set(CATCH_INSTALL_DOCS OFF)
         FetchContent_Declare(
@@ -31,5 +40,5 @@ macro(declare_photobox_dependencies)
             FIND_PACKAGE_ARGS
         )
     endif()
-    FetchContent_MakeAvailable(lunasvg fmt nlohmann_json)
+    FetchContent_MakeAvailable(lunasvg fmt nlohmann_json cpptrace)
 endmacro()

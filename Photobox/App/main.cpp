@@ -6,6 +6,7 @@
 #include <CameraImageProvider.hpp>
 #include <CaptureController.hpp>
 #include <CollagePrinter.hpp>
+#include <CrashCollection.hpp>
 #include <EspHomeCameraLed.hpp>
 #include <EspHomeClient.hpp>
 #include <EspHomeRemoteTrigger.hpp>
@@ -21,6 +22,7 @@ using namespace Pbox;
 
 int main(int argc, char *argv[])
 {
+    install_crash_handler();
     QApplication app(argc, argv);
     QCoreApplication::setApplicationName(QStringLiteral("PhotoBox"));
     QCoreApplication::setOrganizationName(QStringLiteral("com.mathisloge.photobox"));

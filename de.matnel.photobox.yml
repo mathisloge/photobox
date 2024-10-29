@@ -15,10 +15,11 @@ finish-args:
 modules:
   - name: lunasvg
     buildsystem: cmake-ninja
+    builddir: true
     config-opts:
       - -DCMAKE_BUILD_TYPE=Release
       - -DFETCHCONTENT_FULLY_DISCONNECTED=ON
-      - -DFETCHCONTENT_SOURCE_DIR_PLUTOVG=deps/plutovg
+      - -DFETCHCONTENT_SOURCE_DIR_PLUTOVG=../deps/plutovg
       - -DLUNASVG_BUILD_EXAMPLES=OFF
       - -DPLUTOVG_BUILD_EXAMPLES=OFF
     sources:
@@ -34,6 +35,7 @@ modules:
 
   - name: fmt
     buildsystem: cmake-ninja
+    builddir: true
     config-opts:
       - -DCMAKE_BUILD_TYPE=Release
       - -DFMT_TEST=OFF
@@ -46,6 +48,7 @@ modules:
 
   - name: json
     buildsystem: cmake-ninja
+    builddir: true
     config-opts:
       - -DCMAKE_BUILD_TYPE=Release
       - -DJSON_BuildTests=OFF
@@ -68,13 +71,42 @@ modules:
     buildsystem: autotools
     sources:
       - type: git
-        url: https://github.com/gphoto/libgphoto2
+        url: https://github.com/gphoto/libgphoto2.git
         tag: v2.5.31
       - type: script
         commands: [autoreconf --install --symlink]
 
+  - name: libdwarf
+    buildsystem: cmake-ninja
+    builddir: true
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DCMAKE_POLICY_DEFAULT_CMP0077=NEW
+      - -DPIC_ALWAYS=ON
+      - -DBUILD_DWARFDUMP=OFF
+    sources:
+      - type: git
+        url: https://github.com/jeremy-rifkin/libdwarf-lite.git
+        tag: v0.11.0
+
+  - name: cpptrace
+    buildsystem: cmake-ninja
+    builddir: true
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DCPPTRACE_UNWIND_WITH_LIBUNWIND=ON
+      - -DCPPTRACE_USE_EXTERNAL_ZSTD=ON
+      - -DCPPTRACE_USE_EXTERNAL_LIBDWARF=ON
+      - -DCPPTRACE_BUILD_TESTING=OFF
+      - -DCPPTRACE_BUILD_BENCHMARKING=OFF
+    sources:
+      - type: git
+        url: https://github.com/jeremy-rifkin/cpptrace.git
+        tag: v0.7.2
+
   - name: DigitalerApp
     buildsystem: cmake-ninja
+    builddir: true
     config-opts:
       - -DCMAKE_BUILD_TYPE=RelWithDebInfo
       - -DFETCHCONTENT_FULLY_DISCONNECTED=ON
