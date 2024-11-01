@@ -25,7 +25,7 @@ modules:
     sources:
       - type: git
         url: https://github.com/sammycage/plutovg.git
-        commit: a24c3007be5754a0dca11a4502bdadddca1c009e
+        commit: 361758cd2c3c59459f9ad2a3a7ed3704a0dd2bc0
         branch: main
         dest: deps/plutovg
       - type: git
