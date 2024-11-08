@@ -3,7 +3,7 @@ macro(declare_photobox_dependencies)
     FetchContent_Declare(
         lunasvg
         GIT_REPOSITORY https://github.com/sammycage/lunasvg.git
-        GIT_TAG        2246b6a171bb4e64a20d793861de8f44862fed53
+        GIT_TAG        23578c7461634623a5de903370310b3af5140536
         FIND_PACKAGE_ARGS
     )
     set(FMT_INSTALL OFF)
