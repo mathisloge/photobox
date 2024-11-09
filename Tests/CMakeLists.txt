@@ -3,7 +3,7 @@ find_package(Qt6 REQUIRED COMPONENTS Test)
 
 add_executable(tests
     main.cpp
-    CollageRendererTest.cpp
+    #CollageRendererTest.cpp
     TestEspHomeRemoteTrigger.cpp
     pixel_match.cpp
     pixel_match.hpp

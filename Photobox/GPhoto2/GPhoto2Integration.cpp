@@ -5,6 +5,12 @@ DEFINE_LOGGER(gphoto2log);
 
 namespace Pbox::GPhoto2
 {
+namespace
+{
+
+std::optional<QImage> readImageFromFile(CameraFile *file);
+}
+
 bool autodetectAndConnectCamera(Context &context)
 {
     auto cam_list = makeUniqueCameraList();
@@ -78,4 +84,37 @@ bool autodetectAndConnectCamera(Context &context)
     context.camera = std::move(camera);
     return true;
 }
+
+std::optional<QImage> capturePreviewImage(Context &context)
+{
+    auto file = makeUniqueCameraFile();
+    const auto ret_val = gp_camera_capture_preview(context.camera.get(), file.get(), context.context.get());
+    if (ret_val < GP_OK)
+    {
+        return std::nullopt;
+    }
+    return readImageFromFile(file.get());
+}
+
+namespace
+{
+std::optional<QImage> readImageFromFile(CameraFile *file)
+{
+    const char *buffer{};
+    unsigned long int size{};
+    const auto size_result = gp_file_get_data_and_size(file, &buffer, &size);
+    if (size_result < GP_OK)
+    {
+        LOG_DEBUG(gphoto2log, "could not get size of file. result code: {}", size_result);
+        return std::nullopt;
+    }
+    QImage img;
+    if (!img.loadFromData(reinterpret_cast<const uchar *>(buffer), static_cast<int>(size)))
+    {
+        LOG_ERROR(gphoto2log, "Could not create image from data");
+        return std::nullopt;
+    }
+    return img;
+}
+} // namespace
 } // namespace Pbox::GPhoto2

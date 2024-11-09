@@ -26,4 +26,7 @@ CameraAbilitiesListUniquePtr makeUniqueCameraListAbilities();
 
 using PortInfoListUniquePtr = std::unique_ptr<GPPortInfoList, decltype(&gp_port_info_list_free)>;
 PortInfoListUniquePtr makeUniquePortInfoList();
+
+using CameraFileUniquePtr = std::unique_ptr<CameraFile, decltype(&gp_file_free)>;
+CameraFileUniquePtr makeUniqueCameraFile();
 } // namespace Pbox::GPhoto2

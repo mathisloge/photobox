@@ -93,6 +93,17 @@ PortInfoListUniquePtr makeUniquePortInfoList()
     return ptr;
 }
 
+CameraFileUniquePtr makeUniqueCameraFile()
+{
+    CameraFile *file{nullptr};
+    if (gp_file_new(&file) < GP_OK)
+    {
+        LOG_ERROR(gphoto2log, "Could not allocate camera file.");
+        return {nullptr, gp_file_free};
+    }
+    return {file, gp_file_free};
+}
+
 void CameraDeleter::operator()(Camera *c) const
 {
     if (c != nullptr and context != nullptr)
