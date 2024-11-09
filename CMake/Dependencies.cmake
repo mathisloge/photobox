@@ -31,6 +31,23 @@ macro(declare_photobox_dependencies)
         FIND_PACKAGE_ARGS
     )
 
+    set(STDEXEC_BUILD_TESTS OFF)
+    set(STDEXEC_BUILD_EXAMPLES OFF)
+    FetchContent_Declare(
+        stdexec
+        GIT_REPOSITORY https://github.com/NVIDIA/stdexec.git
+        GIT_TAG        c1508b1e46d5806a1c452c9c90821261716d1473
+        FIND_PACKAGE_ARGS
+    )
+
+    set(QUILL_DISABLE_NON_PREFIXED_MACROS OFF)
+    FetchContent_Declare(
+        quill
+        GIT_REPOSITORY https://github.com/odygrd/quill.git
+        GIT_TAG        v7.4.0
+        FIND_PACKAGE_ARGS
+    )
+
     if(BUILD_TESTING)
         set(CATCH_INSTALL_DOCS OFF)
         FetchContent_Declare(
@@ -40,5 +57,5 @@ macro(declare_photobox_dependencies)
             FIND_PACKAGE_ARGS
         )
     endif()
-    FetchContent_MakeAvailable(lunasvg fmt nlohmann_json cpptrace)
+    FetchContent_MakeAvailable(lunasvg fmt nlohmann_json cpptrace stdexec quill)
 endmacro()

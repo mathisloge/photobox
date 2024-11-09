@@ -13,6 +13,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
 include(CTest)
 include(FetchContent)
+include(GenerateExportHeader)
 include(Dependencies)
 
 declare_photobox_dependencies()
@@ -25,6 +26,9 @@ find_package(fmt CONFIG REQUIRED)
 find_package(lunasvg CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(cpptrace CONFIG REQUIRED)
+find_package(stdexec CONFIG REQUIRED)
+find_package(quill CONFIG REQUIRED)
+
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(gphoto2 REQUIRED IMPORTED_TARGET libgphoto2)
 message(STATUS "Found gphoto2 ${gphoto2_VERSION}")

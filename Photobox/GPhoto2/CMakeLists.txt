@@ -8,6 +8,8 @@ qt_add_qml_module(
 )
 target_link_libraries(PhotoboxGPhoto2 PUBLIC
     PhotoboxCore
+    Photobox::Logging
+    STDEXEC::stdexec
     PkgConfig::gphoto2
 )
 
@@ -22,4 +24,9 @@ target_sources(PhotoboxGPhoto2 PRIVATE
     GPhoto2List.hpp
     GPhoto2Worker.cpp
     GPhoto2Worker.hpp
+
+    GPhoto2Wrapper.hpp
+    GPhoto2Wrapper.cpp
+    GPhoto2Integration.hpp
+    GPhoto2Integration.cpp
 )

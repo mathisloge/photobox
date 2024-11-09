@@ -1,3 +1,4 @@
+add_subdirectory(Logging)
 add_subdirectory(Core)
 add_subdirectory(Peripheral)
 add_subdirectory(Ui)
