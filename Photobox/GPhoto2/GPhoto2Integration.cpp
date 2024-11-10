@@ -11,6 +11,9 @@ namespace
 std::optional<QImage> readImageFromFile(CameraFile *file);
 }
 
+auto createContexst()
+{}
+
 bool autodetectAndConnectCamera(Context &context)
 {
     auto cam_list = makeUniqueCameraList();
@@ -93,6 +96,31 @@ std::optional<QImage> capturePreviewImage(Context &context)
     {
         return std::nullopt;
     }
+    return readImageFromFile(file.get());
+}
+
+std::optional<QImage> captureImage(Context &context)
+{
+    CameraFilePath camera_file_path;
+    /* NOP: This gets overridden in the library to /capt0000.jpg */
+    strcpy(camera_file_path.folder, "/");
+    strcpy(camera_file_path.name, "xxx.jpg");
+
+    auto file = makeUniqueCameraFile();
+    const auto ret_val =
+        gp_camera_capture(context.camera.get(), GP_CAPTURE_IMAGE, &camera_file_path, context.context.get());
+    if (ret_val < GP_OK)
+    {
+        LOG_ERROR(gphoto2log, "could invoke gphoto2 capture");
+        return std::nullopt;
+    }
+    gp_camera_file_get(context.camera.get(),
+                       camera_file_path.folder,
+                       camera_file_path.name,
+                       GP_FILE_TYPE_NORMAL,
+                       file.get(),
+                       context.context.get());
+
     return readImageFromFile(file.get());
 }
 

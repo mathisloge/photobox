@@ -12,16 +12,11 @@ bool autodetectAndConnectCamera(Context &context);
 
 std::optional<QImage> capturePreviewImage(Context &context);
 
+std::optional<QImage> captureImage(Context &context);
+
 inline auto flowAutoconnect()
 {
-    return stdexec::then([]() {
-               Context context{};
-               if (gp_abilities_list_load(context.camera_abilities_list.get(), context.context.get()) < GP_OK)
-               {
-                   // throw error?
-               }
-               return context;
-           }) |
+    return stdexec::then([]() { return Context{}; }) | //
            stdexec::then([](auto &&context) {
                while (not autodetectAndConnectCamera(context))
                {
@@ -29,4 +24,24 @@ inline auto flowAutoconnect()
                return context;
            });
 }
+
+inline auto flowCapturePreview(Pbox::GPhoto2::Context &context)
+{
+    return stdexec::then([&context]() -> QImage {
+        std::optional<QImage> image;
+        int error_count{0};
+        while (not image.has_value() and error_count < 5)
+        {
+            image = Pbox::GPhoto2::capturePreviewImage(context);
+            error_count++;
+        }
+        if (not image.has_value())
+        {
+            throw std::runtime_error("Could not take preview image");
+        }
+
+        return *image;
+    });
+}
+
 } // namespace Pbox::GPhoto2

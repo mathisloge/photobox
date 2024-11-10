@@ -14,6 +14,8 @@
 #include <ICamera.hpp>
 #include <ImageStorage.hpp>
 #include <MockCamera.hpp>
+#include <Pbox/SetupLogging.hpp>
+#include <Scheduler.hpp>
 
 Q_IMPORT_QML_PLUGIN(Photobox_CorePlugin)
 Q_IMPORT_QML_PLUGIN(Photobox_UiPlugin)
@@ -23,6 +25,8 @@ using namespace Pbox;
 int main(int argc, char *argv[])
 {
     install_crash_handler();
+    setupLogging();
+
     QApplication app(argc, argv);
     QCoreApplication::setApplicationName(QStringLiteral("PhotoBox"));
     QCoreApplication::setOrganizationName(QStringLiteral("com.mathisloge.photobox"));
@@ -82,9 +86,11 @@ int main(int argc, char *argv[])
     std::unique_ptr<CameraLed> camera_led =
         std::make_unique<EspHomeCameraLed>(std::make_unique<EspHomeClient>(camera_led_host));
     std::shared_ptr<ICamera> camera;
+
+    Scheduler scheduler;
     if (not developer_mode)
     {
-        camera = std::make_shared<GPhoto2Camera>();
+        camera = std::make_shared<GPhoto2Camera>(scheduler);
     }
     else
     {
