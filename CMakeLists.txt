@@ -36,11 +36,6 @@ message(STATUS "Found gphoto2 ${gphoto2_VERSION}")
 add_subdirectory(Photobox)
 
 if(BUILD_TESTING)
-    FetchContent_MakeAvailable(Catch2)
-    find_package(Catch2 CONFIG REQUIRED)
-    list(APPEND CMAKE_MODULE_PATH "${Catch2_SOURCE_DIR}/extras")
-
-    include(Catch)
     add_subdirectory(Tests)
 endif()
 

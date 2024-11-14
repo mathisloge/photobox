@@ -56,6 +56,7 @@ macro(declare_photobox_dependencies)
             GIT_TAG        v3.7.1
             FIND_PACKAGE_ARGS
         )
+        FetchContent_MakeAvailable(Catch2)
     endif()
     FetchContent_MakeAvailable(lunasvg fmt nlohmann_json cpptrace stdexec quill)
 endmacro()
