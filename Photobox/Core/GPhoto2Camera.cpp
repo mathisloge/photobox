@@ -2,41 +2,28 @@
 #include <QPointer>
 #include <QVideoFrame>
 #include <GPhoto2Integration.hpp>
+#include <Pbox/Conditional.hpp>
 #include <Pbox/Logger.hpp>
 #include <Pbox/QStdexec.hpp>
 #include <exec/static_thread_pool.hpp>
-#include <exec/variant_sender.hpp>
 
 DEFINE_LOGGER(gphoto2camera);
-
-namespace
-{
-inline auto tst(bool cond, stdexec::sender auto left, stdexec::sender auto right)
-    -> exec::variant_sender<decltype(left), decltype(right)>
-{
-    if (cond)
-    {
-        return left;
-    }
-    return right;
-};
-} // namespace
-
 namespace Pbox
 {
 GPhoto2Camera::GPhoto2Camera(Scheduler &scheduler)
 {
+    auto begin = stdexec::schedule(scheduler.getWorkScheduler());
 
-    auto begin = stdexec::schedule(scheduler.getScheduler());
+    //! TODO: stop source does not really work :D
     auto final_flow = stdexec::when_all(begin | Pbox::GPhoto2::flowAutoconnect()) |
                       stdexec::let_value([&scheduler, begin, this](Pbox::GPhoto2::Context &context) {
-                          auto capture_flow = stdexec::let_value([this, &context, begin]() {
+                          auto capture_flow = stdexec::let_value([this, &context, begin, &scheduler]() {
                               auto capture = begin //
                                              | stdexec::then([this, &context]() {
                                                    capture_photo_ = false;
                                                    return GPhoto2::captureImage(context);
-                                               })                                                        //
-                                             | stdexec::continues_on(qThreadAsScheduler(this->thread())) //
+                                               })                                                         //
+                                             | stdexec::continues_on(scheduler.getQtEventLoopScheduler()) //
                                              | stdexec::then([this](auto &&image) {
                                                    if (image.has_value())
                                                    {
@@ -47,7 +34,7 @@ GPhoto2Camera::GPhoto2Camera(Scheduler &scheduler)
                                              | Pbox::GPhoto2::flowCapturePreview(context) //
                                              | stdexec::then([this](auto &&image) { processPreviewImage(image); });
 
-                              return tst(capture_photo_, std::move(capture), std::move(preview));
+                              return conditional(capture_photo_, std::move(capture), std::move(preview));
                           });
 
                           return begin                                                                    //

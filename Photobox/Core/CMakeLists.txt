@@ -29,6 +29,8 @@ qt_add_qml_module(
         CrashCollection.hpp
         GPhoto2Camera.hpp
         GPhoto2Camera.cpp
+        Scheduler.cpp
+        Scheduler.hpp
     RESOURCES
         Fonts/GreatVibes/GreatVibes-Regular.ttf
         Fonts/Roboto/Roboto-Bold.ttf

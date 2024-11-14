@@ -4,9 +4,12 @@ target_link_libraries(PhotoboxUtils INTERFACE
     STDEXEC::stdexec
     Qt6::Core
 )
-
-target_include_directories(PhotoboxUtils INTERFACE
-    "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
-    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-    "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
+target_sources(PhotoboxUtils
+    INTERFACE
+        FILE_SET headers
+            TYPE HEADERS
+            BASE_DIRS include
+            FILES
+                include/Pbox/Conditional.hpp
+                include/Pbox/QStdexec.hpp
 )
