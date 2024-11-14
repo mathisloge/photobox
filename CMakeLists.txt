@@ -15,7 +15,9 @@ include(CTest)
 include(FetchContent)
 include(GenerateExportHeader)
 include(Dependencies)
+include(Options)
 
+declare_photobox_options()
 declare_photobox_dependencies()
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Qml Quick Network Multimedia PrintSupport REQUIRED)
