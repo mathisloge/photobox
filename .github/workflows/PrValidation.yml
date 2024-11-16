@@ -24,7 +24,7 @@ jobs:
           version: '6.8.0'
           install-deps: true
           set-env: true
-          cache: true
+          cache: false
           modules: 'qtscxml qtmultimedia'
           archives: 'qtbase qtprintsupport'
 
