@@ -27,7 +27,7 @@ macro(declare_photobox_dependencies)
     FetchContent_Declare(
         cpptrace
         GIT_REPOSITORY https://github.com/jeremy-rifkin/cpptrace.git
-        GIT_TAG        v0.7.2
+        GIT_TAG        v0.7.3
         FIND_PACKAGE_ARGS
     )
 
@@ -36,7 +36,7 @@ macro(declare_photobox_dependencies)
     FetchContent_Declare(
         stdexec
         GIT_REPOSITORY https://github.com/NVIDIA/stdexec.git
-        GIT_TAG        c1508b1e46d5806a1c452c9c90821261716d1473
+        GIT_TAG        15dcdbcc464891d369ab46a9e8d5521ddc7853d7
         FIND_PACKAGE_ARGS
     )
 
@@ -44,7 +44,7 @@ macro(declare_photobox_dependencies)
     FetchContent_Declare(
         quill
         GIT_REPOSITORY https://github.com/odygrd/quill.git
-        GIT_TAG        v7.4.0
+        GIT_TAG        v7.5.0
         FIND_PACKAGE_ARGS
     )
 

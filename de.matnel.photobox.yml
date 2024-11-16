@@ -1,6 +1,6 @@
 id: de.matnel.photobox
 runtime: org.kde.Platform
-runtime-version: '6.8'
+runtime-version: "6.8"
 sdk: org.kde.Sdk
 command: launcher.sh
 finish-args:
@@ -100,7 +100,50 @@ modules:
     sources:
       - type: git
         url: https://github.com/jeremy-rifkin/cpptrace.git
-        tag: v0.7.2
+        tag: v0.7.3
+
+  - name: stdexec
+    buildsystem: cmake-ninja
+    builddir: false
+    config-opts:
+      - -DSTDEXEC_BUILD_TESTS=OFF
+      - -DSTDEXEC_BUILD_EXAMPLES=OFF
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DFETCHCONTENT_FULLY_DISCONNECTED=ON
+      - -DFETCHCONTENT_SOURCE_DIR_RAPIDS-CMAKE=deps/rapids-cmake
+      - -DCPM_DOWNLOAD_LOCATION=deps/cpm/CPM.cmake
+    sources:
+      - type: file
+        url: https://raw.githubusercontent.com/rapidsai/rapids-cmake/v24.10.00/RAPIDS.cmake
+        sha256: 4249de68ed4d97bc06150f577cc2e0abb47c5a071af008f41ebec5a2749be7bf
+        dest-filename: RAPIDS.cmake
+      - type: file
+        url: https://raw.githubusercontent.com/cplusplus/sender-receiver/refs/tags/R9/execution.bs
+        sha256: fab7f3ae70f7ed21a39382b8a577c28acdd963b80938bb44cc756756e4efc233
+        dest-filename: execution.bs
+      - type: git
+        url: https://github.com/rapidsai/rapids-cmake.git
+        tag: v24.10.00
+        dest: deps/rapids-cmake
+      - type: file
+        url: https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.40.2/CPM.cmake
+        sha256: 192aa0ccdc57dfe75bd9e4b176bf7fb5692fd2b3e3f7b09c74856fc39572b31c
+        dest: deps/cpm
+        dest-filename: CPM.cmake
+      - type: git
+        url: https://github.com/NVIDIA/stdexec.git
+        commit: 15dcdbcc464891d369ab46a9e8d5521ddc7853d7
+        branch: main
+
+  - name: quill
+    buildsystem: cmake-ninja
+    builddir: true
+    config-opts:
+      - -DQUILL_DISABLE_NON_PREFIXED_MACROS=OFF
+    sources:
+      - type: git
+        url: https://github.com/odygrd/quill.git
+        tag: v7.5.0
 
   - name: DigitalerApp
     buildsystem: cmake-ninja
