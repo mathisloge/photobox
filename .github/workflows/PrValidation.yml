@@ -26,6 +26,7 @@ jobs:
           set-env: true
           cache: true
           modules: 'qtscxml qtmultimedia'
+          archives: 'qtprintsupport'
 
       - name: Run workflow
         run: cmake --workflow --preset ci
