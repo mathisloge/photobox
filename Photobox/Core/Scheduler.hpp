@@ -26,6 +26,9 @@ struct Scheduler
         return svg_thread_pool_.get_scheduler();
     }
 
+    /**
+     * @brief All interaction with the qt event loop should happen in this context.
+     */
     QThreadScheduler getQtEventLoopScheduler();
 
     exec::static_thread_pool compute_thread_pool_{2};

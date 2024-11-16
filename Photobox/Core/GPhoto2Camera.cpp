@@ -19,19 +19,23 @@ GPhoto2Camera::GPhoto2Camera(Scheduler &scheduler)
     auto final_flow = stdexec::when_all(begin | Pbox::GPhoto2::flowAutoconnect()) |
                       stdexec::let_value([&scheduler, begin, this](Pbox::GPhoto2::Context &context) {
                           auto capture_flow = stdexec::let_value([this, &context, begin, &scheduler]() {
-                              auto capture = begin //
-                                             | stdexec::then([this, &context]() {
-                                                   capture_photo_ = false;
-                                                   return GPhoto2::captureImage(context);
-                                               })                                                         //
-                                             | stdexec::continues_on(scheduler.getQtEventLoopScheduler()) //
-                                             | stdexec::then([this](auto &&image) {
-                                                   if (image.has_value())
-                                                   {
-                                                       Q_EMIT imageCaptured(image.value());
-                                                   }
-                                               });
-                              auto preview = begin                                        //
+                              auto capture =
+                                  begin //
+                                  | stdexec::then([this, &context]() {
+                                        capture_photo_ = false;
+                                        return GPhoto2::captureImage(context);
+                                    })                                                         //
+                                  | stdexec::continues_on(scheduler.getQtEventLoopScheduler()) //
+                                  | stdexec::then([this](auto &&image) {
+                                        if (image.has_value())
+                                        {
+                                            Q_EMIT imageCaptured(image.value());
+                                        }
+                                        return image.has_value();
+                                    }) |
+                                  exec::repeat_effect_until(); // todo: this now retries forever to capture a image.
+                                                               // maybe retry_n times and emit an error?
+                              auto preview = begin             //
                                              | Pbox::GPhoto2::flowCapturePreview(context) //
                                              | stdexec::then([this](auto &&image) { processPreviewImage(image); });
 

@@ -17,6 +17,7 @@
 #include <Pbox/Logger.hpp>
 #include <Pbox/SetupLogging.hpp>
 #include <Scheduler.hpp>
+#include <fmt/core.h>
 
 Q_IMPORT_QML_PLUGIN(Photobox_CorePlugin)
 Q_IMPORT_QML_PLUGIN(Photobox_UiPlugin)
