@@ -1,6 +1,8 @@
 #include "CaptureController.hpp"
 #include <fstream>
 #include <Pbox/CleanupAsyncScope.hpp>
+#include <Pbox/Conditional.hpp>
+#include <Pbox/Logger.hpp>
 #include <fmt/format.h>
 #include "CameraImageProvider.hpp"
 #include "CollagePrinter.hpp"
@@ -8,36 +10,10 @@
 #include "ICamera.hpp"
 #include "ImageStorage.hpp"
 
+DEFINE_LOGGER(captureControllerLog)
+
 namespace Pbox
 {
-namespace
-{
-class CollageSaveWorkerThread : public QThread
-{
-    Q_OBJECT
-  public:
-    CollageSaveWorkerThread(std::filesystem::path file_path, CollageRenderer &renderer, CollagePrinter &printer)
-        : file_path_{std::move(file_path)}
-        , renderer_{renderer}
-        , printer_{printer}
-    {}
-
-  private:
-    void run() override
-    {
-        renderer_.dumpAsJson(fmt::format("{}.json", file_path_.c_str()));
-        qDebug() << "saving collage to" << file_path_;
-        renderer_.renderToFile(file_path_);
-        printer_.print(renderer_);
-    }
-
-  private:
-    std::filesystem::path file_path_;
-    CollageRenderer &renderer_;
-    CollagePrinter &printer_;
-};
-} // namespace
-
 CaptureController::CaptureController(Scheduler &scheduler,
                                      const std::filesystem::path &collage_directory,
                                      std::unique_ptr<ImageStorage> image_storage,
@@ -53,46 +29,7 @@ CaptureController::CaptureController(Scheduler &scheduler,
     Q_ASSERT(camera_ != nullptr);
     Q_ASSERT(collage_renderer_ != nullptr);
 
-    connect(camera_.get(), &ICamera::imageCaptured, image_storage_.get(), &ImageStorage::onImageCaptured);
-    connect(camera_.get(), &ICamera::imageCaptured, this, [this](const QImage &image) {
-        const auto unique_image_name =
-            QString::fromStdString(fmt::format("capture-{}-{}", current_capture_, image_counter_++));
-
-        Q_EMIT imageCaptured(image, unique_image_name);
-        capture_model_.setImage(current_capture_, unique_image_name);
-        Q_EMIT capturedImageReady();
-    });
-    connect(this, &CaptureController::captureComplete, this, [this]() {
-        if (not collage_finished_)
-        {
-            current_capture_++;
-        }
-    });
-    connect(image_storage_.get(),
-            &ImageStorage::imageSaved,
-            this,
-            [this](const std::filesystem::path &captured_image_path) {
-                const auto &element = settings_.image_elements.at(current_capture_);
-                collage_renderer_->setSourceOfPhoto(element, captured_image_path);
-                if (collage_finished_)
-                {
-                    collage_image_path_ = image_storage_->storageDir() / image_storage_->generateNewImageFilePath();
-                    collage_renderer_->updateLayout();
-                    CollageSaveWorkerThread *worker_thread =
-                        new CollageSaveWorkerThread(collage_image_path_, *collage_renderer_, *printer_);
-                    connect(worker_thread,
-                            &CollageSaveWorkerThread::finished,
-                            this,
-                            &CaptureController::collageCaptureComplete);
-                    connect(worker_thread, &CollageSaveWorkerThread::finished, worker_thread, &QObject::deleteLater);
-                    worker_thread->start();
-                }
-                else
-                {
-                    Q_EMIT captureComplete();
-                }
-            });
-
+    connect(camera_.get(), &ICamera::imageCaptured, this, &CaptureController::saveImage);
     loadSettings(collage_directory);
 }
 
@@ -166,6 +103,50 @@ void CaptureController::loadSettings(const std::filesystem::path &collage_direct
                          }));
 }
 
+void CaptureController::saveImage(const QImage &image)
+{
+    const auto unique_image_name =
+        QString::fromStdString(fmt::format("capture-{}-{}", current_capture_, image_counter_++));
+    Q_EMIT imageCaptured(image, unique_image_name);
+    capture_model_.setImage(current_capture_, unique_image_name);
+    Q_EMIT capturedImageReady();
+
+    auto image_save_flow =
+        stdexec::schedule(scheduler_.getWorkScheduler()) | stdexec::then([this, image]() {
+            const auto image_name = image_storage_->generateNewImageFilePath();
+
+            const auto image_path = image_storage_->storageDir() / image_name;
+            LOG_DEBUG(captureControllerLog, "Saving image to {}", image_path.string());
+            if (not image.save(QString::fromStdString(image_path)))
+            {
+                LOG_ERROR(captureControllerLog, "Could not save image to {}", image_path.string());
+            }
+            return image_path;
+        }) |
+        stdexec::then([this](const std::string &captured_image_path) {
+            const auto &element = settings_.image_elements.at(current_capture_);
+            collage_renderer_->setSourceOfPhoto(element, captured_image_path);
+            return captured_image_path;
+        }) |
+        stdexec::let_value([this](const std::string &image_path) {
+            return conditional(
+                collage_finished_,
+                stdexec::schedule(scheduler_.getSvgRenderScheduler()) | stdexec::then([this, image_path]() {
+                    collage_image_path_ = image_storage_->storageDir() / image_storage_->generateNewImageFilePath();
+                    LOG_DEBUG(captureControllerLog, "saving collage to {}", collage_image_path_.string());
+                    collage_renderer_->updateLayout();
+                    collage_renderer_->dumpAsJson(fmt::format("{}.json", collage_image_path_.string()));
+                    collage_renderer_->renderToFile(collage_image_path_);
+                    printer_->print(*collage_renderer_);
+                }) | stdexec::continues_on(scheduler_.getQtEventLoopScheduler()) |
+                    stdexec::then([this]() { Q_EMIT collageCaptureComplete(); }),
+                stdexec::schedule(scheduler_.getQtEventLoopScheduler()) |
+                    stdexec::then([this]() { current_capture_++; }));
+        });
+
+    async_scope_.spawn(std::move(image_save_flow));
+}
+
 int CaptureImageModel::rowCount(const QModelIndex & /*parent*/) const
 {
     return static_cast<int>(image_sources_.size());
@@ -203,7 +184,6 @@ void CaptureImageModel::resetImageCount(int count)
 
 void CaptureImageModel::setImage(int element_index, QString source)
 {
-
     if (image_sources_.size() <= element_index)
     {
         beginInsertRows({}, image_sources_.size(), image_sources_.size());
@@ -226,4 +206,3 @@ QString CaptureImageModel::sourceOfLastItem() const
     return image_sources_.back();
 }
 } // namespace Pbox
-#include "CaptureController.moc"

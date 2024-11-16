@@ -63,9 +63,9 @@ class CaptureController : public QObject
 
   private:
     void loadSettings(const std::filesystem::path &collage_directory);
+    void saveImage(const QImage &image);
 
   Q_SIGNALS:
-    void captureComplete();
     void collageCompletedChanged();
     void collageCaptureComplete();
     void imageCaptured(const QImage &image, const QString &image_id);

@@ -1,45 +1,13 @@
 #include "ImageStorage.hpp"
-#include <QDebug>
 #include <QImage>
-#include <QThread>
+#include <Pbox/Logger.hpp>
 #include <fmt/format.h>
-using namespace Qt::Literals::StringLiterals;
 
+DEFINE_LOGGER(imageStorageLog)
+
+using namespace Qt::Literals::StringLiterals;
 namespace Pbox
 {
-namespace
-{
-class StoreWorkerThread : public QThread
-{
-    Q_OBJECT
-  public:
-    StoreWorkerThread(std::filesystem::path storage_dir, std::string image_name, const QImage &image_to_save)
-        : storage_dir_{std::move(storage_dir)}
-        , image_name_{std::move(image_name)}
-        , image_to_save_{image_to_save}
-    {}
-  Q_SIGNALS:
-    void imageSaved(const std::filesystem::path &file_path);
-
-  private:
-    void run() override
-    {
-        const auto image_path = storage_dir_ / image_name_;
-        qDebug() << "Saving image to " << image_path.c_str();
-        if (not image_to_save_.save(QString::fromStdString(image_path)))
-        {
-            qCritical() << "Could not save image";
-            return;
-        }
-        Q_EMIT imageSaved(image_path);
-    }
-
-  private:
-    std::filesystem::path storage_dir_;
-    std::string image_name_;
-    QImage image_to_save_;
-};
-} // namespace
 
 ImageStorage::ImageStorage(std::filesystem::path storage_dir)
     : storage_dir_{std::move(storage_dir)}
@@ -65,17 +33,12 @@ ImageStorage::ImageStorage(std::filesystem::path storage_dir)
         }
         catch (const std::exception &exception)
         {
-            qCritical() << exception.what();
+            LOG_CRITICAL(imageStorageLog,
+                         "Could not create directories to path '{}'. Failed with: '{}'",
+                         storage_dir_.string(),
+                         exception.what());
         }
     }
-}
-
-void ImageStorage::onImageCaptured(const QImage &captured_image)
-{
-    StoreWorkerThread *worker_thread = new StoreWorkerThread(storage_dir_, generateNewImageFilePath(), captured_image);
-    connect(worker_thread, &StoreWorkerThread::imageSaved, this, &ImageStorage::imageSaved);
-    connect(worker_thread, &StoreWorkerThread::finished, worker_thread, &QObject::deleteLater);
-    worker_thread->start();
 }
 
 std::string ImageStorage::generateNewImageFilePath()
@@ -90,4 +53,3 @@ const std::filesystem::path &ImageStorage::storageDir() const
 }
 
 } // namespace Pbox
-#include "ImageStorage.moc"
