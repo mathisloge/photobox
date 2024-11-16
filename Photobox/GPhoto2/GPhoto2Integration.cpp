@@ -7,12 +7,8 @@ namespace Pbox::GPhoto2
 {
 namespace
 {
-
 std::optional<QImage> readImageFromFile(CameraFile *file);
 }
-
-auto createContexst()
-{}
 
 bool autodetectAndConnectCamera(Context &context)
 {
@@ -39,16 +35,12 @@ bool autodetectAndConnectCamera(Context &context)
     }
 
     const auto port_lookup_result = gp_port_info_list_lookup_path(context.port_list.get(), port_value);
-    switch (port_lookup_result)
-    {
-    case GP_ERROR_UNKNOWN_PORT:
-        LOG_ERROR(gphoto2log, "The specified port ({}) can not be found.", port_value);
-        break;
-    default:
-        break;
-    }
     if (port_lookup_result < GP_OK)
     {
+        LOG_ERROR(gphoto2log,
+                  "Could not obtain specified port ({}). Failed with: {}",
+                  port_value,
+                  gp_port_result_as_string(port_lookup_result));
         return false;
     }
 

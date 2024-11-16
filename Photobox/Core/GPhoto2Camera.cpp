@@ -57,7 +57,7 @@ GPhoto2Camera::~GPhoto2Camera()
 {
     stoken_.request_stop();
     auto cleanup_sender = async_scope_.on_empty();
-    stdexec::sync_wait(cleanup_sender);
+    stdexec::sync_wait(std::move(cleanup_sender));
 }
 
 void GPhoto2Camera::requestCapturePhoto()
@@ -67,12 +67,6 @@ void GPhoto2Camera::requestCapturePhoto()
 
 void GPhoto2Camera::processPreviewImage(const QImage &image)
 {
-    QPointer<QVideoSink> video_sink{getVideoSink()};
-
-    if (video_sink.isNull())
-    {
-        return;
-    }
     QVideoFrame video_frame{QVideoFrameFormat{image.size(), QVideoFrameFormat::Format_RGBA8888}};
     if (video_frame.map(QVideoFrame::WriteOnly))
     {
@@ -94,6 +88,11 @@ void GPhoto2Camera::processPreviewImage(const QImage &image)
         LOG_ERROR(gphoto2camera, "Could not map video frame");
     }
 
+    QPointer<QVideoSink> video_sink{getVideoSink()};
+    if (video_sink.isNull())
+    {
+        return;
+    }
     video_sink->setVideoFrame(video_frame);
 }
 } // namespace Pbox
