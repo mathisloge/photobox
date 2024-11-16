@@ -12,4 +12,6 @@ target_sources(PhotoboxUtils
             FILES
                 include/Pbox/Conditional.hpp
                 include/Pbox/QStdexec.hpp
+                include/Pbox/DisableCopyMove.hpp
+                include/Pbox/CleanupAsyncScope.hpp
 )

@@ -57,7 +57,6 @@ std::vector<CachedFont> initFonts()
     {
         fonts.emplace_back(*std::move(roboto_regular));
     }
-
     return fonts;
 }
 } // namespace

@@ -14,11 +14,14 @@
 #include <ICamera.hpp>
 #include <ImageStorage.hpp>
 #include <MockCamera.hpp>
+#include <Pbox/Logger.hpp>
 #include <Pbox/SetupLogging.hpp>
 #include <Scheduler.hpp>
 
 Q_IMPORT_QML_PLUGIN(Photobox_CorePlugin)
 Q_IMPORT_QML_PLUGIN(Photobox_UiPlugin)
+
+DEFINE_ROOT_LOGGER(rootlogger)
 
 using namespace Pbox;
 
@@ -28,6 +31,7 @@ int main(int argc, char *argv[])
     setupLogging();
     int app_return_code{EXIT_FAILURE};
     Scheduler scheduler;
+
     {
         QApplication app(argc, argv);
         QCoreApplication::setApplicationName(QStringLiteral("PhotoBox"));
@@ -100,12 +104,14 @@ int main(int argc, char *argv[])
             camera = std::make_shared<MockCamera>();
         }
 
+        LOG_NOTICE(rootlogger, "Start init capture controller");
         auto capture_controller =
-            std::make_shared<CaptureController>(collage_directory.toStdString(),
+            std::make_shared<CaptureController>(scheduler,
+                                                collage_directory.toStdString(),
                                                 std::make_unique<ImageStorage>(capture_directory.toStdString()),
                                                 camera,
                                                 std::make_unique<CollagePrinter>(printer_settings.toStdString()));
-
+        LOG_NOTICE(rootlogger, "End init capture controller");
         QQmlApplicationEngine engine;
 
         engine.setInitialProperties({

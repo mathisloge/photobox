@@ -2,6 +2,7 @@
 #include <QPointer>
 #include <QVideoFrame>
 #include <GPhoto2Integration.hpp>
+#include <Pbox/CleanupAsyncScope.hpp>
 #include <Pbox/Conditional.hpp>
 #include <Pbox/Logger.hpp>
 #include <Pbox/QStdexec.hpp>
@@ -56,8 +57,7 @@ GPhoto2Camera::GPhoto2Camera(Scheduler &scheduler)
 GPhoto2Camera::~GPhoto2Camera()
 {
     stoken_.request_stop();
-    auto cleanup_sender = async_scope_.on_empty();
-    stdexec::sync_wait(std::move(cleanup_sender));
+    cleanup_async_scope(async_scope_);
 }
 
 void GPhoto2Camera::requestCapturePhoto()

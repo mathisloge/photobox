@@ -1,5 +1,6 @@
 #include "CaptureController.hpp"
 #include <fstream>
+#include <Pbox/CleanupAsyncScope.hpp>
 #include <fmt/format.h>
 #include "CameraImageProvider.hpp"
 #include "CollagePrinter.hpp"
@@ -37,14 +38,16 @@ class CollageSaveWorkerThread : public QThread
 };
 } // namespace
 
-CaptureController::CaptureController(const std::filesystem::path &collage_directory,
+CaptureController::CaptureController(Scheduler &scheduler,
+                                     const std::filesystem::path &collage_directory,
                                      std::unique_ptr<ImageStorage> image_storage,
                                      std::shared_ptr<ICamera> camera,
                                      std::unique_ptr<CollagePrinter> printer)
-    : image_storage_{std::move(image_storage)}
+    : scheduler_{scheduler}
+    , image_storage_{std::move(image_storage)}
     , camera_{std::move(camera)}
     , printer_{std::move(printer)}
-    , collage_renderer_{std::make_unique<CollageRenderer>(font_cache_)}
+    , collage_renderer_{std::make_unique<CollageRenderer>()}
 {
     Q_ASSERT(image_storage_ != nullptr);
     Q_ASSERT(camera_ != nullptr);
@@ -93,7 +96,10 @@ CaptureController::CaptureController(const std::filesystem::path &collage_direct
     loadSettings(collage_directory);
 }
 
-CaptureController::~CaptureController() = default;
+CaptureController::~CaptureController()
+{
+    cleanup_async_scope(async_scope_);
+}
 
 void CaptureController::captureImage()
 {
@@ -141,17 +147,23 @@ QString CaptureController::getCollageImagePath()
 
 void CaptureController::loadSettings(const std::filesystem::path &collage_directory)
 {
-    std::ifstream settings_file{collage_directory / "collage_settings.json"};
-    nlohmann::json json;
-    settings_file >> json;
-    settings_ = json;
+    async_scope_.spawn(stdexec::schedule(scheduler_.getSvgRenderScheduler()) |
+                       stdexec::then([this]() { init_lunasvg(font_cache_); }));
 
-    collage_renderer_->loadDocument(collage_directory / "collage.svg");
-    for (auto &&element : settings_.image_elements)
-    {
-        collage_renderer_->addPhotoElement(element);
-    }
-    max_capture_count_ = static_cast<int>(settings_.image_elements.size()) - 1;
+    async_scope_.spawn(stdexec::schedule(scheduler_.getWorkScheduler()) //
+                       | stdexec::then([this, collage_directory]() {
+                             std::ifstream settings_file{collage_directory / "collage_settings.json"};
+                             nlohmann::json json;
+                             settings_file >> json;
+                             settings_ = json;
+
+                             collage_renderer_->loadDocument(collage_directory / "collage.svg");
+                             for (auto &&element : settings_.image_elements)
+                             {
+                                 collage_renderer_->addPhotoElement(element);
+                             }
+                             max_capture_count_ = static_cast<int>(settings_.image_elements.size()) - 1;
+                         }));
 }
 
 int CaptureImageModel::rowCount(const QModelIndex & /*parent*/) const

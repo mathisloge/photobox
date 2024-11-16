@@ -2,7 +2,9 @@
 #include <QAbstractListModel>
 #include <QObject>
 #include <QtQmlIntegration>
+#include <exec/async_scope.hpp>
 #include "CollageSettings.hpp"
+#include "Scheduler.hpp"
 #include "SvgFontCache.hpp"
 namespace Pbox
 {
@@ -44,7 +46,8 @@ class CaptureController : public QObject
     Q_PROPERTY(QString collageImagePath READ getCollageImagePath NOTIFY collageCaptureComplete);
 
   public:
-    explicit CaptureController(const std::filesystem::path &collage_directory,
+    explicit CaptureController(Scheduler &scheduler,
+                               const std::filesystem::path &collage_directory,
                                std::unique_ptr<ImageStorage> image_storage,
                                std::shared_ptr<ICamera> camera,
                                std::unique_ptr<CollagePrinter> printer);
@@ -69,6 +72,8 @@ class CaptureController : public QObject
     void capturedImageReady();
 
   private:
+    Scheduler &scheduler_;
+    exec::async_scope async_scope_;
     SvgFontCache font_cache_;
     std::unique_ptr<ImageStorage> image_storage_;
     std::shared_ptr<ICamera> camera_;
