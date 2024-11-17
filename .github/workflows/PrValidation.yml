@@ -26,7 +26,7 @@ jobs:
           set-env: true
           cache: false
           modules: 'qtscxml qtmultimedia'
-          archives: 'qtbase qtqml qtprintsupport'
+          archives: 'qtbase qtquick qtquickcontrols qtqmlcore qtqml qtprintsupport'
 
       - name: Run workflow
         run: cmake --workflow --preset ci
