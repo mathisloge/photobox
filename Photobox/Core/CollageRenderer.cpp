@@ -93,9 +93,7 @@ void CollageRenderer::render(QPainter *painter, float width, float height) const
     const QImage pixmap{bitmap.data(), bitmap.width(), bitmap.height(), QImage::Format::Format_ARGB32_Premultiplied};
 
     painter->save();
-
     painter->drawImage(pixmap.rect(), pixmap);
-
     painter->restore();
 }
 

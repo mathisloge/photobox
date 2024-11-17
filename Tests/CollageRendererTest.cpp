@@ -9,7 +9,8 @@ TEST_CASE("CollageRenderer save as png", "[CollageRenderer]")
 {
     const auto asset_path = std::filesystem::path{kAssetsPath};
     SvgFontCache font_cache;
-    CollageRenderer renderer{font_cache};
+    init_lunasvg(font_cache);
+    CollageRenderer renderer{};
 
     renderer.loadDocument(asset_path / "Collage.svg");
     renderer.addPhotoElement("image-1");

@@ -14,7 +14,6 @@ namespace Pbox
 GPhoto2Camera::GPhoto2Camera(Scheduler &scheduler)
 {
     auto begin = stdexec::schedule(scheduler.getWorkScheduler());
-
     //! TODO: stop source does not really work :D
     auto final_flow = stdexec::when_all(begin | Pbox::GPhoto2::flowAutoconnect()) |
                       stdexec::let_value([&scheduler, begin, this](Pbox::GPhoto2::Context &context) {

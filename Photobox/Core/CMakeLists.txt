@@ -31,6 +31,8 @@ qt_add_qml_module(
         GPhoto2Camera.cpp
         Scheduler.cpp
         Scheduler.hpp
+        CollageCaptureSession.hpp
+        CollageCaptureSession.cpp
     RESOURCES
         Fonts/GreatVibes/GreatVibes-Regular.ttf
         Fonts/Roboto/Roboto-Bold.ttf

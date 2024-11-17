@@ -5,11 +5,11 @@ include(Catch)
 
 add_executable(tests
     main.cpp
-    #CollageRendererTest.cpp
+    CollageRendererTest.cpp
+    TestCollageCaptureSession.cpp
     TestEspHomeRemoteTrigger.cpp
     pixel_match.cpp
     pixel_match.hpp
-    GPhoto2IntegrationTest.cpp
 )
 target_link_libraries(tests PRIVATE
     Qt6::Test

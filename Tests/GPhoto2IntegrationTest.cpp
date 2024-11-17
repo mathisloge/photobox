@@ -1,6 +1,5 @@
 #include <GPhoto2Integration.hpp>
 #include <Pbox/Logger.hpp>
-#include <Pbox/SetupLogging.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <exec/finally.hpp>
 #include <exec/static_thread_pool.hpp>
@@ -9,7 +8,6 @@ DEFINE_LOGGER(testlog);
 
 TEST_CASE("GPhoto2 Integration", "[CameraHW]")
 {
-    Pbox::setupLogging();
     exec::static_thread_pool sched{3};
     auto begin = stdexec::schedule(sched.get_scheduler());
 
