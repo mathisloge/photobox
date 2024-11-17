@@ -25,7 +25,7 @@ jobs:
           install-deps: true
           set-env: true
           cache: false
-          modules: 'qmake qtscxml qtmultimedia'
+          modules: 'qtscxml qtmultimedia'
           archives: 'qtbase qtquick qtquickcontrols qtqmlcore qtqml qtprintsupport'
 
       - name: Run workflow
