@@ -1,5 +1,7 @@
 #include "GPhoto2Integration.hpp"
+#include <QImage>
 #include <Pbox/Logger.hpp>
+#include "GPhoto2Context.hpp"
 
 DEFINE_LOGGER(gphoto2log);
 

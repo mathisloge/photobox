@@ -6,20 +6,51 @@
 #include <Pbox/Conditional.hpp>
 #include <Pbox/Logger.hpp>
 #include <Pbox/QStdexec.hpp>
+#include <exec/repeat_effect_until.hpp>
 #include <exec/static_thread_pool.hpp>
+#include "GPhoto2Exeption.hpp"
 
 DEFINE_LOGGER(gphoto2camera);
+
+namespace
+{
+inline auto flowCapturePreview(Pbox::GPhoto2::Context &context)
+{
+    return stdexec::then([&context]() -> QImage {
+        std::optional<QImage> image;
+        int error_count{0};
+        while (not image.has_value() and error_count < 5)
+        {
+            image = Pbox::GPhoto2::capturePreviewImage(context);
+            error_count++;
+        }
+        if (not image.has_value())
+        {
+            throw Pbox::GPhoto2::GPhoto2Exception{"Could not take preview image"};
+        }
+
+        return *image;
+    });
+}
+} // namespace
 namespace Pbox
 {
 GPhoto2Camera::GPhoto2Camera(Scheduler &scheduler)
 {
-    auto begin = stdexec::schedule(scheduler.getWorkScheduler());
+    auto autoconnect_flow = stdexec::schedule(scheduler.getWorkScheduler()) //
+                            | stdexec::then([this]() {
+                                  GPhoto2::Context context;
+                                  while (not autodetectAndConnectCamera(context) and not stoken_.stop_requested())
+                                  {
+                                  }
+                                  return context;
+                              });
     //! TODO: stop source does not really work :D
-    auto final_flow = stdexec::when_all(begin | Pbox::GPhoto2::flowAutoconnect()) |
-                      stdexec::let_value([&scheduler, begin, this](Pbox::GPhoto2::Context &context) {
-                          auto capture_flow = stdexec::let_value([this, &context, begin, &scheduler]() {
+    auto final_flow = stdexec::when_all(std::move(autoconnect_flow)) |
+                      stdexec::let_value([&scheduler, this](Pbox::GPhoto2::Context &context) {
+                          auto capture_flow = stdexec::let_value([this, &context, &scheduler]() {
                               auto capture =
-                                  begin //
+                                  stdexec::schedule(scheduler.getWorkScheduler()) //
                                   | stdexec::then([this, &context]() {
                                         capture_photo_ = false;
                                         return GPhoto2::captureImage(context);
@@ -31,17 +62,17 @@ GPhoto2Camera::GPhoto2Camera(Scheduler &scheduler)
                                             Q_EMIT imageCaptured(image.value());
                                         }
                                         return image.has_value();
-                                    }) |
-                                  exec::repeat_effect_until(); // todo: this now retries forever to capture a image.
-                                                               // maybe retry_n times and emit an error?
-                              auto preview = begin             //
-                                             | Pbox::GPhoto2::flowCapturePreview(context) //
+                                    })                           //
+                                  | exec::repeat_effect_until(); // todo: this now retries forever to capture a image.
+                                                                 // maybe retry_n times and emit an error?
+                              auto preview = stdexec::schedule(scheduler.getWorkScheduler()) //
+                                             | flowCapturePreview(context)                   //
                                              | stdexec::then([this](auto &&image) { processPreviewImage(image); });
 
                               return conditional(capture_photo_, std::move(capture), std::move(preview));
                           });
 
-                          return begin                                                                    //
+                          return stdexec::schedule(scheduler.getWorkScheduler())                          //
                                  | std::move(capture_flow)                                                //
                                  | stdexec::then([this](auto &&...) { return stoken_.stop_requested(); }) //
                                  | exec::repeat_effect_until()                                            //
@@ -59,8 +90,11 @@ GPhoto2Camera::GPhoto2Camera(Scheduler &scheduler)
 
 GPhoto2Camera::~GPhoto2Camera()
 {
+    LOG_DEBUG(gphoto2camera, "Camera stop");
     stoken_.request_stop();
     cleanup_async_scope(async_scope_);
+
+    LOG_DEBUG(gphoto2camera, "Async scope cleaned up");
 }
 
 void GPhoto2Camera::requestCapturePhoto()

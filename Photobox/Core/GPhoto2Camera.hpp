@@ -1,4 +1,5 @@
 #pragma once
+#include <GPhoto2Context.hpp>
 #include <exec/async_scope.hpp>
 #include "ICamera.hpp"
 #include "Scheduler.hpp"
