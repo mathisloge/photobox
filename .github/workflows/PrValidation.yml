@@ -12,9 +12,10 @@ jobs:
       options: --privileged
     steps:
       - uses: actions/checkout@v4
-      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+      - uses: flathub-infra/flatpak-github-actions/flatpak-builder@master
         with:
           bundle: photobox.flatpak
           manifest-path: de.matnel.photobox.Devel.yml
           cache-key: flatpak-builder-${{ github.sha }}
+          cache: false
           run-tests: true
