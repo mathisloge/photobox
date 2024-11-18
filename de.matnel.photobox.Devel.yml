@@ -1,7 +1,6 @@
 id: de.matnel.photobox.Devel
 runtime: org.kde.Platform
 runtime-version: "6.8"
-run-tests: true
 sdk: org.kde.Sdk
 command: launcher.sh
 finish-args:

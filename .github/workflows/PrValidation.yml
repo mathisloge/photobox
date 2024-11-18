@@ -17,5 +17,4 @@ jobs:
           bundle: photobox.flatpak
           manifest-path: de.matnel.photobox.Devel.yml
           cache-key: flatpak-builder-${{ github.sha }}
-          cache: false
           run-tests: true
