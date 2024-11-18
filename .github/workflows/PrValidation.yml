@@ -1,32 +1,20 @@
-name: Build and test
 on:
   push:
     branches: [main]
   pull_request:
-
+name: Build and test
 jobs:
-  build-test:
-    runs-on: ubuntu-24.04
-
+  flatpak:
+    name: "Flatpak"
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:kde-6.8
+      options: --privileged
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install deps
-        run: sudo apt update && sudo apt install -y ninja-build libgphoto2-dev libunwind-dev libicu-dev
-
-      - uses: hendrikmuhs/ccache-action@v1.2
+      - uses: flathub-infra/flatpak-github-actions/flatpak-builder@master
         with:
-          create-symlink: true
-
-      - name: Install Qt
-        uses: jurplel/install-qt-action@v4
-        with:
-          version: '6.8.0'
-          install-deps: true
-          set-env: true
-          cache: false
-          modules: 'qtscxml qtmultimedia'
-          archives: 'qtbase qtquick qtquickcontrols qtqmlcore qtqml qtprintsupport'
-
-      - name: Run workflow
-        run: cmake --workflow --preset ci
+          bundle: photobox.flatpak
+          manifest-path: de.matnel.photobox.Devel.yml
+          cache-key: flatpak-builder-${{ github.sha }}
+          run-tests: true

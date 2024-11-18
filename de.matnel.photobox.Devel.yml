@@ -1,6 +1,7 @@
-id: de.matnel.photobox
+id: de.matnel.photobox.Devel
 runtime: org.kde.Platform
 runtime-version: "6.8"
+run-tests: true
 sdk: org.kde.Sdk
 command: launcher.sh
 finish-args:
@@ -22,6 +23,7 @@ modules:
   - Flatpak/cpptrace.yaml
   - Flatpak/stdexec.yaml
   - Flatpak/quill.yaml
+  - Flatpak/catch2.yaml
 
   - name: DigitalerApp
     buildsystem: cmake-ninja
@@ -29,7 +31,7 @@ modules:
     config-opts:
       - -DCMAKE_BUILD_TYPE=RelWithDebInfo
       - -DFETCHCONTENT_FULLY_DISCONNECTED=ON
-      - -DBUILD_TESTING=OFF
+      - -DBUILD_TESTING=ON
     sources:
       - type: dir
         path: .

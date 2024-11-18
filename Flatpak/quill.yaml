@@ -1,0 +1,9 @@
+name: quill
+buildsystem: cmake-ninja
+builddir: true
+config-opts:
+  - -DQUILL_DISABLE_NON_PREFIXED_MACROS=OFF
+sources:
+  - type: git
+    url: https://github.com/odygrd/quill.git
+    tag: v7.5.0

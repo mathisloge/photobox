@@ -1,0 +1,12 @@
+name: fmt
+buildsystem: cmake-ninja
+builddir: true
+config-opts:
+  - -DCMAKE_BUILD_TYPE=Release
+  - -DCATCH_INSTALL_DOCS=OFF
+  - -DCATCH_INSTALL_EXTRAS=ON
+  - -DCATCH_BUILD_TESTING=OFF
+sources:
+  - type: git
+    url: https://github.com/catchorg/Catch2.git
+    tag: v3.7.1
