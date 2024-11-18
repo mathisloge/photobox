@@ -64,6 +64,7 @@ CaptureImageModel *CaptureController::getModel()
 CameraImageProvider *CaptureController::createImageProvider()
 {
     auto *image_provider = new CameraImageProvider();
+    // TODO: release images after collage is finished. => Do this in CaptureSessions
     connect(this, &CaptureController::imageCaptured, image_provider, &CameraImageProvider::addImage);
     return image_provider;
 }

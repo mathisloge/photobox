@@ -304,6 +304,7 @@ ApplicationWindow {
 
         PreviewImage {
             source: "image://camera/" + ApplicationState.captureController.model.sourceOfLastItem()
+            cache: false
         }
 
     }
@@ -313,6 +314,7 @@ ApplicationWindow {
 
         PreviewImage {
             source: "file://" + ApplicationState.captureController.collageImagePath
+            cache: false
         }
 
     }
