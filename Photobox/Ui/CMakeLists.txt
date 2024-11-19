@@ -6,6 +6,9 @@ qt_add_qml_module(
         Countdown.qml
         PreviewImage.qml
         BusyPage.qml
+        SystemStatus.qml
+        StatusPage.qml
+        CapturePage.qml
     RESOURCES
         ImageBorder.svg
 )

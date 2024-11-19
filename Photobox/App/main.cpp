@@ -82,13 +82,14 @@ int main(int argc, char *argv[])
         const QWindow::Visibility window_mode =
             parser.isSet(fullscreen_option) ? QWindow::Visibility::FullScreen : QWindow::Visibility::Windowed;
 
-        qDebug() << "capture_directory =" << capture_directory;
-        qDebug() << "collage_directory =" << collage_directory;
-        qDebug() << "printer_settings =" << printer_settings;
-        qDebug() << "developer_mode=" << developer_mode;
-        qDebug() << "trigger_button_host=" << trigger_button_host;
-        qDebug() << "camera_led_host=" << camera_led_host;
-        qDebug() << "window_mode=" << window_mode;
+        LOG_NOTICE(rootlogger, "capture_directory={}", capture_directory.toStdString());
+        LOG_NOTICE(rootlogger, "collage_directory={}", collage_directory.toStdString());
+        LOG_NOTICE(rootlogger, "printer_settings={}", printer_settings.toStdString());
+        LOG_NOTICE(rootlogger, "developer_mode={}", developer_mode);
+        LOG_NOTICE(rootlogger, "trigger_button_host={}", trigger_button_host.toStdString());
+        LOG_NOTICE(rootlogger, "camera_led_host={}", camera_led_host.toStdString());
+        LOG_NOTICE(rootlogger, "window_mode={}", static_cast<int>(window_mode));
+        LOG_NOTICE(rootlogger, "capture_directory={}", capture_directory.toStdString());
 
         std::unique_ptr<RemoteTrigger> remote_trigger =
             std::make_unique<EspHomeRemoteTrigger>(std::make_unique<EspHomeClient>(trigger_button_host));
@@ -126,7 +127,7 @@ int main(int argc, char *argv[])
         app_state->capture_controller = capture_controller;
         app_state->camera_led = camera_led.get();
 
-        engine.loadFromModule("Photobox.App", "Main");
+        engine.loadFromModule("Photobox.App", "MainNew");
         engine.addImageProvider(QLatin1String("camera"), capture_controller->createImageProvider());
 
         app_return_code = app.exec();

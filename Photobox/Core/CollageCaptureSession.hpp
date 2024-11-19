@@ -3,6 +3,7 @@
 #include <QObject>
 #include <Pbox/DisableCopyMove.hpp>
 #include "CollageSettings.hpp"
+#include "ICaptureSession.hpp"
 
 namespace Pbox
 {

@@ -31,6 +31,7 @@ qt_add_qml_module(
         GPhoto2Camera.cpp
         Scheduler.cpp
         Scheduler.hpp
+        ICaptureSession.hpp
         CollageCaptureSession.hpp
         CollageCaptureSession.cpp
     RESOURCES
