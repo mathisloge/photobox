@@ -11,6 +11,7 @@ qt_add_qml_module(
         CapturePage.qml
     RESOURCES
         ImageBorder.svg
+        Logo.svg
 )
 
 target_include_directories(PhotoboxUi PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")

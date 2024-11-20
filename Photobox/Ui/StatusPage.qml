@@ -6,20 +6,15 @@ import Photobox.Core
 Page {
     ColumnLayout {
         anchors.fill: parent
-
-        SystemStatusDelegate {
-            title: "Camera"
-            status: SystemStatusCode.Connecting
+        Image {
+            Layout.alignment: Qt.AlignHCenter
+            source: "Logo.svg"
         }
-
-        SystemStatusDelegate {
-            title: "Buzzer"
-            status: SystemStatusCode.Ok
-        }
-
-        SystemStatusDelegate {
-            title: "Camera"
-            status: SystemStatusCode.Error
+        ListView {
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            delegate: SystemStatusDelegate {}
+            model: ApplicationState.systemStatusManager.model
         }
     }
 }

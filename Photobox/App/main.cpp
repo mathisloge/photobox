@@ -18,6 +18,7 @@
 #include <Pbox/SetupLogging.hpp>
 #include <Scheduler.hpp>
 #include <fmt/core.h>
+#include "SystemStatusManager.hpp"
 
 Q_IMPORT_QML_PLUGIN(Photobox_CorePlugin)
 Q_IMPORT_QML_PLUGIN(Photobox_UiPlugin)
@@ -91,6 +92,8 @@ int main(int argc, char *argv[])
         LOG_NOTICE(rootlogger, "window_mode={}", static_cast<int>(window_mode));
         LOG_NOTICE(rootlogger, "capture_directory={}", capture_directory.toStdString());
 
+        SystemStatusManager system_status_manager;
+
         std::unique_ptr<RemoteTrigger> remote_trigger =
             std::make_unique<EspHomeRemoteTrigger>(std::make_unique<EspHomeClient>(trigger_button_host));
         std::unique_ptr<CameraLed> camera_led =
@@ -105,6 +108,7 @@ int main(int argc, char *argv[])
         {
             camera = std::make_shared<MockCamera>();
         }
+        system_status_manager.registerClient(std::addressof(camera->systemStatusClient()));
 
         LOG_NOTICE(rootlogger, "Start init capture controller");
         auto capture_controller =
@@ -122,6 +126,7 @@ int main(int argc, char *argv[])
         auto &&app_state = engine.singletonInstance<ApplicationState *>("Photobox.Core", "ApplicationState");
         Q_ASSERT(app_state != nullptr);
 
+        app_state->system_status_manager = std::addressof(system_status_manager);
         app_state->camera = camera;
         app_state->remote_trigger = remote_trigger.get();
         app_state->capture_controller = capture_controller;

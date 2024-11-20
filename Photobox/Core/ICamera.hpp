@@ -4,6 +4,8 @@
 
 namespace Pbox
 {
+class SystemStatusClient;
+
 class ICamera : public QObject
 {
     Q_OBJECT
@@ -16,6 +18,8 @@ class ICamera : public QObject
 
     QVideoSink *getVideoSink() const;
     void setVideoSink(QVideoSink *video_sink);
+
+    virtual const SystemStatusClient &systemStatusClient() const = 0;
 
     Q_INVOKABLE virtual void requestCapturePhoto() = 0;
   Q_SIGNALS:

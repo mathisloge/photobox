@@ -4,6 +4,7 @@
 #include <QMediaCaptureSession>
 #include <QVideoFrame>
 #include "ICamera.hpp"
+#include "SystemStatusClient.hpp"
 
 namespace Pbox
 {
@@ -17,7 +18,10 @@ class MockCamera : public ICamera
 
     void requestCapturePhoto() override;
 
+    const SystemStatusClient &systemStatusClient() const override;
+
   private:
+    SystemStatusClient status_client_;
     QMediaCaptureSession capture_session_;
     QImageCapture image_capture_;
     QCamera camera_;

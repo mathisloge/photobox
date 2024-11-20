@@ -1,4 +1,7 @@
 #include "SystemStatusModel.hpp"
+#include <Pbox/Logger.hpp>
+
+DEFINE_LOGGER(systemStatusModel);
 
 namespace Pbox
 {
@@ -14,12 +17,17 @@ QVariant SystemStatusModel::data(const QModelIndex &index, int role) const
         return {};
     }
     const auto &client = clients_.at(index.row());
+    if (client.isNull())
+    {
+        LOG_WARNING(systemStatusModel, "Got dangling system client.");
+        return {};
+    }
     switch (Role{role})
     {
     case Role::Title:
-        return client.name();
+        return client->name();
     case Role::Status:
-        return QVariant::fromValue(client.systemStatus());
+        return QVariant::fromValue(client->systemStatus());
     }
     return {};
 }
@@ -27,16 +35,20 @@ QVariant SystemStatusModel::data(const QModelIndex &index, int role) const
 QHash<int, QByteArray> SystemStatusModel::roleNames() const
 {
     static const auto kRoles = QHash<int, QByteArray>{
-        {std::underlying_type_t<Role>(Role::Title), "title"},
-        {std::underlying_type_t<Role>(Role::Status), "status"},
+        {std::to_underlying(Role::Title), "title"},
+        {std::to_underlying(Role::Status), "status"},
     };
     return kRoles;
 }
 
-void SystemStatusModel::registerClient(SystemStatusClient &&client)
+void SystemStatusModel::addClient(const SystemStatusClient *client)
 {
-    beginInsertRows(QModelIndex{}, clients_.size(), clients_.size());
-    clients_.emplace_back(std::move(client));
+    const int new_index = static_cast<int>(clients_.size());
+    beginInsertRows(QModelIndex{}, new_index, new_index);
+    clients_.emplace_back(client);
+    connect(client, &SystemStatusClient::systemStatusChanged, this, [this, row = new_index]() {
+        Q_EMIT dataChanged(index(row), index(row), {std::to_underlying(Role::Status)});
+    });
     endInsertRows();
 }
 } // namespace Pbox

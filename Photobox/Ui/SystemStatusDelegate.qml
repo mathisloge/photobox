@@ -6,16 +6,16 @@ import Photobox.Core
 
 RowLayout {
     id: root
-    property alias title: label.text
-    property int status: SystemStatusCode.Error
+    required property string title
+    required property int status
 
     readonly property color errorStatus: "#E51400"
     readonly property color errorStatusBorder: "#A20025"
     readonly property color okStatus: "#60A917"
     readonly property color okStatusBorder: "#008A00"
 
-    property color statusColor: errorStatus
-    property color statusColorBorder: errorStatusBorder
+    property color __statusColor: errorStatus
+    property color __statusColorBorder: errorStatusBorder
 
     Loader {
         id: loader
@@ -27,14 +27,16 @@ RowLayout {
 
     Label {
         id: label
+        text: root.title
+        font.pixelSize: 42
     }
 
     Component {
         id: ledStatusComponent
         Rectangle {
             radius: 180
-            color: root.statusColor
-            border.color: root.statusColorBorder
+            color: root.__statusColor
+            border.color: root.__statusColorBorder
             border.width: 5
         }
     }
@@ -57,15 +59,15 @@ RowLayout {
         State {
             when: root.status === SystemStatusCode.Error
             PropertyChanges {
-                root.statusColor: root.errorStatus
-                root.statusColorBorder: root.errorStatusBorder
+                root.__statusColor: root.errorStatus
+                root.__statusColorBorder: root.errorStatusBorder
             }
         },
         State {
             when: root.status === SystemStatusCode.Ok
             PropertyChanges {
-                root.statusColor: root.okStatus
-                root.statusColorBorder: root.okStatusBorder
+                root.__statusColor: root.okStatus
+                root.__statusColorBorder: root.okStatusBorder
             }
         }
     ]

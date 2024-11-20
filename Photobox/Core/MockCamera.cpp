@@ -7,10 +7,18 @@
 namespace Pbox
 {
 MockCamera::MockCamera()
-    : camera_{QMediaDevices::defaultVideoInput()}
+    : status_client_(QStringLiteral("Mock Kamera"), true)
+    , camera_{QMediaDevices::defaultVideoInput()}
 {
     capture_session_.setCamera(&camera_);
     capture_session_.setImageCapture(&image_capture_);
+
+    connect(&camera_, &QCamera::errorOccurred, this, [this](QCamera::Error error, QString /*message*/) {
+        status_client_.setSystemStatus(error == QCamera::Error::NoError ? SystemStatusCode::Code::Ok
+                                                                        : SystemStatusCode::Code::Error);
+    });
+    status_client_.setSystemStatus(SystemStatusCode::Code::Ok);
+
     camera_.setActive(true);
 
     connect(this, &ICamera::videoSinkChanged, this, [this]() { capture_session_.setVideoSink(getVideoSink()); });
@@ -28,5 +36,10 @@ MockCamera::~MockCamera() = default;
 void MockCamera::requestCapturePhoto()
 {
     image_capture_.capture();
+}
+
+const SystemStatusClient &MockCamera::systemStatusClient() const
+{
+    return status_client_;
 }
 } // namespace Pbox
