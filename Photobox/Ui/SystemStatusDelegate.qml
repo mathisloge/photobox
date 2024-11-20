@@ -2,18 +2,12 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Photobox.Core
 
 RowLayout {
     id: root
-
-    enum Status {
-        Connecting,
-        Error,
-        Ok
-    }
-
     property alias title: label.text
-    property int status: SystemStatus.Status.Error
+    property int status: SystemStatusCode.Error
 
     readonly property color errorStatus: "#E51400"
     readonly property color errorStatusBorder: "#A20025"
@@ -55,20 +49,20 @@ RowLayout {
 
     states: [
         State {
-            when: root.status === SystemStatus.Status.Connecting
+            when: root.status === SystemStatusCode.Connecting
             PropertyChanges {
                 loader.sourceComponent: busyComponent
             }
         },
         State {
-            when: root.status === SystemStatus.Status.Error
+            when: root.status === SystemStatusCode.Error
             PropertyChanges {
                 root.statusColor: root.errorStatus
                 root.statusColorBorder: root.errorStatusBorder
             }
         },
         State {
-            when: root.status === SystemStatus.Status.Ok
+            when: root.status === SystemStatusCode.Ok
             PropertyChanges {
                 root.statusColor: root.okStatus
                 root.statusColorBorder: root.okStatusBorder

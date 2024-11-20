@@ -1,24 +1,25 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Photobox.Core
 
 Page {
     ColumnLayout {
         anchors.fill: parent
 
-        SystemStatus {
+        SystemStatusDelegate {
             title: "Camera"
-            status: SystemStatus.Status.Connecting
+            status: SystemStatusCode.Connecting
         }
 
-        SystemStatus {
+        SystemStatusDelegate {
             title: "Buzzer"
-            status: SystemStatus.Status.Ok
+            status: SystemStatusCode.Ok
         }
 
-        SystemStatus {
+        SystemStatusDelegate {
             title: "Camera"
-            status: SystemStatus.Status.Error
+            status: SystemStatusCode.Error
         }
     }
 }

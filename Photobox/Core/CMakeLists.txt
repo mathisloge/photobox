@@ -36,8 +36,7 @@ qt_add_qml_module(
         CollageCaptureSession.cpp
         SystemStatusModel.cpp
         SystemStatusModel.hpp
-        SystemStatus.hpp
-        SystemStatus.cpp
+        SystemStatusCode.hpp
     RESOURCES
         Fonts/GreatVibes/GreatVibes-Regular.ttf
         Fonts/Roboto/Roboto-Bold.ttf

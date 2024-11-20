@@ -1,17 +1,17 @@
 #pragma once
 #include <QtQmlIntegration>
 
-namespace Pbox::SystemStatus
+namespace Pbox::SystemStatusCode
 {
 QML_ELEMENT
 Q_NAMESPACE
 
-enum class StatusType
+enum class Code
 {
     Error,
     Connecting,
     Ok
 };
-Q_ENUM_NS(StatusType)
+Q_ENUM_NS(Code)
 
-} // namespace Pbox::SystemStatus
+} // namespace Pbox::SystemStatusCode
