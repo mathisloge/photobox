@@ -7,6 +7,23 @@
 
 DEFINE_LOGGER(collage_context)
 
+namespace
+{
+void logError(std::exception_ptr ex)
+{
+    try
+    {
+        if (ex)
+        {
+            std::rethrow_exception(ex);
+        }
+    }
+    catch (const std::exception &e)
+    {
+        LOG_ERROR(collage_context, "Error while initializing the collage: {}", e.what());
+    }
+}
+} // namespace
 namespace Pbox
 {
 CollageContext::CollageContext(Scheduler &scheduler,
@@ -23,6 +40,10 @@ CollageContext::CollageContext(Scheduler &scheduler,
                             stdexec::then([this, printer_settings = std::move(*printer_settings)]() {
                                 printer_ = std::make_unique<CollagePrinter>(printer_settings);
                                 updateSystemStatus();
+                            }) |
+                            stdexec::upon_error([this](auto &&ex_ptr) {
+                                system_status_client_.setSystemStatus(SystemStatusCode::Code::Error);
+                                logError(std::forward<decltype(ex_ptr)>(ex_ptr));
                             });
         async_scope_.spawn(std::move(init_printer));
     }
@@ -46,7 +67,7 @@ CollageContext::CollageContext(Scheduler &scheduler,
                         }) |
                         stdexec::upon_error([this](auto &&ex_ptr) {
                             system_status_client_.setSystemStatus(SystemStatusCode::Code::Error);
-                            LOG_ERROR(collage_context, "Error while initializing the collage.");
+                            logError(std::forward<decltype(ex_ptr)>(ex_ptr));
                         });
 
     async_scope_.spawn(std::move(init_collage));
