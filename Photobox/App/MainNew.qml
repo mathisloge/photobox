@@ -6,25 +6,25 @@ import QtQuick.Controls
 ApplicationWindow {
     id: window
 
-    StackView {
-        id: stackView
+    Loader {
+        id: viewLoader
 
         anchors.fill: parent
-        initialItem: statusPage
+        sourceComponent: statusPage
 
         states: [
             State {
                 name: "status"
                 when: ApplicationState.systemStatusManager.status === SystemStatusManager.Initializing
-                StateChangeScript {
-                    script: stackView.pop(null)
+                PropertyChanges {
+                    viewLoader.sourceComponent: statusPage
                 }
             },
             State {
                 name: "normal"
                 when: ApplicationState.systemStatusManager.status === SystemStatusManager.RequiredClientsInitilized || ApplicationState.systemStatusManager.status === SystemStatusManager.AllClientsInitializied
-                StateChangeScript {
-                    script: stackView.push(capturePage)
+                PropertyChanges {
+                    viewLoader.sourceComponent: capturePage
                 }
             }
         ]

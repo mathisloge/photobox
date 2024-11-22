@@ -12,19 +12,23 @@ qt_add_qml_module(
         ImageStorage.hpp
         ImageStorage.cpp
         ApplicationState.hpp
-        CollageRenderer.hpp
-        CollageRenderer.cpp
         CaptureController.hpp
         CaptureController.cpp
+        CollageRenderer.hpp
+        CollageRenderer.cpp
         CollageSettings.hpp
         CollagePrinter.hpp
         CollagePrinter.cpp
+        CollageContext.hpp
+        CollageContext.cpp
+        CollageFontCache.hpp
+        CollageFontCache.cpp
+        CollageCaptureSession.hpp
+        CollageCaptureSession.cpp
         RemoteTrigger.cpp
         RemoteTrigger.hpp
         CameraLed.cpp
         CameraLed.hpp
-        SvgFontCache.hpp
-        SvgFontCache.cpp
         CrashCollection.cpp
         CrashCollection.hpp
         GPhoto2Camera.hpp
@@ -32,8 +36,8 @@ qt_add_qml_module(
         Scheduler.cpp
         Scheduler.hpp
         ICaptureSession.hpp
-        CollageCaptureSession.hpp
-        CollageCaptureSession.cpp
+        CaptureManager.hpp
+        CaptureManager.cpp
         SystemStatusCode.hpp
         SystemStatusManager.hpp
         SystemStatusManager.cpp

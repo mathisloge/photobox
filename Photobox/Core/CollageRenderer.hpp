@@ -7,9 +7,9 @@
 class QPainter;
 namespace Pbox
 {
-class SvgFontCache;
+class CollageFontCache;
 
-void init_lunasvg(SvgFontCache &font_cache);
+void init_lunasvg(CollageFontCache &font_cache);
 
 class CollageRenderer
 {

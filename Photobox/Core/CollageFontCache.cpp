@@ -1,4 +1,4 @@
-#include "SvgFontCache.hpp"
+#include "CollageFontCache.hpp"
 #include <QFile>
 
 namespace Pbox
@@ -8,13 +8,13 @@ namespace
 std::vector<CachedFont> initFonts();
 }
 
-SvgFontCache::SvgFontCache()
+CollageFontCache::CollageFontCache()
     : fonts_{initFonts()}
 {}
 
-SvgFontCache::~SvgFontCache() = default;
+CollageFontCache::~CollageFontCache() = default;
 
-std::span<const CachedFont> SvgFontCache::getFonts() const
+std::span<const CachedFont> CollageFontCache::getFonts() const
 {
     return fonts_;
 }

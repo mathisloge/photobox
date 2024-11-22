@@ -5,7 +5,7 @@
 #include <mutex>
 #include <Pbox/Logger.hpp>
 #include <nlohmann/json.hpp>
-#include "SvgFontCache.hpp"
+#include "CollageFontCache.hpp"
 
 DEFINE_LOGGER(collagerenderer);
 namespace Pbox
@@ -131,7 +131,7 @@ const std::filesystem::path &CollageRenderer::getDocumentPath() const
     return base_image_file_path_;
 }
 
-void init_lunasvg(Pbox::SvgFontCache &font_cache)
+void init_lunasvg(Pbox::CollageFontCache &font_cache)
 {
     static thread_local std::once_flag has_init;
     std::call_once(has_init, [&font_cache]() {

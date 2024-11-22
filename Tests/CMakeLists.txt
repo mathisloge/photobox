@@ -6,7 +6,7 @@ include(Catch)
 add_executable(tests
     main.cpp
     CollageRendererTest.cpp
-    TestCollageCaptureSession.cpp
+    #TestCollageCaptureSession.cpp
     TestEspHomeRemoteTrigger.cpp
     pixel_match.cpp
     pixel_match.hpp

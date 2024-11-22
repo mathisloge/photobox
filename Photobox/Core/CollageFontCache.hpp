@@ -2,6 +2,7 @@
 #include <QByteArray>
 #include <span>
 #include <vector>
+#include <Pbox/DisableCopyMove.hpp>
 
 namespace Pbox
 {
@@ -13,12 +14,12 @@ struct CachedFont
     QByteArray font_data;
 };
 
-class SvgFontCache
+class CollageFontCache final
 {
   public:
-    Q_DISABLE_COPY_MOVE(SvgFontCache);
-    SvgFontCache();
-    ~SvgFontCache();
+    PBOX_DISABLE_COPY_MOVE(CollageFontCache);
+    CollageFontCache();
+    ~CollageFontCache();
 
     std::span<const CachedFont> getFonts() const;
 
