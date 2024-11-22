@@ -48,27 +48,29 @@ CollageContext::CollageContext(Scheduler &scheduler,
         async_scope_.spawn(std::move(init_printer));
     }
 
-    auto init_collage = stdexec::schedule(scheduler_.getSvgRenderScheduler()) |
-                        stdexec::then([this]() { init_lunasvg(font_cache_); }) |
-                        stdexec::continues_on(scheduler_.getWorkScheduler()) |
-                        stdexec::then([this, collage_directory = std::move(collage_directory)]() {
-                            std::ifstream settings_file{collage_directory / "collage_settings.json"};
-                            nlohmann::json json;
-                            settings_file >> json;
-                            settings_ = json;
+    auto init_collage =
+        // important to put the fonts into the svg render thread.
+        stdexec::schedule(scheduler_.getSvgRenderScheduler()) |  //
+        stdexec::then([this]() { init_lunasvg(font_cache_); }) | //
+        stdexec::continues_on(scheduler_.getWorkScheduler()) |
+        stdexec::then([this, collage_directory = std::move(collage_directory)]() {
+            std::ifstream settings_file{collage_directory / "collage_settings.json"};
+            nlohmann::json json;
+            settings_file >> json;
+            settings_ = json;
 
-                            renderer_.loadDocument(collage_directory / "collage.svg");
-                            for (auto &&element : settings_.image_elements)
-                            {
-                                renderer_.addPhotoElement(element);
-                            }
-                            document_ready_ = true;
-                            updateSystemStatus();
-                        }) |
-                        stdexec::upon_error([this](auto &&ex_ptr) {
-                            system_status_client_.setSystemStatus(SystemStatusCode::Code::Error);
-                            logError(std::forward<decltype(ex_ptr)>(ex_ptr));
-                        });
+            renderer_.loadDocument(collage_directory / "collage.svg");
+            for (auto &&element : settings_.image_elements)
+            {
+                renderer_.addPhotoElement(element);
+            }
+            document_ready_ = true;
+            updateSystemStatus();
+        }) |
+        stdexec::upon_error([this](auto &&ex_ptr) {
+            system_status_client_.setSystemStatus(SystemStatusCode::Code::Error);
+            logError(std::forward<decltype(ex_ptr)>(ex_ptr));
+        });
 
     async_scope_.spawn(std::move(init_collage));
 }
