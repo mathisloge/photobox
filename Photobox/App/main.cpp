@@ -99,8 +99,6 @@ int main(int argc, char *argv[])
         CollageContext collage_context{scheduler, collage_directory.toStdString(), printer_settings.toStdString()};
         system_status_manager.registerClient(std::addressof(collage_context.systemStatusClient()));
 
-        CaptureManager capture_manager{collage_context};
-
         std::unique_ptr<RemoteTrigger> remote_trigger =
             std::make_unique<EspHomeRemoteTrigger>(std::make_unique<EspHomeClient>(trigger_button_host));
         std::unique_ptr<CameraLed> camera_led =
@@ -115,6 +113,11 @@ int main(int argc, char *argv[])
         {
             camera = std::make_shared<MockCamera>();
         }
+
+        CaptureManager capture_manager{
+            *camera,
+            collage_context,
+        };
         system_status_manager.registerClient(std::addressof(camera->systemStatusClient()));
 
         LOG_NOTICE(rootlogger, "Start init capture controller");

@@ -10,6 +10,8 @@ class ICaptureSession : public QObject
     QML_ELEMENT
     QML_UNCREATABLE("Will be provided as a concrete instance by the c++ API");
 
+    //! @brief True if the session is currently idle (waiting for user input)
+    Q_PROPERTY(bool idle READ isIdle NOTIFY idleChanged FINAL);
     //! @brief True if the live view images of the camera should be visible
     Q_PROPERTY(bool previewVisible READ isPreviewVisible NOTIFY previewVisibleChanged FINAL);
     //! @brief True if the countdown should be visible
@@ -30,6 +32,7 @@ class ICaptureSession : public QObject
     virtual void imageSaved(const std::filesystem::path &captured_image_path) = 0;
 
     /// vvv property methods
+    bool isIdle() const;
     virtual bool isPreviewVisible() const = 0;
     virtual bool isCountdownVisible() const = 0;
     virtual const QString &getCountdownText() const = 0;
@@ -42,9 +45,16 @@ class ICaptureSession : public QObject
     void requestedImageCapture();
 
     /// vvv property signals
+    void idleChanged();
     void previewVisibleChanged();
     void countdownVisibleChanged();
     void countdownTextChanged();
     /// ^^^ property signals
+
+  protected:
+    void setIdle(bool idle);
+
+  private:
+    bool idle_{false};
 };
 } // namespace Pbox

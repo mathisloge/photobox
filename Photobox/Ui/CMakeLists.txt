@@ -9,7 +9,10 @@ qt_add_qml_module(
         SystemStatusDelegate.qml
         StatusPage.qml
         CapturePage.qml
+        BuzzerAnimation.qml
     RESOURCES
+        Buzzer.svg
+        Pointer.svg
         ImageBorder.svg
         Logo.svg
 )

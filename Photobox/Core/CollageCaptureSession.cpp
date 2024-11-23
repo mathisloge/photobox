@@ -15,7 +15,7 @@ CollageCaptureSession::CollageCaptureSession(CollageContext &context)
     countdown_timer_.setInterval(std::chrono::seconds{1});
     countdown_timer_.setSingleShot(false);
     connect(&countdown_timer_, &QTimer::timeout, this, &CollageCaptureSession::handleCountdown);
-    countdown_timer_.start();
+    setIdle(true);
 }
 
 CollageCaptureSession::~CollageCaptureSession() = default;
@@ -103,6 +103,7 @@ void CollageCaptureSession::startCountdownOrFinish()
 
 void CollageCaptureSession::triggerCapture()
 {
+    setIdle(false);
     countdown_timer_.start();
 }
 

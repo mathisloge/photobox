@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 
 Text {
     id: countdownText
@@ -33,6 +32,12 @@ Text {
                 duration: 200
                 easing.type: Easing.InQuad
             }
+        }
+    }
+
+    Behavior on opacity {
+        NumberAnimation {
+            duration: 500
         }
     }
 }
