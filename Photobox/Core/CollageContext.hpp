@@ -4,6 +4,7 @@
 #include "CollageFontCache.hpp"
 #include "CollageRenderer.hpp"
 #include "CollageSettings.hpp"
+#include "Scheduler.hpp"
 #include "SystemStatusClient.hpp"
 
 namespace Pbox
@@ -19,12 +20,19 @@ class CollageContext final
                    std::optional<std::filesystem::path> printer_settings = std::nullopt);
     ~CollageContext();
 
+    Scheduler &scheduler();
     CollageRenderer &renderer();
     const CollageSettings &settings() const;
     const SystemStatusClient &systemStatusClient();
+    stdexec::sender auto asyncSaveAndPrintCollage()
+    {
+        return stdexec::then(stdexec::schedule(scheduler_.getSvgRenderScheduler()),
+                             [this]() { saveAndPrintCollage(); });
+    }
 
   private:
     void updateSystemStatus();
+    void saveAndPrintCollage();
 
   private:
     SystemStatusClient system_status_client_;

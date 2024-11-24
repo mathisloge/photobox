@@ -10,14 +10,24 @@ class ICaptureSession : public QObject
     QML_ELEMENT
     QML_UNCREATABLE("Will be provided as a concrete instance by the c++ API");
 
-    //! @brief True if the session is currently idle (waiting for user input)
-    Q_PROPERTY(bool idle READ isIdle NOTIFY idleChanged FINAL);
+    //! @brief Holds the status of the session
+    Q_PROPERTY(Pbox::ICaptureSession::Status status READ getStatus NOTIFY statusChanged FINAL);
     //! @brief True if the live view images of the camera should be visible
     Q_PROPERTY(bool previewVisible READ isPreviewVisible NOTIFY previewVisibleChanged FINAL);
     //! @brief True if the countdown should be visible
     Q_PROPERTY(bool countdownVisible READ isCountdownVisible NOTIFY countdownVisibleChanged FINAL);
     //! @brief The current text to show in the countdown ui
     Q_PROPERTY(QString countdownText READ getCountdownText NOTIFY countdownTextChanged FINAL)
+
+  public:
+    enum class Status
+    {
+        Idle,      //!< The session waits for user input and does nothing currently
+        Capturing, //!< The session is activly working on capturing the necessary images
+        Busy //!< The session is currently busy and won't accept user inputs and won't capture any images, set only if
+             //!< the user should know about the busy state, otherwise ude capturing
+    };
+    Q_ENUM(Status);
 
   public:
     PBOX_DISABLE_COPY_MOVE(ICaptureSession);
@@ -32,7 +42,7 @@ class ICaptureSession : public QObject
     virtual void imageSaved(const std::filesystem::path &captured_image_path) = 0;
 
     /// vvv property methods
-    bool isIdle() const;
+    Status getStatus() const;
     virtual bool isPreviewVisible() const = 0;
     virtual bool isCountdownVisible() const = 0;
     virtual const QString &getCountdownText() const = 0;
@@ -45,16 +55,16 @@ class ICaptureSession : public QObject
     void requestedImageCapture();
 
     /// vvv property signals
-    void idleChanged();
+    void statusChanged();
     void previewVisibleChanged();
     void countdownVisibleChanged();
     void countdownTextChanged();
     /// ^^^ property signals
 
   protected:
-    void setIdle(bool idle);
+    void setStatus(ICaptureSession::Status status);
 
   private:
-    bool idle_{false};
+    Status status_{Status::Idle};
 };
 } // namespace Pbox

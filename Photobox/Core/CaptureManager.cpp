@@ -9,7 +9,7 @@ CaptureManager::CaptureManager(ICamera &camera, CollageContext &collage_context)
 
 void CaptureManager::triggerButtonPressed()
 {
-    if (session_->isIdle())
+    if (session_->getStatus() == ICaptureSession::Status::Idle)
     {
         session_->triggerCapture();
     }

@@ -39,6 +39,6 @@ ApplicationWindow {
     Component {
         id: capturePage
 
-        CapturePage {}
+        CaptureMainPage {}
     }
 }

@@ -1,14 +1,10 @@
-import QtMultimedia
 import QtQuick
 import QtQuick.Controls
+import QtMultimedia
 import Photobox.Core
 
 Page {
     id: root
-    property alias videoOutput: videoOutput
-    property alias countdownText: countdown.text
-    property alias countdownVisible: countdown.visible
-
     readonly property ICaptureSession session: ApplicationState.captureManager.session
 
     VideoOutput {
@@ -40,7 +36,7 @@ Page {
     BuzzerAnimation {
         anchors.bottom: parent.bottom
         anchors.horizontalCenter: parent.horizontalCenter
-        opacity: root.session.idle ? 1 : 0
+        opacity: root.session.status === ICaptureSession.Idle ? 1 : 0
     }
 
     MouseArea {

@@ -1,4 +1,5 @@
 #include "CollageCaptureSession.hpp"
+#include <Pbox/CleanupAsyncScope.hpp>
 #include <Pbox/Logger.hpp>
 #include "CollageContext.hpp"
 
@@ -15,10 +16,12 @@ CollageCaptureSession::CollageCaptureSession(CollageContext &context)
     countdown_timer_.setInterval(std::chrono::seconds{1});
     countdown_timer_.setSingleShot(false);
     connect(&countdown_timer_, &QTimer::timeout, this, &CollageCaptureSession::handleCountdown);
-    setIdle(true);
 }
 
-CollageCaptureSession::~CollageCaptureSession() = default;
+CollageCaptureSession::~CollageCaptureSession()
+{
+    cleanup_async_scope(async_scope_);
+}
 
 void CollageCaptureSession::handleCountdown()
 {
@@ -93,18 +96,26 @@ void CollageCaptureSession::startCountdownOrFinish()
 {
     if (current_capture_ == context_.settings().image_elements.size())
     {
-        Q_EMIT finished();
+        finish();
     }
     else
     {
+        setStatus(ICaptureSession::Status::Capturing);
         countdown_timer_.start();
     }
 }
 
+void CollageCaptureSession::finish()
+{
+    setStatus(ICaptureSession::Status::Busy);
+    auto finish = stdexec::continues_on(context_.scheduler().getQtEventLoopScheduler()) |
+                  stdexec::then([this]() { Q_EMIT finished(); });
+    async_scope_.spawn(context_.asyncSaveAndPrintCollage() | std::move(finish));
+}
+
 void CollageCaptureSession::triggerCapture()
 {
-    setIdle(false);
-    countdown_timer_.start();
+    startCountdownOrFinish();
 }
 
 bool CollageCaptureSession::isPreviewVisible() const

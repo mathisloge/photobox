@@ -3,7 +3,6 @@
 #include <Pbox/CleanupAsyncScope.hpp>
 #include <Pbox/Logger.hpp>
 #include "CollagePrinter.hpp"
-#include "Scheduler.hpp"
 
 DEFINE_LOGGER(collage_context)
 
@@ -92,6 +91,21 @@ void CollageContext::updateSystemStatus()
     {
         system_status_client_.setSystemStatus(SystemStatusCode::Code::Ok);
     }
+}
+
+void CollageContext::saveAndPrintCollage()
+{
+    renderer_.updateLayout();
+    renderer_.renderToFile("test_collage.svg");
+    if (printer_ != nullptr)
+    {
+        printer_->print(renderer_);
+    }
+}
+
+Scheduler &CollageContext::scheduler()
+{
+    return scheduler_;
 }
 
 CollageRenderer &CollageContext::renderer()

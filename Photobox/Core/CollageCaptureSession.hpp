@@ -2,7 +2,7 @@
 #include <QImage>
 #include <QObject>
 #include <Pbox/DisableCopyMove.hpp>
-#include "CollageSettings.hpp"
+#include <exec/async_scope.hpp>
 #include "ICaptureSession.hpp"
 
 namespace Pbox
@@ -32,8 +32,10 @@ class CollageCaptureSession : public ICaptureSession
     void startCountdownOrFinish();
     void handleCountdown();
     void setPreviewVisible(bool visible);
+    void finish();
 
   private:
+    exec::async_scope async_scope_;
     CollageContext &context_;
     int current_capture_{0};
     bool preview_visible_{true};

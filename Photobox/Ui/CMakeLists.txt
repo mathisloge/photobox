@@ -8,6 +8,7 @@ qt_add_qml_module(
         BusyPage.qml
         SystemStatusDelegate.qml
         StatusPage.qml
+        CaptureMainPage.qml
         CapturePage.qml
         BuzzerAnimation.qml
     RESOURCES

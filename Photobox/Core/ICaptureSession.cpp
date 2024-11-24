@@ -2,17 +2,17 @@
 
 namespace Pbox
 {
-bool ICaptureSession::isIdle() const
+ICaptureSession::Status ICaptureSession::getStatus() const
 {
-    return idle_;
+    return status_;
 }
 
-void ICaptureSession::setIdle(bool idle)
+void ICaptureSession::setStatus(ICaptureSession::Status status)
 {
-    if (idle_ != idle)
+    if (status_ != status)
     {
-        idle_ = idle;
-        Q_EMIT idleChanged();
+        status_ = status;
+        Q_EMIT statusChanged();
     }
 }
 } // namespace Pbox
