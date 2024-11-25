@@ -114,10 +114,8 @@ int main(int argc, char *argv[])
             camera = std::make_shared<MockCamera>();
         }
 
-        CaptureManager capture_manager{
-            *camera,
-            collage_context,
-        };
+        ImageStorage image_storage{capture_directory.toStdString()};
+        CaptureManager capture_manager{scheduler, image_storage, *camera, collage_context};
         system_status_manager.registerClient(std::addressof(camera->systemStatusClient()));
 
         LOG_NOTICE(rootlogger, "Start init capture controller");

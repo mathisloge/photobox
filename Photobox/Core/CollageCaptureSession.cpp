@@ -96,10 +96,12 @@ void CollageCaptureSession::startCountdownOrFinish()
 {
     if (current_capture_ == context_.settings().image_elements.size())
     {
+        LOG_DEBUG(collage_capture_session, "Got all images. Finishing...", current_capture_);
         finish();
     }
     else
     {
+        LOG_DEBUG(collage_capture_session, "Starting countdown");
         setStatus(ICaptureSession::Status::Capturing);
         countdown_timer_.start();
     }

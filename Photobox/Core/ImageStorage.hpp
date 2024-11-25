@@ -1,22 +1,20 @@
 #pragma once
-#include <QObject>
+#include <atomic>
 #include <filesystem>
 
+class QImage;
 namespace Pbox
 {
-class ImageStorage : public QObject
+class ImageStorage
 {
-    Q_OBJECT
   public:
     explicit ImageStorage(std::filesystem::path storage_dir);
-    void onImageCaptured(const QImage &captured_image);
+    std::filesystem::path saveImage(const QImage &image);
     const std::filesystem::path &storageDir() const;
     std::string generateNewImageFilePath();
-  Q_SIGNALS:
-    void imageSaved(const std::filesystem::path &file_path);
 
   private:
     std::filesystem::path storage_dir_;
-    std::uint32_t image_counter_{0};
+    std::atomic_uint32_t image_counter_{0};
 };
 } // namespace Pbox

@@ -1,10 +1,13 @@
 #pragma once
 #include <QObject>
 #include <QtQmlIntegration>
+#include <exec/async_scope.hpp>
 #include "ICaptureSession.hpp"
 
 namespace Pbox
 {
+class Scheduler;
+class ImageStorage;
 class CollageContext;
 class ICamera;
 class CaptureManager : public QObject
@@ -17,7 +20,12 @@ class CaptureManager : public QObject
     Q_PROPERTY(Pbox::ICamera *camera READ getCamera CONSTANT);
 
   public:
-    explicit CaptureManager(ICamera &camera, CollageContext &collage_context);
+    PBOX_DISABLE_COPY_MOVE(CaptureManager);
+    explicit CaptureManager(Scheduler &scheduler,
+                            ImageStorage &image_storage,
+                            ICamera &camera,
+                            CollageContext &collage_context);
+    ~CaptureManager();
     Q_INVOKABLE void triggerButtonPressed();
 
     /// vvv property methods
@@ -31,7 +39,10 @@ class CaptureManager : public QObject
     /// ^^^ property signals
 
   private:
-    std::unique_ptr<ICaptureSession> session_{nullptr};
+    Scheduler &scheduler_;
+    ImageStorage &image_storage_;
     ICamera &camera_;
+    std::unique_ptr<ICaptureSession> session_{nullptr};
+    exec::async_scope async_scope_;
 };
 } // namespace Pbox

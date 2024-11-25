@@ -41,6 +41,17 @@ ImageStorage::ImageStorage(std::filesystem::path storage_dir)
     }
 }
 
+std::filesystem::path ImageStorage::saveImage(const QImage &image)
+{
+    const auto file_path = storage_dir_ / generateNewImageFilePath();
+    const bool image_saved = image.save(QString::fromStdString(file_path));
+    if (not image_saved)
+    {
+        throw std::runtime_error{"Image could not be saved."};
+    }
+    return file_path;
+}
+
 std::string ImageStorage::generateNewImageFilePath()
 {
     constexpr std::string_view kNameTemplate = "capture";
