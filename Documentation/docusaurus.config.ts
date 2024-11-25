@@ -12,7 +12,7 @@ const config: Config = {
   url: 'https://mathisloge.github.io/',
   baseUrl: '/photobox/',
 
-  organizationName: 'mathisloge', 
+  organizationName: 'mathisloge',
   projectName: 'photobox',
 
   onBrokenLinks: 'throw',
@@ -21,6 +21,16 @@ const config: Config = {
   i18n: {
     defaultLocale: 'en',
     locales: ['en'],
+  },
+
+  markdown: {
+    mermaid: true,
+  },
+
+  themes: ['@docusaurus/theme-mermaid'],
+
+  future: {
+    experimental_faster: true,
   },
 
   presets: [

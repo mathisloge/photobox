@@ -10,38 +10,36 @@ type FeatureItem = {
 
 const FeatureList: FeatureItem[] = [
   {
-    title: 'Easy to Use',
+    title: 'Instant Photo Collage Magic',
     Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        Transform a customizeable numbver of consecutive snapshots into a beautifully arranged collage with customizable themed designs.
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
+    title: 'Live Preview & Countdown Fun',
     Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        Enjoy a live preview before each shot and a customizable countdown timer. 
+        Strike the perfect pose as the photobox adds excitement to every click with interactive visual cues.
       </>
     ),
   },
   {
-    title: 'Powered by React',
+    title: 'Instant Printing',
     Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        Get your memories in hand within seconds! The photobox offers seamless integration with photo printers, delivering vibrant, smudge-proof prints of your collages, perfect for keepsakes or sharing on the spot.
       </>
     ),
   },
 ];
 
-function Feature({title, Svg, description}: FeatureItem) {
+function Feature({ title, Svg, description }: FeatureItem) {
   return (
     <div className={clsx('col col--4')}>
       <div className="text--center">
