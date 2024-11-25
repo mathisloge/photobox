@@ -3,7 +3,7 @@
 #include <QtQmlIntegration>
 #include <exec/async_scope.hpp>
 #include "ICaptureSession.hpp"
-
+#include "ImageProvider.hpp"
 namespace Pbox
 {
 class Scheduler;
@@ -25,8 +25,10 @@ class CaptureManager : public QObject
                             ImageStorage &image_storage,
                             ICamera &camera,
                             CollageContext &collage_context);
-    ~CaptureManager();
+    ~CaptureManager() override;
     Q_INVOKABLE void triggerButtonPressed();
+
+    ImageProvider *createImageProvider();
 
     /// vvv property methods
     Pbox::ICaptureSession *getSession();
@@ -37,6 +39,8 @@ class CaptureManager : public QObject
     /// vvv property signals
     void sessionChanged();
     /// ^^^ property signals
+    void imageCaptured(const QImage &image, std::uint32_t image_id);
+    void resetImages();
 
   private:
     Scheduler &scheduler_;
@@ -44,5 +48,6 @@ class CaptureManager : public QObject
     ICamera &camera_;
     std::unique_ptr<ICaptureSession> session_{nullptr};
     exec::async_scope async_scope_;
+    std::atomic_uint32_t image_ids_;
 };
 } // namespace Pbox

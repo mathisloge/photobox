@@ -4,6 +4,7 @@
 #include <Pbox/Logger.hpp>
 #include <Scheduler.hpp>
 #include "CollageCaptureSession.hpp"
+#include "ImageProvider.hpp"
 #include "ImageStorage.hpp"
 
 DEFINE_LOGGER(capture_manager);
@@ -20,7 +21,12 @@ CaptureManager::CaptureManager(Scheduler &scheduler,
     , session_{std::make_unique<CollageCaptureSession>(collage_context)}
 {
     connect(&camera_, &ICamera::imageCaptured, this, [this](auto &&image) {
-        session_->imageCaptured(image);
+        //! important: first emit the signal so that all image providers have it saved, and only then set the image to
+        //! the session. otherwise qml will not reevalute the image and the providers don't have a signal to schedule a
+        //! cache invalidation
+        const auto image_id = image_ids_++;
+        Q_EMIT imageCaptured(image, image_id);
+        session_->imageCaptured(image, image_id);
         async_scope_.spawn(
             stdexec::schedule(scheduler_.getWorkScheduler()) |
             stdexec::then([this, image = image]() { return image_storage_.saveImage(image); }) |
@@ -29,6 +35,7 @@ CaptureManager::CaptureManager(Scheduler &scheduler,
             stdexec::upon_error([](auto &&ex_ptr) { LOG_ERROR(capture_manager, "Error while saving image"); }));
     });
     connect(session_.get(), &ICaptureSession::requestedImageCapture, &camera_, &ICamera::requestCapturePhoto);
+    connect(session_.get(), &ICaptureSession::finished, this, &CaptureManager::resetImages);
 }
 
 CaptureManager::~CaptureManager()
@@ -42,6 +49,14 @@ void CaptureManager::triggerButtonPressed()
     {
         session_->triggerCapture();
     }
+}
+
+ImageProvider *CaptureManager::createImageProvider()
+{
+    auto *image_provider = new ImageProvider();
+    connect(this, &CaptureManager::imageCaptured, image_provider, &ImageProvider::addImage);
+    connect(this, &CaptureManager::resetImages, image_provider, &ImageProvider::resetCache);
+    return image_provider;
 }
 
 Pbox::ICaptureSession *CaptureManager::getSession()

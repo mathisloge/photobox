@@ -1,26 +1,35 @@
-#include "CameraImageProvider.hpp"
+#include "ImageProvider.hpp"
 
 using namespace Qt::Literals::StringLiterals;
 
 namespace Pbox
 {
-CameraImageProvider::CameraImageProvider()
+ImageProvider::ImageProvider()
     : QQuickImageProvider{QQuickImageProvider::Pixmap}
 {}
 
-void CameraImageProvider::addImage(const QImage &image, QString id)
+ImageProvider::~ImageProvider() = default;
+
+void ImageProvider::addImage(const QImage &image, std::uint32_t id)
 {
-    captured_images_[std::move(id)] = QPixmap::fromImage(image);
+    captured_images_[id] = QPixmap::fromImage(image);
 }
 
-void CameraImageProvider::resetCache()
+void ImageProvider::resetCache()
 {
     captured_images_.clear();
 }
 
-QPixmap CameraImageProvider::requestPixmap(const QString &id, QSize *size, const QSize &requestedSize)
+QPixmap ImageProvider::requestPixmap(const QString &id, QSize *size, const QSize &requestedSize)
 {
-    const auto it = captured_images_.find(id);
+    bool converted{false};
+    std::uint32_t image_id = id.toUInt(std::addressof(converted));
+    if (not converted)
+    {
+        return {};
+    }
+
+    const auto it = captured_images_.find(image_id);
     if (it != captured_images_.end())
     {
         const auto &image = it->second;

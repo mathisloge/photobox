@@ -10,12 +10,14 @@
 namespace Pbox
 {
 class Scheduler;
+class ImageStorage;
 class CollagePrinter;
 class CollageContext final
 {
   public:
     PBOX_DISABLE_COPY_MOVE(CollageContext);
     CollageContext(Scheduler &scheduler,
+                   ImageStorage &image_storage,
                    std::filesystem::path collage_directory,
                    std::optional<std::filesystem::path> printer_settings = std::nullopt);
     ~CollageContext();
@@ -27,16 +29,17 @@ class CollageContext final
     stdexec::sender auto asyncSaveAndPrintCollage()
     {
         return stdexec::then(stdexec::schedule(scheduler_.getSvgRenderScheduler()),
-                             [this]() { saveAndPrintCollage(); });
+                             [this]() { return saveAndPrintCollage(); });
     }
 
   private:
     void updateSystemStatus();
-    void saveAndPrintCollage();
+    std::filesystem::path saveAndPrintCollage();
 
   private:
-    SystemStatusClient system_status_client_;
     Scheduler &scheduler_;
+    ImageStorage &image_storage_;
+    SystemStatusClient system_status_client_;
     exec::async_scope async_scope_;
     CollageFontCache font_cache_;
     CollageSettings settings_;

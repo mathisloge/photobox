@@ -16,11 +16,10 @@ class CollageCaptureSession : public ICaptureSession
     explicit CollageCaptureSession(CollageContext &context);
     ~CollageCaptureSession() override;
     void triggerCapture() override;
-    void imageCaptured(const QImage &captured_image) override;
+    void imageCaptured(const QImage &captured_image, std::uint32_t image_id) override;
     void imageSaved(const std::filesystem::path &captured_image_path) override;
 
     /// vvv property methods
-    bool isPreviewVisible() const override;
     bool isCountdownVisible() const override;
     const QString &getCountdownText() const override;
     /// ^^^ property methods
@@ -31,7 +30,7 @@ class CollageCaptureSession : public ICaptureSession
   private:
     void startCountdownOrFinish();
     void handleCountdown();
-    void setPreviewVisible(bool visible);
+    void handlePreviewTimeout();
     void finish();
 
   private:
@@ -43,5 +42,6 @@ class CollageCaptureSession : public ICaptureSession
     QString final_countdown_text_{QStringLiteral("Smile!")};
     QString current_countdown_text_;
     QTimer countdown_timer_;
+    QTimer preview_timer_;
 };
 } // namespace Pbox

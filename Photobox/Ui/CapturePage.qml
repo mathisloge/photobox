@@ -12,7 +12,7 @@ Page {
 
         anchors.fill: parent
 
-        opacity: root.session.previewVisible ? 1 : 0
+        opacity: root.session.liveViewVisible ? 1 : 0
 
         Behavior on opacity {
             NumberAnimation {

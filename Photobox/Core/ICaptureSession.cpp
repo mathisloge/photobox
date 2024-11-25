@@ -15,4 +15,32 @@ void ICaptureSession::setStatus(ICaptureSession::Status status)
         Q_EMIT statusChanged();
     }
 }
+
+bool ICaptureSession::isLiveViewVisible() const
+{
+    return live_view_visible_;
+}
+
+void ICaptureSession::setLiveViewVisible(bool visible)
+{
+    if (visible != live_view_visible_)
+    {
+        live_view_visible_ = visible;
+        Q_EMIT liveViewVisibleChanged();
+    }
+}
+
+const QString &ICaptureSession::getPreviewImage() const
+{
+    return preview_image_;
+}
+
+void ICaptureSession::setPreviewImage(QString preview_image)
+{
+    if (preview_image_ != preview_image)
+    {
+        preview_image_ = std::move(preview_image);
+        Q_EMIT previewImageChanged();
+    }
+}
 } // namespace Pbox

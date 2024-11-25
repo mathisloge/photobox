@@ -3,8 +3,6 @@
 #include <QQmlExtensionPlugin>
 #include <QWindow>
 #include <ApplicationState.hpp>
-#include <CameraImageProvider.hpp>
-#include <CaptureController.hpp>
 #include <CollagePrinter.hpp>
 #include <CrashCollection.hpp>
 #include <EspHomeCameraLed.hpp>
@@ -96,7 +94,9 @@ int main(int argc, char *argv[])
 
         SystemStatusManager system_status_manager;
 
-        CollageContext collage_context{scheduler, collage_directory.toStdString(), printer_settings.toStdString()};
+        ImageStorage image_storage{capture_directory.toStdString()};
+        CollageContext collage_context{
+            scheduler, image_storage, collage_directory.toStdString(), printer_settings.toStdString()};
         system_status_manager.registerClient(std::addressof(collage_context.systemStatusClient()));
 
         std::unique_ptr<RemoteTrigger> remote_trigger =
@@ -114,18 +114,9 @@ int main(int argc, char *argv[])
             camera = std::make_shared<MockCamera>();
         }
 
-        ImageStorage image_storage{capture_directory.toStdString()};
         CaptureManager capture_manager{scheduler, image_storage, *camera, collage_context};
         system_status_manager.registerClient(std::addressof(camera->systemStatusClient()));
 
-        LOG_NOTICE(rootlogger, "Start init capture controller");
-        // auto capture_controller =
-        //     std::make_shared<CaptureController>(scheduler,
-        //                                         collage_directory.toStdString(),
-        //                                         std::make_unique<ImageStorage>(capture_directory.toStdString()),
-        //                                         camera,
-        //                                         std::make_unique<CollagePrinter>(printer_settings.toStdString()));
-        LOG_NOTICE(rootlogger, "End init capture controller");
         QQmlApplicationEngine engine;
 
         engine.setInitialProperties({
@@ -137,12 +128,11 @@ int main(int argc, char *argv[])
         app_state->system_status_manager = std::addressof(system_status_manager);
         app_state->camera = camera;
         app_state->remote_trigger = remote_trigger.get();
-        // app_state->capture_controller = capture_controller;
         app_state->camera_led = camera_led.get();
         app_state->capture_manager = std::addressof(capture_manager);
 
         engine.loadFromModule("Photobox.App", "MainNew");
-        // engine.addImageProvider(QLatin1String("camera"), capture_controller->createImageProvider());
+        engine.addImageProvider(QLatin1String("preview-image"), capture_manager.createImageProvider());
 
         app_return_code = app.exec();
     }

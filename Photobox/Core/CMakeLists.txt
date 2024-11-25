@@ -3,17 +3,15 @@ qt_add_qml_module(
     URI "Photobox.Core"
     STATIC
     SOURCES
-        CameraImageProvider.hpp
-        CameraImageProvider.cpp
         ICamera.hpp
         ICamera.cpp
         MockCamera.hpp
         MockCamera.cpp
         ImageStorage.hpp
         ImageStorage.cpp
+        ImageProvider.hpp
+        ImageProvider.cpp
         ApplicationState.hpp
-        CaptureController.hpp
-        CaptureController.cpp
         CollageRenderer.hpp
         CollageRenderer.cpp
         CollageSettings.hpp

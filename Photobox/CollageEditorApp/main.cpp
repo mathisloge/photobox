@@ -5,7 +5,6 @@
 #include <QQmlApplicationEngine>
 #include <QQmlExtensionPlugin>
 #include <ApplicationState.hpp>
-#include <CameraImageProvider.hpp>
 #include <GPhoto2Camera.hpp>
 #include <ICamera.hpp>
 #include <ImageStorage.hpp>

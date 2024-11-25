@@ -3,6 +3,7 @@
 #include <Pbox/CleanupAsyncScope.hpp>
 #include <Pbox/Logger.hpp>
 #include "CollagePrinter.hpp"
+#include "ImageStorage.hpp"
 
 DEFINE_LOGGER(collage_context)
 
@@ -26,10 +27,12 @@ void logError(std::exception_ptr ex)
 namespace Pbox
 {
 CollageContext::CollageContext(Scheduler &scheduler,
+                               ImageStorage &image_storage,
                                std::filesystem::path collage_directory,
                                std::optional<std::filesystem::path> printer_settings)
-    : system_status_client_{QStringLiteral("Collage"), true}
-    , scheduler_{scheduler}
+    : scheduler_{scheduler}
+    , image_storage_{image_storage}
+    , system_status_client_{QStringLiteral("Collage"), true}
 {
     if (printer_settings.has_value())
     {
@@ -93,14 +96,16 @@ void CollageContext::updateSystemStatus()
     }
 }
 
-void CollageContext::saveAndPrintCollage()
+std::filesystem::path CollageContext::saveAndPrintCollage()
 {
+    const auto saved_path = image_storage_.storageDir() / image_storage_.generateNewImageFilePath();
     renderer_.updateLayout();
-    renderer_.renderToFile("test_collage.svg");
+    renderer_.renderToFile(saved_path);
     if (printer_ != nullptr)
     {
         printer_->print(renderer_);
     }
+    return saved_path;
 }
 
 Scheduler &CollageContext::scheduler()
