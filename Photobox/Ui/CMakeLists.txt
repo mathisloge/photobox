@@ -10,6 +10,7 @@ qt_add_qml_module(
         StatusPage.qml
         CaptureMainPage.qml
         CapturePage.qml
+        PreviewPage.qml
         BuzzerAnimation.qml
     RESOURCES
         Buzzer.svg

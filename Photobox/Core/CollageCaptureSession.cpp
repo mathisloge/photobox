@@ -101,13 +101,16 @@ void CollageCaptureSession::startCountdownOrFinish()
 void CollageCaptureSession::finish()
 {
     setStatus(ICaptureSession::Status::Busy);
-    auto finish =
-        stdexec::continues_on(context_.scheduler().getQtEventLoopScheduler()) |
-        stdexec::then([this](auto &&saved_image_path) {
-            LOG_DEBUG(collage_capture_session, "collage finished. Saved to  {}", saved_image_path.string());
-            setPreviewImage(QString::fromStdString(std::forward<decltype(saved_image_path)>(saved_image_path)));
-            Q_EMIT finished();
-        });
+    auto finish = stdexec::continues_on(context_.scheduler().getQtEventLoopScheduler()) |
+                  stdexec::then([this](auto &&saved_image_path) {
+                      LOG_DEBUG(collage_capture_session,
+                                "collage finished. Saved to  {}",
+                                std::filesystem::absolute(saved_image_path).string());
+                      setPreviewImage(QString::fromStdString(
+                          fmt::format("file://{}", std::filesystem::absolute(saved_image_path).string())));
+                      setStatus(ICaptureSession::Status::Capturing);
+                      Q_EMIT finished();
+                  });
     async_scope_.spawn(context_.asyncSaveAndPrintCollage() | std::move(finish));
 }
 
