@@ -26,6 +26,8 @@ CollageCaptureSession::CollageCaptureSession(CollageContext &context)
     preview_timer_.setInterval(std::chrono::seconds{5});
     preview_timer_.setSingleShot(true);
     connect(&preview_timer_, &QTimer::timeout, this, &CollageCaptureSession::handlePreviewTimeout);
+
+    setLiveViewVisible(true);
 }
 
 CollageCaptureSession::~CollageCaptureSession()
@@ -100,6 +102,8 @@ void CollageCaptureSession::startCountdownOrFinish()
         LOG_DEBUG(collage_capture_session, "Starting countdown");
         setStatus(ICaptureSession::Status::Capturing);
         setLiveViewVisible(true);
+        current_countdown_text_ = QString::number(countdown_counter_);
+        Q_EMIT countdownTextChanged();
         countdown_timer_.start();
     }
     else if (not finished_ and saved_collage_path_.has_value())
@@ -140,7 +144,7 @@ void CollageCaptureSession::finish()
 
 void CollageCaptureSession::triggerCapture()
 {
-    if (not countdown_timer_.isActive() and not preview_timer_.isActive())
+    if (getStatus() == Status::Idle)
     {
         startCountdownOrFinish();
     }

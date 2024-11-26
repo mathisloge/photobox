@@ -33,7 +33,7 @@ MockCamera::MockCamera()
 
     connect(&image_capture_, &QImageCapture::imageCaptured, this, [this](auto, auto &&preview) {
         LOG_INFO(mock_camera, "Got image. Delaying publishing...");
-        QTimer::singleShot(std::chrono::seconds{1}, this, [this, preview]() {
+        QTimer::singleShot(std::chrono::seconds{3}, this, [this, preview]() {
             LOG_INFO(mock_camera, "Publishing image...");
             Q_EMIT imageCaptured(preview);
         });
