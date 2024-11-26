@@ -46,9 +46,6 @@ qt_add_qml_module(
         SystemStatusClient.cpp
     RESOURCES
         Fonts/GreatVibes/GreatVibes-Regular.ttf
-        Fonts/Roboto/Roboto-Bold.ttf
-        Fonts/Roboto/Roboto-BoldItalic.ttf
-        Fonts/Roboto/Roboto-Italic.ttf
         Fonts/Roboto/Roboto-Regular.ttf
 )
 

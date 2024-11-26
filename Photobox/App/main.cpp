@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
         app_state->camera_led = camera_led.get();
         app_state->capture_manager = std::addressof(capture_manager);
 
-        engine.loadFromModule("Photobox.App", "MainNew");
+        engine.loadFromModule("Photobox.App", "Main");
         engine.addImageProvider(QLatin1String("preview-image"), capture_manager.createImageProvider());
 
         app_return_code = app.exec();
