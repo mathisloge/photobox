@@ -32,6 +32,7 @@ class CollageCaptureSession : public ICaptureSession
     void handleCountdown();
     void handlePreviewTimeout();
     void finish();
+    bool allImagesCaptured() const;
 
   private:
     exec::async_scope async_scope_;
@@ -39,9 +40,11 @@ class CollageCaptureSession : public ICaptureSession
     int current_capture_{0};
     bool preview_visible_{true};
     int countdown_counter_{0};
+    bool finished_{false};
     QString final_countdown_text_{QStringLiteral("Smile!")};
     QString current_countdown_text_;
     QTimer countdown_timer_;
     QTimer preview_timer_;
+    std::optional<std::filesystem::path> saved_collage_path_;
 };
 } // namespace Pbox

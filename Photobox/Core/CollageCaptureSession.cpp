@@ -55,6 +55,7 @@ void CollageCaptureSession::handleCountdown()
 
 void CollageCaptureSession::handlePreviewTimeout()
 {
+    LOG_DEBUG(collage_capture_session, "preview timer timeout");
     setPreviewImage({});
     startCountdownOrFinish();
 }
@@ -72,6 +73,12 @@ void CollageCaptureSession::imageSaved(const std::filesystem::path &captured_ima
         auto &&image_element = context_.settings().image_elements.at(current_capture_);
         context_.renderer().setSourceOfPhoto(image_element, captured_image_path);
         current_capture_++;
+        // finish the collage to do the heavy work while the preview image from the current image is shown.
+        if (allImagesCaptured())
+        {
+            LOG_DEBUG(collage_capture_session, "Got all images. Finishing...", current_capture_);
+            finish();
+        }
     }
     catch (const std::out_of_range &ex)
     {
@@ -84,33 +91,46 @@ void CollageCaptureSession::imageSaved(const std::filesystem::path &captured_ima
 
 void CollageCaptureSession::startCountdownOrFinish()
 {
-    if (current_capture_ == context_.settings().image_elements.size())
-    {
-        LOG_DEBUG(collage_capture_session, "Got all images. Finishing...", current_capture_);
-        finish();
-    }
-    else
+    if (not allImagesCaptured())
     {
         LOG_DEBUG(collage_capture_session, "Starting countdown");
         setStatus(ICaptureSession::Status::Capturing);
         setLiveViewVisible(true);
         countdown_timer_.start();
     }
+    else if (not finished_ and saved_collage_path_.has_value())
+    {
+        LOG_DEBUG(collage_capture_session, "(startCountdownOrFinish) collage wasn't shown yet.");
+        setPreviewImage(QString::fromStdString(fmt::format("file://{}", saved_collage_path_->string())));
+        finished_ = true;
+        preview_timer_.start();
+    }
+    else if (finished_)
+    {
+        LOG_DEBUG(collage_capture_session, "(startCountdownOrFinish) collage is now finished.");
+        Q_EMIT finished();
+    }
+    else
+    {
+        LOG_WARNING(collage_capture_session,
+                    "some weird state. allImagesCaptured={}, saved_collage_path_.has_value()={}, finished_={}",
+                    allImagesCaptured(),
+                    saved_collage_path_.has_value(),
+                    finished_);
+    }
 }
 
 void CollageCaptureSession::finish()
 {
     setStatus(ICaptureSession::Status::Busy);
-    auto finish = stdexec::continues_on(context_.scheduler().getQtEventLoopScheduler()) |
-                  stdexec::then([this](auto &&saved_image_path) {
-                      LOG_DEBUG(collage_capture_session,
-                                "collage finished. Saved to  {}",
-                                std::filesystem::absolute(saved_image_path).string());
-                      setPreviewImage(QString::fromStdString(
-                          fmt::format("file://{}", std::filesystem::absolute(saved_image_path).string())));
-                      setStatus(ICaptureSession::Status::Capturing);
-                      Q_EMIT finished();
-                  });
+    auto finish =
+        stdexec::continues_on(context_.scheduler().getQtEventLoopScheduler()) |
+        stdexec::then([this](auto &&saved_image_path) {
+            saved_collage_path_ = std::filesystem::absolute(saved_image_path);
+            LOG_DEBUG(collage_capture_session, "collage finished. Saved to {}", saved_collage_path_->string());
+            setStatus(ICaptureSession::Status::Capturing);
+            startCountdownOrFinish();
+        });
     async_scope_.spawn(context_.asyncSaveAndPrintCollage() | std::move(finish));
 }
 
@@ -130,6 +150,11 @@ bool CollageCaptureSession::isCountdownVisible() const
 const QString &CollageCaptureSession::getCountdownText() const
 {
     return current_countdown_text_;
+}
+
+bool CollageCaptureSession::allImagesCaptured() const
+{
+    return current_capture_ == context_.settings().image_elements.size();
 }
 
 } // namespace Pbox

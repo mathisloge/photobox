@@ -43,6 +43,9 @@ class CaptureManager : public QObject
     void resetImages();
 
   private:
+    void sessionFinished();
+
+  private:
     Scheduler &scheduler_;
     ImageStorage &image_storage_;
     ICamera &camera_;

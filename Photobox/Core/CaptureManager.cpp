@@ -35,7 +35,7 @@ CaptureManager::CaptureManager(Scheduler &scheduler,
             stdexec::upon_error([](auto &&ex_ptr) { LOG_ERROR(capture_manager, "Error while saving image"); }));
     });
     connect(session_.get(), &ICaptureSession::requestedImageCapture, &camera_, &ICamera::requestCapturePhoto);
-    connect(session_.get(), &ICaptureSession::finished, this, &CaptureManager::resetImages);
+    connect(session_.get(), &ICaptureSession::finished, this, &CaptureManager::sessionFinished);
 }
 
 CaptureManager::~CaptureManager()
@@ -67,5 +67,10 @@ Pbox::ICaptureSession *CaptureManager::getSession()
 ICamera *CaptureManager::getCamera()
 {
     return std::addressof(camera_);
+}
+
+void CaptureManager::sessionFinished()
+{
+    Q_EMIT resetImages();
 }
 } // namespace Pbox

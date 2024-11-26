@@ -4,10 +4,14 @@
 #include <QPointer>
 #include <QTimer>
 #include <QVideoFrameFormat>
+#include <Pbox/Logger.hpp>
+
+DEFINE_LOGGER(mock_camera)
+
 namespace Pbox
 {
 MockCamera::MockCamera()
-    : status_client_(QStringLiteral("Mock Kamera"), true)
+    : status_client_(QStringLiteral("Mock Camera"), true)
     , camera_{QMediaDevices::defaultVideoInput()}
 {
     capture_session_.setCamera(&camera_);
@@ -24,9 +28,9 @@ MockCamera::MockCamera()
     connect(this, &ICamera::videoSinkChanged, this, [this]() { capture_session_.setVideoSink(getVideoSink()); });
 
     connect(&image_capture_, &QImageCapture::imageCaptured, this, [this](auto, auto &&preview) {
-        qDebug() << "got image";
+        LOG_INFO(mock_camera, "Got image. Delaying publishing...");
         QTimer::singleShot(std::chrono::seconds{1}, this, [this, preview]() {
-            qDebug() << "publish image";
+            LOG_INFO(mock_camera, "Publishing image...");
             Q_EMIT imageCaptured(preview);
         });
     });
