@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathisloge.opensource@pm.me>
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 import Photobox.Core
 import Photobox.Ui
 import QtMultimedia
@@ -10,7 +14,7 @@ ApplicationWindow {
 
     property var currentImage: ""
 
-    signal capturedPreviewFinished()
+    signal capturedPreviewFinished
 
     visible: true
     color: "black"
@@ -28,7 +32,6 @@ ApplicationWindow {
                 to: 1
                 duration: 500
             }
-
         }
 
         pushExit: Transition {
@@ -38,7 +41,6 @@ ApplicationWindow {
                 to: 0
                 duration: 500
             }
-
         }
 
         popEnter: Transition {
@@ -48,7 +50,6 @@ ApplicationWindow {
                 to: 1
                 duration: 500
             }
-
         }
 
         popExit: Transition {
@@ -58,9 +59,7 @@ ApplicationWindow {
                 to: 0
                 duration: 500
             }
-
         }
-
     }
 
     Component {
@@ -79,9 +78,7 @@ ApplicationWindow {
                     NumberAnimation {
                         duration: 500
                     }
-
                 }
-
             }
 
             Flow {
@@ -100,7 +97,6 @@ ApplicationWindow {
                         fillMode: Image.PreserveAspectFit
                         source: "image://camera/" + model.source
                     }
-
                 }
 
                 add: Transition {
@@ -117,11 +113,8 @@ ApplicationWindow {
                             duration: 1000
                             easing.type: Easing.InOutCubic
                         }
-
                     }
-
                 }
-
             }
 
             Countdown {
@@ -163,7 +156,6 @@ ApplicationWindow {
                         signal: startButton.clicked
                         targetState: collageCapture
                     }
-
                 }
 
                 DSM.State {
@@ -193,7 +185,6 @@ ApplicationWindow {
                             signal: startButton.clicked
                             targetState: stateBeginCountdown
                         }
-
                     }
 
                     DSM.State {
@@ -209,7 +200,6 @@ ApplicationWindow {
                             targetState: stateBeforeCapture
                             guard: countdown.count <= 1
                         }
-
                     }
 
                     DSM.State {
@@ -224,7 +214,6 @@ ApplicationWindow {
                             signal: countdown.finished
                             targetState: stateCapturePhoto
                         }
-
                     }
 
                     DSM.State {
@@ -239,7 +228,6 @@ ApplicationWindow {
                             signal: ApplicationState.captureController.capturedImageReady
                             targetState: stateShowCapturedImage
                         }
-
                     }
 
                     DSM.State {
@@ -260,7 +248,6 @@ ApplicationWindow {
                             guard: ApplicationState.captureController.collageComplete
                             targetState: stateShowCollageFinal
                         }
-
                     }
 
                     DSM.State {
@@ -274,7 +261,6 @@ ApplicationWindow {
                             signal: ApplicationState.captureController.collageCaptureComplete
                             targetState: stateShowCollageFinal
                         }
-
                     }
 
                     DSM.State {
@@ -288,15 +274,10 @@ ApplicationWindow {
                             targetState: idleState
                             timeout: 10000
                         }
-
                     }
-
                 }
-
             }
-
         }
-
     }
 
     Component {
@@ -306,7 +287,6 @@ ApplicationWindow {
             source: "image://camera/" + ApplicationState.captureController.model.sourceOfLastItem()
             cache: false
         }
-
     }
 
     Component {
@@ -316,15 +296,11 @@ ApplicationWindow {
             source: "file://" + ApplicationState.captureController.collageImagePath
             cache: false
         }
-
     }
 
     Component {
         id: busyComponent
 
-        BusyPage {
-        }
-
+        BusyPage {}
     }
-
 }

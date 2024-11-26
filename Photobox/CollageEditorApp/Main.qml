@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathisloge.opensource@pm.me>
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 import Photobox.Core
 import Photobox.Ui
 import QtCore
@@ -44,11 +48,8 @@ ApplicationWindow {
                     text: "Abbrechen"
                     onClicked: popup.close()
                 }
-
             }
-
         }
-
     }
 
     RowLayout {
@@ -88,11 +89,8 @@ ApplicationWindow {
                             fileSetImageDialog.open();
                         }
                     }
-
                 }
-
             }
-
         }
 
         CollageImage {
@@ -101,7 +99,6 @@ ApplicationWindow {
             Layout.fillWidth: true
             Layout.fillHeight: true
         }
-
     }
 
     FileDialog {
@@ -151,9 +148,6 @@ ApplicationWindow {
                     image.saveConfiguration();
                 }
             }
-
         }
-
     }
-
 }

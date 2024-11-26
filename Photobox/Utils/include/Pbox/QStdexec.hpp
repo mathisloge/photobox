@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathisloge.opensource@pm.me>
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #ifndef QTHREADSENDER_H
 #define QTHREADSENDER_H
 

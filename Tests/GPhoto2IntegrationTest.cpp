@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathisloge.opensource@pm.me>
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #include <GPhoto2Integration.hpp>
 #include <Pbox/Logger.hpp>
 #include <catch2/catch_test_macros.hpp>

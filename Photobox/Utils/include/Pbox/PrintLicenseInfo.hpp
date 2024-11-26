@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "CameraLed.hpp"
+#pragma once
+
 namespace Pbox
 {
-CameraLed::CameraLed() = default;
-CameraLed::~CameraLed() = default;
-} // namespace Pbox
+void printLicenseInfo();
+}

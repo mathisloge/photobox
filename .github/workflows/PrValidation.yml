@@ -15,6 +15,6 @@ jobs:
       - uses: flathub-infra/flatpak-github-actions/flatpak-builder@master
         with:
           bundle: photobox.flatpak
-          manifest-path: de.matnel.photobox.Devel.yml
+          manifest-path: de.matnel.photobox.Devel.yaml
           cache-key: flatpak-builder-${{ github.sha }}
           run-tests: true
