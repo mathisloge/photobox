@@ -7,7 +7,7 @@
 #include <Pbox/CleanupAsyncScope.hpp>
 #include <Pbox/Logger.hpp>
 #include <Scheduler.hpp>
-#include "CollageCaptureSession.hpp"
+#include "IdleCaptureSession.hpp"
 #include "ImageProvider.hpp"
 #include "ImageStorage.hpp"
 
@@ -18,11 +18,11 @@ namespace Pbox
 CaptureManager::CaptureManager(Scheduler &scheduler,
                                ImageStorage &image_storage,
                                ICamera &camera,
-                               CollageContext &collage_context)
+                               CaptureSessionFactoryFnc collage_session_factory)
     : scheduler_{scheduler}
     , image_storage_{image_storage}
     , camera_{camera}
-    , session_{std::make_unique<CollageCaptureSession>(collage_context)}
+    , collage_session_factory_{std::move(collage_session_factory)}
 {
     connect(&camera_, &ICamera::imageCaptured, this, [this](auto &&image) {
         //! important: first emit the signal so that all image providers have it saved, and only then set the image to
@@ -38,8 +38,7 @@ CaptureManager::CaptureManager(Scheduler &scheduler,
             stdexec::then([this](auto &&saved_image_path) { session_->imageSaved(saved_image_path); }) |
             stdexec::upon_error([](auto &&ex_ptr) { LOG_ERROR(capture_manager, "Error while saving image"); }));
     });
-    connect(session_.get(), &ICaptureSession::requestedImageCapture, &camera_, &ICamera::requestCapturePhoto);
-    connect(session_.get(), &ICaptureSession::finished, this, &CaptureManager::sessionFinished);
+    switchToSession(std::make_unique<IdleCaptureSession>());
 }
 
 CaptureManager::~CaptureManager()
@@ -75,6 +74,26 @@ ICamera *CaptureManager::getCamera()
 
 void CaptureManager::sessionFinished()
 {
+    LOG_DEBUG(capture_manager, "Session '{}' finished", session_->name());
     Q_EMIT resetImages();
+    if (session_->name() == IdleCaptureSession::kName)
+    {
+        switchToSession(collage_session_factory_());
+        session_->triggerCapture();
+    }
+    else
+    {
+        switchToSession(std::make_unique<IdleCaptureSession>());
+    }
+}
+
+void CaptureManager::switchToSession(CaptureSessionPtr &&new_session)
+{
+    const auto old_session_name = session_ != nullptr ? session_->name() : "unknown";
+    session_ = std::move(new_session);
+    connect(session_.get(), &ICaptureSession::requestedImageCapture, &camera_, &ICamera::requestCapturePhoto);
+    connect(session_.get(), &ICaptureSession::finished, this, &CaptureManager::sessionFinished);
+    Q_EMIT sessionChanged();
+    LOG_INFO(capture_manager, "Switched session from '{}' to '{}'", old_session_name, session_->name());
 }
 } // namespace Pbox

@@ -21,6 +21,7 @@
 #include <Scheduler.hpp>
 #include <fmt/core.h>
 #include "CaptureManager.hpp"
+#include "CollageCaptureSession.hpp"
 #include "CollageContext.hpp"
 #include "SystemStatusManager.hpp"
 
@@ -118,7 +119,9 @@ int main(int argc, char *argv[])
             camera = std::make_shared<MockCamera>();
         }
 
-        CaptureManager capture_manager{scheduler, image_storage, *camera, collage_context};
+        CaptureManager capture_manager{scheduler, image_storage, *camera, [&collage_context] {
+                                           return std::make_unique<CollageCaptureSession>(collage_context);
+                                       }};
         system_status_manager.registerClient(std::addressof(camera->systemStatusClient()));
 
         QQmlApplicationEngine engine;

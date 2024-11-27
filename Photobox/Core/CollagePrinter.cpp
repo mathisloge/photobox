@@ -3,9 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "CollagePrinter.hpp"
-#include <QDebug>
 #include <QPainter>
-#include <QPrintDialog>
 #include <QPrinter>
 #include <fstream>
 #include <nlohmann/json.hpp>

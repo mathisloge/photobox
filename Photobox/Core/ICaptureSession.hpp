@@ -37,10 +37,12 @@ class ICaptureSession : public QObject
 
   public:
     PBOX_DISABLE_COPY_MOVE(ICaptureSession);
-    ICaptureSession() = default;
-    ~ICaptureSession() override = default;
+    ICaptureSession(std::string name);
+    ~ICaptureSession() override;
 
-    Q_INVOKABLE virtual void triggerCapture() = 0;
+    const std::string &name() const;
+
+    virtual void triggerCapture() = 0;
 
     //! @brief Will be called if the camera has captured an image.
     virtual void imageCaptured(const QImage &captured_image, std::uint32_t image_id) = 0;
@@ -75,6 +77,7 @@ class ICaptureSession : public QObject
     void setPreviewImage(QString preview_image);
 
   private:
+    std::string name_;
     Status status_{Status::Idle};
     bool live_view_visible_{false};
     QString preview_image_;

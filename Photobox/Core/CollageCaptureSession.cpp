@@ -14,7 +14,8 @@ namespace Pbox
 {
 
 CollageCaptureSession::CollageCaptureSession(CollageContext &context)
-    : context_{context}
+    : ICaptureSession("CollageCaptureSession")
+    , context_{context}
     , countdown_counter_(context_.settings().seconds_between_capture)
 {
     countdown_timer_.setTimerType(Qt::TimerType::PreciseTimer);

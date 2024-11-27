@@ -3,26 +3,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #pragma once
-#include "ICaptureSession.hpp"
-
+#include <functional>
+#include <memory>
 namespace Pbox
 {
-class CaptureSessionFactory
-{};
+class ICaptureSession;
 
-class CaptureSessionFactoryBuilder;
+using CaptureSessionPtr = std::unique_ptr<ICaptureSession>;
+using CaptureSessionFactoryFnc = std::function<CaptureSessionPtr()>;
 
-class CaptureSessionFactoryBuilder
-{
-    using FactoryFunction = std::function<std::unique_ptr<ICaptureSession>()>;
-
-  public:
-    CaptureSessionFactoryBuilder &addIdleState();
-    CaptureSessionFactoryBuilder &addState();
-
-    [[nodiscard]] CaptureSessionFactory create();
-
-  private:
-    std::optional<FactoryFunction> idle_state_factory_;
-};
 } // namespace Pbox
