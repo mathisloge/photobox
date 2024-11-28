@@ -1,0 +1,32 @@
+name: stdexec
+buildsystem: cmake-ninja
+builddir: false
+config-opts:
+  - -DSTDEXEC_BUILD_TESTS=OFF
+  - -DSTDEXEC_BUILD_EXAMPLES=OFF
+  - -DCMAKE_BUILD_TYPE=Release
+  - -DFETCHCONTENT_FULLY_DISCONNECTED=ON
+  - -DFETCHCONTENT_SOURCE_DIR_RAPIDS-CMAKE=deps/rapids-cmake
+  - -DCPM_DOWNLOAD_LOCATION=deps/cpm/CPM.cmake
+sources:
+  - type: file
+    url: https://raw.githubusercontent.com/rapidsai/rapids-cmake/v24.10.00/RAPIDS.cmake
+    sha256: 0100b87a18a6b4ff9498fc2a835340d938e252685cf13bf975d38d2cc1a0b33e
+    dest-filename: RAPIDS.cmake
+  - type: file
+    url: https://raw.githubusercontent.com/cplusplus/sender-receiver/refs/tags/R9/execution.bs
+    sha256: fab7f3ae70f7ed21a39382b8a577c28acdd963b80938bb44cc756756e4efc233
+    dest-filename: execution.bs
+  - type: git
+    url: https://github.com/rapidsai/rapids-cmake.git
+    tag: v24.10.00
+    dest: deps/rapids-cmake
+  - type: file
+    url: https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.40.2/CPM.cmake
+    sha256: c8cdc32c03816538ce22781ed72964dc864b2a34a310d3b7104812a5ca2d835d
+    dest: deps/cpm
+    dest-filename: CPM.cmake
+  - type: git
+    url: https://github.com/NVIDIA/stdexec.git
+    commit: 999a11e0a82f9e4d0cedb29ed0b0282543b30805
+    branch: main

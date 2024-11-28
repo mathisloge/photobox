@@ -1,18 +1,20 @@
 #!/bin/bash
+# SPDX-FileCopyrightText: 2024 Mathis Logemann <mathisloge.opensource@pm.me>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 if [ "$#" -lt 1 ]; then
   echo "Benutzung: $0 [app|editor] [optionen]"
   exit 1
 fi
 
-# Entscheiden, welches Programm ausgeführt wird
 case "$1" in
   app)
-    shift # Entfernt das erste Argument ("app")
+    shift # removes ("app")
     exec /app/bin/PhotoboxApp "$@"
     ;;
   editor)
-    shift # Entfernt das erste Argument ("editor")
+    shift # removes ("editor")
     exec /app/bin/CollageEditorApp "$@"
     ;;
   *)

@@ -1,0 +1,88 @@
+version = 1
+SPDX-PackageName = "Photobox"
+SPDX-PackageSupplier = "Mathis Logemann"
+SPDX-PackageDownloadLocation = "https://github.com/mathisloge/photobox"
+
+[[annotations]]
+path = "EspHome/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2024 Mathis Logemann <mathisloge.opensource@pm.me>"
+SPDX-License-Identifier = "GPL-3.0-or-later"
+
+[[annotations]]
+path = "Flatpak/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2024 Mathis Logemann <mathisloge.opensource@pm.me>"
+SPDX-License-Identifier = "GPL-3.0-or-later"
+
+[[annotations]]
+path = "CMake/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2024 Mathis Logemann <mathisloge.opensource@pm.me>"
+SPDX-License-Identifier = "GPL-3.0-or-later"
+
+[[annotations]]
+path = "Tests/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2024 Mathis Logemann <mathisloge.opensource@pm.me>"
+SPDX-License-Identifier = "GPL-3.0-or-later"
+
+[[annotations]]
+path = "Documentation/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2024 Mathis Logemann <mathisloge.opensource@pm.me>"
+SPDX-License-Identifier = "GPL-3.0-or-later"
+
+[[annotations]]
+path = ".github/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2024 Mathis Logemann <mathisloge.opensource@pm.me>"
+SPDX-License-Identifier = "GPL-3.0-or-later"
+
+[[annotations]]
+path = "*.yaml"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2024 Mathis Logemann <mathisloge.opensource@pm.me>"
+SPDX-License-Identifier = "GPL-3.0-or-later"
+
+[[annotations]]
+path = ".clang-format"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2024 Mathis Logemann <mathisloge.opensource@pm.me>"
+SPDX-License-Identifier = "GPL-3.0-or-later"
+
+[[annotations]]
+path = "photobox.flatpakref"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2024 Mathis Logemann <mathisloge.opensource@pm.me>"
+SPDX-License-Identifier = "GPL-3.0-or-later"
+
+[[annotations]]
+path = "**/CMakeLists.txt"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2024 Mathis Logemann <mathisloge.opensource@pm.me>"
+SPDX-License-Identifier = "GPL-3.0-or-later"
+
+[[annotations]]
+path = ".gitignore"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2024 Mathis Logemann <mathisloge.opensource@pm.me>"
+SPDX-License-Identifier = "GPL-3.0-or-later"
+
+[[annotations]]
+path = ".clang-tidy"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2024 Mathis Logemann <mathisloge.opensource@pm.me>"
+SPDX-License-Identifier = "GPL-3.0-or-later"
+
+[[annotations]]
+path = ".clangd"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2024 Mathis Logemann <mathisloge.opensource@pm.me>"
+SPDX-License-Identifier = "GPL-3.0-or-later"
+
+[[annotations]]
+path = "CMakePresets.json"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2024 Mathis Logemann <mathisloge.opensource@pm.me>"
+SPDX-License-Identifier = "GPL-3.0-or-later"

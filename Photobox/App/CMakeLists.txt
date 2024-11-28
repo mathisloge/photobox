@@ -8,8 +8,6 @@ target_link_libraries(PhotoboxApp PRIVATE
     Qt6::PrintSupport
     PhotoboxCore
     PhotoboxCoreplugin
-    PhotoboxGPhoto2
-    PhotoboxGPhoto2plugin
     PhotoboxUiplugin
     PhotoboxPeripheral
 )

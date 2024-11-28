@@ -1,0 +1,59 @@
+esphome:
+  name: photobox-trigger
+
+esp32:
+  board: esp32-c6-devkitm-1
+  variant: esp32c6
+  framework:
+    type: esp-idf
+    version: "5.3.1"
+    platform_version: 6.9.0
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+ota:
+  - platform: esphome
+    password: ""
+
+wifi:
+  ssid: "photobox"
+  password: "photobox-matnel"
+  fast_connect: true
+
+
+web_server:
+  port: 80
+  local: true
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO3
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    name: "PhotoTriggerButton"
+    filters:
+      - delayed_on: 10ms
+      - delayed_off: 10ms
+
+light:
+  - platform: esp32_rmt_led_strip
+    rgb_order: GRB
+    pin: GPIO10
+    num_leds: 24
+    rmt_channel: 0
+    chipset: ws2812
+    name: "StatusLight"
+    effects:
+      - addressable_random_twinkle:
+          name: IdleMode
+          twinkle_probability: 5%
+          progress_interval: 32ms
+      - addressable_rainbow:
+          name: CountdownMode
+          speed: 40
+          width: 40

@@ -1,10 +1,20 @@
+// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathisloge.opensource@pm.me>
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #pragma once
-#include <memory>
+#include "GPhoto2Wrapper.hpp"
 #include <gphoto2-context.h>
 
-namespace Pbox
+namespace Pbox::GPhoto2
 {
-using GPhoto2ContextSharedPtr = std::shared_ptr<GPContext>;
-
-[[nodiscard]] GPhoto2ContextSharedPtr make_gphoto2_context();
-}; // namespace Pbox
+struct Context
+{
+    Context();
+    ContextUniquePtr context{makeUniqueContext()};
+    CameraAbilitiesListUniquePtr camera_abilities_list{makeUniqueCameraListAbilities()};
+    PortInfoListUniquePtr port_list{makeUniquePortInfoList()};
+    CameraUniquePtr camera{nullptr, CameraDeleter{context.get()}};
+    CameraAbilities camera_abilities{};
+};
+} // namespace Pbox::GPhoto2

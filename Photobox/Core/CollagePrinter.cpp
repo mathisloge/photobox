@@ -1,14 +1,17 @@
+// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathisloge.opensource@pm.me>
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "CollagePrinter.hpp"
-#include <QDebug>
 #include <QPainter>
-#include <QPrintDialog>
 #include <QPrinter>
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include "CollageRenderer.hpp"
 
 using json = nlohmann::json;
-void from_json(const json &j, QMarginsF &l)
+
+static void from_json(const json &j, QMarginsF &l)
 {
     l.setTop(j.at("top").get<qreal>());
     l.setTop(j.at("bottom").get<qreal>());
@@ -16,12 +19,12 @@ void from_json(const json &j, QMarginsF &l)
     l.setTop(j.at("right").get<qreal>());
 }
 
-void from_json(const json &j, QPageSize &p)
+static void from_json(const json &j, QPageSize &p)
 {
     p = QPageSize{j.at("pageSizeId").get<QPageSize::PageSizeId>()};
 }
 
-void from_json(const json &j, QPageLayout &l)
+static void from_json(const json &j, QPageLayout &l)
 {
     l.setPageSize(j.at("pageSize").get<QPageSize>());
     l.setOrientation(j.at("orientation").get<QPageLayout::Orientation>());
@@ -29,7 +32,7 @@ void from_json(const json &j, QPageLayout &l)
     l.setMargins(j.at("margins").get<QMarginsF>());
 }
 
-void from_json(const json &j, QPrinter &l)
+static void from_json(const json &j, QPrinter &l)
 {
     const auto name = j.at("name").get<std::string>();
     if (name.empty())
@@ -66,7 +69,7 @@ void CollagePrinter::print(CollageRenderer &renderer)
 {
     QPainter painter;
     painter.begin(printer_.get());
-    renderer.render(&painter, printer_->width(), printer_->height());
+    renderer.render(&painter, static_cast<float>(printer_->width()), static_cast<float>(printer_->height()));
     painter.end();
 }
 } // namespace Pbox

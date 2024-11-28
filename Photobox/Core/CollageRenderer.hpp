@@ -1,16 +1,27 @@
+// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathisloge.opensource@pm.me>
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #pragma once
 #include <filesystem>
 #include <unordered_map>
+#include <Pbox/DisableCopyMove.hpp>
 #include <lunasvg.h>
 
 class QPainter;
 namespace Pbox
 {
-class SvgFontCache;
+class CollageFontCache;
+
+void init_lunasvg(CollageFontCache &font_cache);
+
 class CollageRenderer
 {
   public:
-    explicit CollageRenderer(SvgFontCache &font_cache);
+    PBOX_DISABLE_COPY_MOVE(CollageRenderer);
+    explicit CollageRenderer();
+    ~CollageRenderer();
+
     void loadDocument(const std::string &file_path);
     void addPhotoElement(const std::string &element_id);
     void removePhotoElement(const std::string &element_id);

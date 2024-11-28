@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.28)
+cmake_minimum_required(VERSION 3.30)
 project(photobox VERSION 0.0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
@@ -13,11 +13,14 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
 include(CTest)
 include(FetchContent)
+include(GenerateExportHeader)
 include(Dependencies)
+include(Options)
 
+declare_photobox_options()
 declare_photobox_dependencies()
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Qml Quick Network Multimedia PrintSupport REQUIRED)
+find_package(Qt6 6.8 REQUIRED COMPONENTS Core Gui Qml Quick Network Multimedia PrintSupport)
 qt_policy(SET QTP0001 NEW)
 qt_standard_project_setup()
 
@@ -25,6 +28,9 @@ find_package(fmt CONFIG REQUIRED)
 find_package(lunasvg CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(cpptrace CONFIG REQUIRED)
+find_package(stdexec CONFIG REQUIRED)
+find_package(quill CONFIG REQUIRED)
+
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(gphoto2 REQUIRED IMPORTED_TARGET libgphoto2)
 message(STATUS "Found gphoto2 ${gphoto2_VERSION}")
@@ -32,11 +38,6 @@ message(STATUS "Found gphoto2 ${gphoto2_VERSION}")
 add_subdirectory(Photobox)
 
 if(BUILD_TESTING)
-    FetchContent_MakeAvailable(Catch2)
-    find_package(Catch2 CONFIG REQUIRED)
-    list(APPEND CMAKE_MODULE_PATH "${Catch2_SOURCE_DIR}/extras")
-
-    include(Catch)
     add_subdirectory(Tests)
 endif()
 

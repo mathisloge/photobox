@@ -6,8 +6,17 @@ qt_add_qml_module(
         Countdown.qml
         PreviewImage.qml
         BusyPage.qml
+        SystemStatusDelegate.qml
+        StatusPage.qml
+        CaptureMainPage.qml
+        CapturePage.qml
+        PreviewPage.qml
+        BuzzerAnimation.qml
     RESOURCES
+        Buzzer.svg
+        Pointer.svg
         ImageBorder.svg
+        Logo.svg
 )
 
 target_include_directories(PhotoboxUi PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")

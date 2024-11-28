@@ -1,46 +1,29 @@
+// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathisloge.opensource@pm.me>
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "CollageRenderer.hpp"
-#include <QDebug>
-#include <QFile>
+#include <QImage>
 #include <QPainter>
 #include <fstream>
 #include <mutex>
+#include <Pbox/Logger.hpp>
 #include <nlohmann/json.hpp>
-#include "SvgFontCache.hpp"
-namespace
-{
+#include "CollageFontCache.hpp"
 
-void init_lunasvg(Pbox::SvgFontCache &font_cache)
-{
-    static std::once_flag has_init;
-    std::call_once(has_init, [&font_cache]() {
-        for (auto &&font : font_cache.getFonts())
-        {
-            lunasvg_add_font_face_from_data(
-                font.name.c_str(),
-                font.bold,
-                font.italic,
-                font.font_data.data(),
-                font.font_data.size(),
-                [](void * /*closure*/) {},
-                nullptr);
-        }
-    });
-}
-
-} // namespace
+DEFINE_LOGGER(collagerenderer);
 namespace Pbox
 {
 
-CollageRenderer::CollageRenderer(SvgFontCache &font_cache)
-{
-    init_lunasvg(font_cache);
-}
+CollageRenderer::CollageRenderer() = default;
+
+CollageRenderer::~CollageRenderer() = default;
 
 void CollageRenderer::loadDocument(const std::string &file_path)
 {
     base_image_file_path_ = file_path;
     document_ = lunasvg::Document::loadFromFile(file_path);
-    qDebug() << "loaded image" << file_path << "valid=" << (document_ != nullptr);
+    LOG_DEBUG(collagerenderer, "loded image from {}. Is valid document: {}", file_path, (document_ != nullptr));
 }
 
 void CollageRenderer::addPhotoElement(const std::string &element_id)
@@ -48,7 +31,7 @@ void CollageRenderer::addPhotoElement(const std::string &element_id)
     auto el = document_->getElementById(element_id);
     if (el.isNull())
     {
-        qDebug() << "null element";
+        LOG_ERROR(collagerenderer, "The element '{}' could not be found in the SVG.", element_id);
         return;
     }
     images_[element_id] = std::move(el);
@@ -64,7 +47,10 @@ void CollageRenderer::setSourceOfPhoto(const std::string &element_id, const std:
     auto it = images_.find(element_id);
     if (it == images_.end())
     {
-        qDebug() << "Could not find image element" << element_id << "to set to path" << file_path;
+        LOG_ERROR(collagerenderer,
+                  "Can't set image '{}' to element href since the element '{}' could not be found",
+                  file_path,
+                  element_id);
         return;
     }
     it->second.setAttribute("href", file_path);
@@ -84,8 +70,8 @@ lunasvg::Bitmap CollageRenderer::scaledBitmap(float width, float height) const
 
     if (width > 0 and height > 0)
     {
-        const float scale_width = static_cast<float>(width) / document_->width();
-        const float scale_height = static_cast<float>(height) / document_->height();
+        const float scale_width = width / document_->width();
+        const float scale_height = height / document_->height();
 
         const float scale = std::min(scale_width, scale_height);
 
@@ -94,8 +80,8 @@ lunasvg::Bitmap CollageRenderer::scaledBitmap(float width, float height) const
     }
     else
     {
-        width = static_cast<float>(document_->width());
-        height = static_cast<float>(document_->height());
+        width = document_->width();
+        height = document_->height();
     }
 
     return document_->renderToBitmap(static_cast<int>(width), static_cast<int>(height));
@@ -111,9 +97,7 @@ void CollageRenderer::render(QPainter *painter, float width, float height) const
     const QImage pixmap{bitmap.data(), bitmap.width(), bitmap.height(), QImage::Format::Format_ARGB32_Premultiplied};
 
     painter->save();
-
     painter->drawImage(pixmap.rect(), pixmap);
-
     painter->restore();
 }
 
@@ -150,4 +134,23 @@ const std::filesystem::path &CollageRenderer::getDocumentPath() const
 {
     return base_image_file_path_;
 }
+
+void init_lunasvg(Pbox::CollageFontCache &font_cache)
+{
+    static thread_local std::once_flag has_init;
+    std::call_once(has_init, [&font_cache]() {
+        for (auto &&font : font_cache.getFonts())
+        {
+            lunasvg_add_font_face_from_data(
+                font.name.c_str(),
+                font.bold,
+                font.italic,
+                font.font_data.data(),
+                font.font_data.size(),
+                [](void * /*closure*/) {},
+                nullptr);
+        }
+    });
+}
+
 } // namespace Pbox

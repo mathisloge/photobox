@@ -3,7 +3,7 @@ macro(declare_photobox_dependencies)
     FetchContent_Declare(
         lunasvg
         GIT_REPOSITORY https://github.com/sammycage/lunasvg.git
-        GIT_TAG        23578c7461634623a5de903370310b3af5140536
+        GIT_TAG        v3.0.1
         FIND_PACKAGE_ARGS
     )
     set(FMT_INSTALL OFF)
@@ -27,7 +27,24 @@ macro(declare_photobox_dependencies)
     FetchContent_Declare(
         cpptrace
         GIT_REPOSITORY https://github.com/jeremy-rifkin/cpptrace.git
-        GIT_TAG        v0.7.2
+        GIT_TAG        v0.7.3
+        FIND_PACKAGE_ARGS
+    )
+
+    set(STDEXEC_BUILD_TESTS OFF)
+    set(STDEXEC_BUILD_EXAMPLES OFF)
+    FetchContent_Declare(
+        stdexec
+        GIT_REPOSITORY https://github.com/NVIDIA/stdexec.git
+        GIT_TAG        15dcdbcc464891d369ab46a9e8d5521ddc7853d7
+        FIND_PACKAGE_ARGS
+    )
+
+    set(QUILL_DISABLE_NON_PREFIXED_MACROS OFF)
+    FetchContent_Declare(
+        quill
+        GIT_REPOSITORY https://github.com/odygrd/quill.git
+        GIT_TAG        v7.5.0
         FIND_PACKAGE_ARGS
     )
 
@@ -39,6 +56,7 @@ macro(declare_photobox_dependencies)
             GIT_TAG        v3.7.1
             FIND_PACKAGE_ARGS
         )
+        FetchContent_MakeAvailable(Catch2)
     endif()
-    FetchContent_MakeAvailable(lunasvg fmt nlohmann_json cpptrace)
+    FetchContent_MakeAvailable(lunasvg fmt nlohmann_json cpptrace stdexec quill)
 endmacro()

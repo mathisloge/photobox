@@ -1,0 +1,14 @@
+name: cpptrace
+buildsystem: cmake-ninja
+builddir: true
+config-opts:
+  - -DCMAKE_BUILD_TYPE=Release
+  - -DCPPTRACE_UNWIND_WITH_LIBUNWIND=ON
+  - -DCPPTRACE_USE_EXTERNAL_ZSTD=ON
+  - -DCPPTRACE_USE_EXTERNAL_LIBDWARF=ON
+  - -DCPPTRACE_BUILD_TESTING=OFF
+  - -DCPPTRACE_BUILD_BENCHMARKING=OFF
+sources:
+  - type: git
+    url: https://github.com/jeremy-rifkin/cpptrace.git
+    tag: v0.7.3

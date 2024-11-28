@@ -1,0 +1,35 @@
+id: de.matnel.photobox
+runtime: org.kde.Platform
+runtime-version: "6.8"
+sdk: org.kde.Sdk
+command: launcher.sh
+finish-args:
+  - --share=ipc
+  - --share=network
+  - --socket=fallback-x11
+  - --socket=wayland
+  - --socket=session-bus
+  - --socket=cups
+  - --device=all
+  - --filesystem=host
+modules:
+  - Flatpak/lunasvg.yaml
+  - Flatpak/fmt.yaml
+  - Flatpak/json.yaml
+  - Flatpak/libusb.yaml
+  - Flatpak/gphoto2.yaml
+  - Flatpak/libdwarf.yaml
+  - Flatpak/cpptrace.yaml
+  - Flatpak/stdexec.yaml
+  - Flatpak/quill.yaml
+
+  - name: DigitalerApp
+    buildsystem: cmake-ninja
+    builddir: true
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=RelWithDebInfo
+      - -DFETCHCONTENT_FULLY_DISCONNECTED=ON
+      - -DBUILD_TESTING=OFF
+    sources:
+      - type: dir
+        path: .

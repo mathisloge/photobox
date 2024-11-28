@@ -1,27 +1,16 @@
+// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathisloge.opensource@pm.me>
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "GPhoto2Context.hpp"
-#include <QDebug>
-
-namespace
+#include "GPhoto2Exeption.hpp"
+namespace Pbox::GPhoto2
 {
-void handleGPhoto2Error(GPContext * /*context*/, const char *str, void * /*data*/)
+Context::Context()
 {
-    qDebug() << "gphoto2 error:" << str;
+    if (gp_abilities_list_load(camera_abilities_list.get(), context.get()) < GP_OK)
+    {
+        throw GPhoto2Exception{"Could not load abilities"};
+    }
 }
-
-void handleGPhoto2Status(GPContext * /*context*/, const char *str, void * /*data*/)
-{
-    qDebug() << "gphoto2 status:" << str;
-}
-} // namespace
-namespace Pbox
-{
-GPhoto2ContextSharedPtr make_gphoto2_context()
-{
-    GPhoto2ContextSharedPtr ctx{gp_context_new(), &gp_context_unref};
-
-    gp_context_set_error_func(ctx.get(), handleGPhoto2Error, NULL);
-    gp_context_set_status_func(ctx.get(), handleGPhoto2Status, NULL);
-
-    return ctx;
-}
-}; // namespace Pbox
+} // namespace Pbox::GPhoto2

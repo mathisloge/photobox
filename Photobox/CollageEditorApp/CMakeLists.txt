@@ -7,8 +7,6 @@ target_link_libraries(CollageEditorApp PRIVATE
     Qt6::Quick
     PhotoboxCore
     PhotoboxCoreplugin
-    PhotoboxGPhoto2
-    PhotoboxGPhoto2plugin
     PhotoboxUiplugin
 )
 

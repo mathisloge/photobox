@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathisloge.opensource@pm.me>
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #include <QApplication>
 #include <QPainter>
 #include <QPrintDialog>
@@ -5,7 +9,6 @@
 #include <QQmlApplicationEngine>
 #include <QQmlExtensionPlugin>
 #include <ApplicationState.hpp>
-#include <CameraImageProvider.hpp>
 #include <GPhoto2Camera.hpp>
 #include <ICamera.hpp>
 #include <ImageStorage.hpp>

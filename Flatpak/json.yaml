@@ -1,0 +1,11 @@
+name: json
+buildsystem: cmake-ninja
+builddir: true
+config-opts:
+  - -DCMAKE_BUILD_TYPE=Release
+  - -DJSON_BuildTests=OFF
+  - -DJSON_Install=ON
+sources:
+  - type: git
+    url: https://github.com/nlohmann/json.git
+    tag: v3.11.3
