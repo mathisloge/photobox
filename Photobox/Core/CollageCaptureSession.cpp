@@ -28,6 +28,10 @@ CollageCaptureSession::CollageCaptureSession(CollageContext &context)
     preview_timer_.setSingleShot(true);
     connect(&preview_timer_, &QTimer::timeout, this, &CollageCaptureSession::handlePreviewTimeout);
 
+    connect(this, &CollageCaptureSession::requestedImageCapture, this, [this]() {
+        setCaptureStatus(ICaptureSession::CaptureStatus::WaitForCapture);
+    });
+
     setLiveViewVisible(true);
 }
 
@@ -55,6 +59,10 @@ void CollageCaptureSession::handleCountdown()
     else
     {
         current_countdown_text_ = QString::number(countdown_counter_);
+        if (countdown_counter_ < 1)
+        {
+            setCaptureStatus(ICaptureSession::CaptureStatus::BeforeCapture);
+        }
     }
     LOG_DEBUG(collage_capture_session, "Countdown {}: {}", countdown_counter_, current_countdown_text_.toStdString());
     Q_EMIT countdownTextChanged();
@@ -69,6 +77,7 @@ void CollageCaptureSession::handlePreviewTimeout()
 
 void CollageCaptureSession::imageCaptured(const QImage & /*captured_image*/, std::uint32_t image_id)
 {
+    setCaptureStatus(ICaptureSession::CaptureStatus::Idle);
     setPreviewImage(QString::fromStdString(fmt::format("image://preview-image/{}", image_id)));
     preview_timer_.start();
 }

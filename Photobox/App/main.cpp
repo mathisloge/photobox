@@ -119,9 +119,10 @@ int main(int argc, char *argv[])
             camera = std::make_shared<MockCamera>();
         }
 
-        CaptureManager capture_manager{scheduler, image_storage, *camera, *remote_trigger, [&collage_context] {
-                                           return std::make_unique<CollageCaptureSession>(collage_context);
-                                       }};
+        CaptureManager capture_manager{
+            scheduler, image_storage, *camera, *remote_trigger, *camera_led, [&collage_context] {
+                return std::make_unique<CollageCaptureSession>(collage_context);
+            }};
         system_status_manager.registerClient(std::addressof(camera->systemStatusClient()));
 
         QQmlApplicationEngine engine;

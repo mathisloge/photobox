@@ -35,11 +35,20 @@ class ICaptureSession : public QObject
     };
     Q_ENUM(Status);
 
+    enum class CaptureStatus
+    {
+        Idle,           //!< Nothing related to the camera currently happening
+        BeforeCapture,  //!< The session is working towards a capture
+        WaitForCapture, //!< The session is activly waiting for the completion of the capture
+    };
+    Q_ENUM(CaptureStatus);
+
   public:
     PBOX_DISABLE_COPY_MOVE(ICaptureSession);
     ICaptureSession(std::string name);
     ~ICaptureSession() override;
 
+    //! @brief The name of the session.
     const std::string &name() const;
 
     virtual void triggerCapture() = 0;
@@ -51,6 +60,7 @@ class ICaptureSession : public QObject
 
     /// vvv property methods
     Status getStatus() const;
+    CaptureStatus getCaptureStatus() const;
     bool isLiveViewVisible() const;
     virtual bool isCountdownVisible() const = 0;
     virtual const QString &getCountdownText() const = 0;
@@ -65,6 +75,7 @@ class ICaptureSession : public QObject
 
     /// vvv property signals
     void statusChanged();
+    void captureStatusChanged();
     void liveViewVisibleChanged();
     void countdownVisibleChanged();
     void countdownTextChanged();
@@ -73,12 +84,14 @@ class ICaptureSession : public QObject
 
   protected:
     void setStatus(ICaptureSession::Status status);
+    void setCaptureStatus(ICaptureSession::CaptureStatus capture_status);
     void setLiveViewVisible(bool visible);
     void setPreviewImage(QString preview_image);
 
   private:
     std::string name_;
     Status status_{Status::Idle};
+    CaptureStatus capture_status_{CaptureStatus::Idle};
     bool live_view_visible_{false};
     QString preview_image_;
 };

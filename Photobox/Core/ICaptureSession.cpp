@@ -31,6 +31,20 @@ void ICaptureSession::setStatus(ICaptureSession::Status status)
     }
 }
 
+ICaptureSession::CaptureStatus ICaptureSession::getCaptureStatus() const
+{
+    return capture_status_;
+}
+
+void ICaptureSession::setCaptureStatus(ICaptureSession::CaptureStatus capture_status)
+{
+    if (capture_status_ != capture_status)
+    {
+        capture_status_ = capture_status;
+        Q_EMIT captureStatusChanged();
+    }
+}
+
 bool ICaptureSession::isLiveViewVisible() const
 {
     return live_view_visible_;

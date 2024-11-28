@@ -7,6 +7,7 @@
 #include <Pbox/CleanupAsyncScope.hpp>
 #include <Pbox/Logger.hpp>
 #include <Scheduler.hpp>
+#include "CameraLed.hpp"
 #include "IdleCaptureSession.hpp"
 #include "ImageProvider.hpp"
 #include "ImageStorage.hpp"
@@ -20,11 +21,13 @@ CaptureManager::CaptureManager(Scheduler &scheduler,
                                ImageStorage &image_storage,
                                ICamera &camera,
                                RemoteTrigger &remote_trigger,
+                               CameraLed &camera_led,
                                CaptureSessionFactoryFnc collage_session_factory)
     : scheduler_{scheduler}
     , image_storage_{image_storage}
     , camera_{camera}
     , remote_trigger_{remote_trigger}
+    , camera_led_{camera_led}
     , session_{std::make_unique<IdleCaptureSession>()}
     , collage_session_factory_{std::move(collage_session_factory)}
 {
@@ -116,6 +119,23 @@ void CaptureManager::handleSessionStatusChange()
         remote_trigger_.playEffect(RemoteTrigger::Effect::Countdown);
         break;
     case ICaptureSession::Status::Busy:
+        break;
+    }
+}
+
+void CaptureManager::handleSessionCaptureStatusChange()
+{
+    const auto status = session_->getCaptureStatus();
+    switch (status)
+    {
+    case ICaptureSession::CaptureStatus::Idle:
+        camera_led_.turnOff();
+        break;
+    case ICaptureSession::CaptureStatus::BeforeCapture:
+        camera_led_.playEffect(CameraLed::Effect::Pulsate);
+        break;
+    case ICaptureSession::CaptureStatus::WaitForCapture:
+        camera_led_.playEffect(CameraLed::Effect::Capture);
         break;
     }
 }
