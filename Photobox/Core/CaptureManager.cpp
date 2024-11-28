@@ -10,6 +10,7 @@
 #include "IdleCaptureSession.hpp"
 #include "ImageProvider.hpp"
 #include "ImageStorage.hpp"
+#include "RemoteTrigger.hpp"
 
 DEFINE_LOGGER(capture_manager);
 
@@ -18,10 +19,12 @@ namespace Pbox
 CaptureManager::CaptureManager(Scheduler &scheduler,
                                ImageStorage &image_storage,
                                ICamera &camera,
+                               RemoteTrigger &remote_trigger,
                                CaptureSessionFactoryFnc collage_session_factory)
     : scheduler_{scheduler}
     , image_storage_{image_storage}
     , camera_{camera}
+    , remote_trigger_{remote_trigger}
     , session_{std::make_unique<IdleCaptureSession>()}
     , collage_session_factory_{std::move(collage_session_factory)}
 {
@@ -39,6 +42,7 @@ CaptureManager::CaptureManager(Scheduler &scheduler,
             stdexec::then([this](auto &&saved_image_path) { session_->imageSaved(saved_image_path); }) |
             stdexec::upon_error([](auto &&ex_ptr) { LOG_ERROR(capture_manager, "Error while saving image"); }));
     });
+    connect(&remote_trigger_, &RemoteTrigger::triggered, this, &CaptureManager::triggerButtonPressed);
     switchToSession(std::make_unique<IdleCaptureSession>());
 }
 
@@ -94,7 +98,25 @@ void CaptureManager::switchToSession(CaptureSessionPtr &&new_session)
     session_ = std::move(new_session);
     connect(session_.get(), &ICaptureSession::requestedImageCapture, &camera_, &ICamera::requestCapturePhoto);
     connect(session_.get(), &ICaptureSession::finished, this, &CaptureManager::sessionFinished);
+    connect(session_.get(), &ICaptureSession::statusChanged, this, &CaptureManager::handleSessionStatusChange);
     Q_EMIT sessionChanged();
     LOG_INFO(capture_manager, "Switched session from '{}' to '{}'", old_session_name, session_->name());
+}
+
+void CaptureManager::handleSessionStatusChange()
+{
+    const auto status = session_->getStatus();
+
+    switch (status)
+    {
+    case ICaptureSession::Status::Idle:
+        remote_trigger_.playEffect(RemoteTrigger::Effect::Idle);
+        break;
+    case ICaptureSession::Status::Capturing:
+        remote_trigger_.playEffect(RemoteTrigger::Effect::Countdown);
+        break;
+    case ICaptureSession::Status::Busy:
+        break;
+    }
 }
 } // namespace Pbox

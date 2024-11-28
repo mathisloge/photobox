@@ -14,6 +14,7 @@ namespace Pbox
 class Scheduler;
 class ImageStorage;
 class CollageContext;
+class RemoteTrigger;
 class ICamera;
 class CaptureManager : public QObject
 {
@@ -29,6 +30,7 @@ class CaptureManager : public QObject
     explicit CaptureManager(Scheduler &scheduler,
                             ImageStorage &image_storage,
                             ICamera &camera,
+                            RemoteTrigger &remote_trigger,
                             CaptureSessionFactoryFnc collage_session_factory);
     ~CaptureManager() override;
     Q_INVOKABLE void triggerButtonPressed();
@@ -50,11 +52,13 @@ class CaptureManager : public QObject
   private:
     void sessionFinished();
     void switchToSession(CaptureSessionPtr &&new_session);
+    void handleSessionStatusChange();
 
   private:
     Scheduler &scheduler_;
     ImageStorage &image_storage_;
     ICamera &camera_;
+    RemoteTrigger &remote_trigger_;
     CaptureSessionFactoryFnc collage_session_factory_;
     std::unique_ptr<ICaptureSession> session_{nullptr};
     exec::async_scope async_scope_;
