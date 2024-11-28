@@ -28,9 +28,6 @@ class CollageCaptureSession : public ICaptureSession
     const QString &getCountdownText() const override;
     /// ^^^ property methods
 
-  Q_SIGNALS:
-    void finished();
-
   private:
     void startCountdownOrFinish();
     void handleCountdown();

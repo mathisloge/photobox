@@ -22,6 +22,7 @@ CaptureManager::CaptureManager(Scheduler &scheduler,
     : scheduler_{scheduler}
     , image_storage_{image_storage}
     , camera_{camera}
+    , session_{std::make_unique<IdleCaptureSession>()}
     , collage_session_factory_{std::move(collage_session_factory)}
 {
     connect(&camera_, &ICamera::imageCaptured, this, [this](auto &&image) {
