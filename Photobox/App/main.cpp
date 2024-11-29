@@ -23,6 +23,7 @@
 #include "CaptureManager.hpp"
 #include "CollageCaptureSession.hpp"
 #include "CollageContext.hpp"
+#include "SingleCaptureSession.hpp"
 #include "SystemStatusManager.hpp"
 
 Q_IMPORT_QML_PLUGIN(Photobox_CorePlugin)
@@ -66,11 +67,11 @@ int main(int argc, char *argv[])
         parser.addOption(developer_option);
 
         QCommandLineOption trigger_button_host_option(
-            QStringList() << "trigger-btn", "The hostname of the trigger button", "url", "http://192.168.0.31");
+            QStringList() << "trigger-btn", "The hostname of the trigger button", "url", "http://192.168.178.30");
         parser.addOption(trigger_button_host_option);
 
         QCommandLineOption camera_led_host_option(
-            QStringList() << "camera-led", "The hostname of the camera led controller", "url", "http://192.168.0.31");
+            QStringList() << "camera-led", "The hostname of the camera led controller", "url", "http://192.168.178.31");
         parser.addOption(camera_led_host_option);
 
         QCommandLineOption fullscreen_option{QStringList{QStringLiteral("f"), QStringLiteral("fullscreen")},
@@ -100,9 +101,9 @@ int main(int argc, char *argv[])
         SystemStatusManager system_status_manager;
 
         ImageStorage image_storage{capture_directory.toStdString()};
-        CollageContext collage_context{
-            scheduler, image_storage, collage_directory.toStdString(), printer_settings.toStdString()};
-        system_status_manager.registerClient(std::addressof(collage_context.systemStatusClient()));
+        // CollageContext collage_context{
+        //     scheduler, image_storage, collage_directory.toStdString(), printer_settings.toStdString()};
+        // system_status_manager.registerClient(std::addressof(collage_context.systemStatusClient()));
 
         std::unique_ptr<RemoteTrigger> remote_trigger =
             std::make_unique<EspHomeRemoteTrigger>(std::make_unique<EspHomeClient>(trigger_button_host));
@@ -119,10 +120,9 @@ int main(int argc, char *argv[])
             camera = std::make_shared<MockCamera>();
         }
 
-        CaptureManager capture_manager{
-            scheduler, image_storage, *camera, *remote_trigger, *camera_led, [&collage_context] {
-                return std::make_unique<CollageCaptureSession>(collage_context);
-            }};
+        CaptureManager capture_manager{scheduler, image_storage, *camera, *remote_trigger, *camera_led, [] {
+                                           return std::make_unique<SingleCaptureSession>();
+                                       }};
         system_status_manager.registerClient(std::addressof(camera->systemStatusClient()));
 
         QQmlApplicationEngine engine;
