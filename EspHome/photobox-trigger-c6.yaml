@@ -12,11 +12,6 @@ esp32:
 # Enable logging
 logger:
 
-# Enable Home Assistant API
-ota:
-  - platform: esphome
-    password: ""
-
 wifi:
   ssid: "photobox"
   password: "photobox-matnel"
@@ -43,8 +38,8 @@ binary_sensor:
 light:
   - platform: esp32_rmt_led_strip
     rgb_order: GRB
-    pin: GPIO10
-    num_leds: 24
+    pin: GPIO2
+    num_leds: 12
     rmt_channel: 0
     chipset: ws2812
     name: "StatusLight"

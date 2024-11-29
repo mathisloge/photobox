@@ -35,6 +35,8 @@ qt_add_qml_module(
         Scheduler.hpp
         ICaptureSession.cpp
         ICaptureSession.hpp
+        SingleCaptureSession.hpp
+        SingleCaptureSession.cpp
         CaptureSessionFactory.hpp
         IdleCaptureSession.hpp
         IdleCaptureSession.cpp
