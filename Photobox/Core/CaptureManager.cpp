@@ -102,6 +102,12 @@ void CaptureManager::switchToSession(CaptureSessionPtr &&new_session)
     connect(session_.get(), &ICaptureSession::requestedImageCapture, &camera_, &ICamera::requestCapturePhoto);
     connect(session_.get(), &ICaptureSession::finished, this, &CaptureManager::sessionFinished);
     connect(session_.get(), &ICaptureSession::statusChanged, this, &CaptureManager::handleSessionStatusChange);
+    connect(session_.get(),
+            &ICaptureSession::captureStatusChanged,
+            this,
+            &CaptureManager::handleSessionCaptureStatusChange);
+    handleSessionStatusChange();
+    handleSessionCaptureStatusChange();
     Q_EMIT sessionChanged();
     LOG_INFO(capture_manager, "Switched session from '{}' to '{}'", old_session_name, session_->name());
 }
@@ -129,12 +135,15 @@ void CaptureManager::handleSessionCaptureStatusChange()
     switch (status)
     {
     case ICaptureSession::CaptureStatus::Idle:
+        LOG_DEBUG(capture_manager, "Camera LED => off");
         camera_led_.turnOff();
         break;
     case ICaptureSession::CaptureStatus::BeforeCapture:
+        LOG_DEBUG(capture_manager, "Camera LED => Pulsate");
         camera_led_.playEffect(CameraLed::Effect::Pulsate);
         break;
     case ICaptureSession::CaptureStatus::WaitForCapture:
+        LOG_DEBUG(capture_manager, "Camera LED => Capture");
         camera_led_.playEffect(CameraLed::Effect::Capture);
         break;
     }
