@@ -22,6 +22,7 @@ void SingleCaptureSession::triggerCapture()
 {
     if (getStatus() == ICaptureSession::Status::Idle)
     {
+        setLiveViewVisible(true);
         startCapturing();
     }
 }
@@ -48,6 +49,7 @@ void SingleCaptureSession::handleCountdown(int count)
     LOG_DEBUG(single_capture_session, "Countdown {}", count);
     if (count == 1)
     {
+        setLiveViewVisible(false);
         setCaptureStatus(ICaptureSession::CaptureStatus::BeforeCapture);
     }
 }
