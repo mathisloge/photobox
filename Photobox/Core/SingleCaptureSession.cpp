@@ -13,10 +13,9 @@ namespace Pbox
 SingleCaptureSession::SingleCaptureSession()
     : ICaptureSession{"SingleCaptureSession"}
 {
-    countdown_timer_.setTimerType(Qt::TimerType::PreciseTimer);
-    countdown_timer_.setInterval(std::chrono::seconds{1});
-    countdown_timer_.setSingleShot(false);
-    connect(&countdown_timer_, &QTimer::timeout, this, &SingleCaptureSession::handleCountdown);
+    getCountdown()->setSeconds(6);
+    connect(getCountdown(), &Countdown::finished, this, &SingleCaptureSession::requestedImageCapture);
+    connect(getCountdown(), &Countdown::currentCountChanged, this, &SingleCaptureSession::handleCountdown);
 }
 
 void SingleCaptureSession::triggerCapture()
@@ -37,46 +36,19 @@ void SingleCaptureSession::imageCaptured(const QImage & /*captured_image*/, std:
 void SingleCaptureSession::imageSaved(const std::filesystem::path &captured_image_path)
 {}
 
-bool SingleCaptureSession::isCountdownVisible() const
-{
-    return not countdown_text_.isEmpty();
-}
-
-const QString &SingleCaptureSession::getCountdownText() const
-{
-    return countdown_text_;
-}
-
 void SingleCaptureSession::startCapturing()
 {
     setLiveViewVisible(true);
     setStatus(ICaptureSession::Status::Capturing);
-    countdown_counter_ = 5;
-    handleCountdown();
-    countdown_timer_.start();
+    getCountdown()->start();
 }
 
-void SingleCaptureSession::handleCountdown()
+void SingleCaptureSession::handleCountdown(int count)
 {
-    countdown_text_ = QString::number(countdown_counter_);
-    LOG_DEBUG(single_capture_session, "Countdown {}", countdown_counter_);
-    if (countdown_counter_ == 1)
+    LOG_DEBUG(single_capture_session, "Countdown {}", count);
+    if (count == 1)
     {
         setCaptureStatus(ICaptureSession::CaptureStatus::BeforeCapture);
     }
-    else if (countdown_counter_ == 1)
-    {
-        countdown_text_ = "Smile!";
-    }
-    else if (countdown_counter_ == 0)
-    {
-        countdown_text_ = "";
-        countdown_timer_.stop();
-        setCaptureStatus(ICaptureSession::CaptureStatus::Idle);
-        Q_EMIT requestedImageCapture();
-    }
-    countdown_counter_--;
-    Q_EMIT countdownTextChanged();
-    Q_EMIT countdownVisibleChanged();
 }
 } // namespace Pbox
