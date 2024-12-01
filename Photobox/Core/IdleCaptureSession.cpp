@@ -23,16 +23,4 @@ void IdleCaptureSession::imageCaptured(const QImage &captured_image, std::uint32
 
 void IdleCaptureSession::imageSaved(const std::filesystem::path &captured_image_path)
 {}
-
-bool IdleCaptureSession::isCountdownVisible() const
-{
-    return false;
-}
-
-const QString &IdleCaptureSession::getCountdownText() const
-{
-    static const QString kEmpty;
-    return kEmpty;
-}
-
 } // namespace Pbox
