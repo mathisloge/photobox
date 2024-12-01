@@ -35,6 +35,8 @@ qt_add_qml_module(
         Scheduler.hpp
         ICaptureSession.cpp
         ICaptureSession.hpp
+        SingleCaptureSession.hpp
+        SingleCaptureSession.cpp
         CaptureSessionFactory.hpp
         IdleCaptureSession.hpp
         IdleCaptureSession.cpp
@@ -47,6 +49,8 @@ qt_add_qml_module(
         SystemStatusModel.hpp
         SystemStatusClient.hpp
         SystemStatusClient.cpp
+        Countdown.hpp
+        Countdown.cpp
     RESOURCES
         Fonts/GreatVibes/GreatVibes-Regular.ttf
         Fonts/Roboto/Roboto-Regular.ttf
