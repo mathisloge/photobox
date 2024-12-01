@@ -9,6 +9,9 @@ jobs:
   test-deploy:
     name: Test deployment
     runs-on: ubuntu-latest
+    defaults:
+        run:
+          working-directory: "./Documentation"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -17,8 +20,9 @@ jobs:
         with:
           node-version: 18
           cache: npm
+          cache-dependency-path: "./Documentation"
 
       - name: Install dependencies
         run: npm install --frozen-lockfile
       - name: Test build website
-        run: npm build
+        run: npm run build
