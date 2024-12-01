@@ -101,9 +101,9 @@ int main(int argc, char *argv[])
         SystemStatusManager system_status_manager;
 
         ImageStorage image_storage{capture_directory.toStdString()};
-        // CollageContext collage_context{
-        //     scheduler, image_storage, collage_directory.toStdString(), printer_settings.toStdString()};
-        // system_status_manager.registerClient(std::addressof(collage_context.systemStatusClient()));
+        CollageContext collage_context{
+            scheduler, image_storage, collage_directory.toStdString(), printer_settings.toStdString()};
+        system_status_manager.registerClient(std::addressof(collage_context.systemStatusClient()));
 
         std::unique_ptr<RemoteTrigger> remote_trigger =
             std::make_unique<EspHomeRemoteTrigger>(std::make_unique<EspHomeClient>(trigger_button_host));
@@ -120,9 +120,10 @@ int main(int argc, char *argv[])
             camera = std::make_shared<MockCamera>();
         }
 
-        CaptureManager capture_manager{scheduler, image_storage, *camera, *remote_trigger, *camera_led, [] {
-                                           return std::make_unique<SingleCaptureSession>();
-                                       }};
+        CaptureManager capture_manager{
+            scheduler, image_storage, *camera, *remote_trigger, *camera_led, [&collage_context] {
+                return std::make_unique<CollageCaptureSession>(collage_context);
+            }};
         system_status_manager.registerClient(std::addressof(camera->systemStatusClient()));
 
         QQmlApplicationEngine engine;
