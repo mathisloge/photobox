@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: "Documentation"
+        working-directory: "./Documentation"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
         run:
-          working-directory: "Documentation"
+          working-directory: "./Documentation"
 
     permissions:
       pages: write
