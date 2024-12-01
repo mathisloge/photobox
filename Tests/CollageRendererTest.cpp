@@ -16,7 +16,7 @@ TEST_CASE("CollageRenderer save as png", "[CollageRenderer]")
     init_lunasvg(font_cache);
     CollageRenderer renderer{};
 
-    renderer.loadDocument(asset_path / "Collage.svg");
+    renderer.loadDocument(asset_path / "collage.svg");
     renderer.addPhotoElement("image-1");
     renderer.addPhotoElement("image-2");
 

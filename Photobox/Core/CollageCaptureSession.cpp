@@ -76,10 +76,10 @@ void CollageCaptureSession::imageSaved(const std::filesystem::path &captured_ima
     }
     catch (const std::out_of_range &ex)
     {
-        LOG_BACKTRACE(collage_capture_session,
-                      "Tried to add an image which wasn't part of the collage. current_capture={}. Error: {}",
-                      current_capture_,
-                      ex.what());
+        LOG_ERROR(collage_capture_session,
+                  "Tried to add an image which wasn't part of the collage. current_capture={}. Error: {}",
+                  current_capture_,
+                  ex.what());
     }
 }
 
