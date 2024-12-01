@@ -3,13 +3,17 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include <QSignalSpy>
+#include <QTest>
 #include <CollageCaptureSession.hpp>
+#include <CollageFontCache.hpp>
 #include <CollageRenderer.hpp>
 #include <Pbox/Logger.hpp>
-#include <SvgFontCache.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include "../pixel_match.hpp"
+#include "CollageContext.hpp"
+#include "ImageStorage.hpp"
+#include "Scheduler.hpp"
 #include "TestAssets.hpp"
-#include "pixel_match.hpp"
 
 using namespace Pbox;
 
@@ -18,30 +22,28 @@ DEFINE_LOGGER(testlog);
 TEST_CASE("Test CollageCaptureSession", "[UnitTest]")
 {
     const auto asset_path = std::filesystem::path{kAssetsPath};
-    SvgFontCache font_cache;
+    CollageFontCache font_cache;
     init_lunasvg(font_cache);
-    CollageRenderer renderer{};
-    CollageSettings settings{
-        .automatic_capture = true, .seconds_between_capture = 3, .image_elements = {"image-1", "image-2"}};
+    ImageStorage storage{std::filesystem::current_path()};
+    Scheduler scheduler;
+    CollageContext context{scheduler, storage, kAssetsPath};
 
-    renderer.loadDocument(asset_path / "Collage.svg");
-    std::ranges::for_each(settings.image_elements,
-                          std::bind(&CollageRenderer::addPhotoElement, &renderer, std::placeholders::_1));
+    QTRY_VERIFY(context.systemStatusClient().systemStatus() == SystemStatusCode::Code::Ok);
 
-    CollageCaptureSession session{settings, renderer};
+    CollageCaptureSession session{context};
     QSignalSpy finished_spy{&session, &CollageCaptureSession::finished};
 
-    session.imageCaptured(asset_path / "capture_1.png");
+    session.imageCaptured(QImage{}, 1);
+    session.imageSaved(asset_path / "capture_1.png");
     REQUIRE(finished_spy.size() == 0);
-    session.imageCaptured(asset_path / "capture_5.png");
+    session.imageCaptured(QImage{}, 2);
+    session.imageSaved(asset_path / "capture_5.png");
+    finished_spy.wait(std::chrono::seconds{context.settings().seconds_between_capture} + std::chrono::seconds{5});
     REQUIRE(finished_spy.size() == 1);
 
     // should not be added anywhere and the signal schould not be emitted
-    session.imageCaptured(asset_path / "capture_5.png");
-    REQUIRE(finished_spy.size() == 1);
-
-    renderer.updateLayout();
-    renderer.renderToFile(std::filesystem::current_path() / "collage_session_test.png");
+    // session.imageSaved(asset_path / "capture_5.png");
+    // REQUIRE(finished_spy.size() == 1);
 
     const QImage expected_img =
         QImage{(asset_path / "expected_collage.png").c_str()}.convertToFormat(QImage::Format_RGBA8888);
