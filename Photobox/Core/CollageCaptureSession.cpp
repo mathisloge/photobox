@@ -16,22 +16,18 @@ namespace Pbox
 CollageCaptureSession::CollageCaptureSession(CollageContext &context)
     : ICaptureSession("CollageCaptureSession")
     , context_{context}
-    , countdown_counter_(context_.settings().seconds_between_capture)
 {
-    countdown_timer_.setTimerType(Qt::TimerType::PreciseTimer);
-    countdown_timer_.setInterval(std::chrono::seconds{1});
-    countdown_timer_.setSingleShot(false);
-    connect(&countdown_timer_, &QTimer::timeout, this, &CollageCaptureSession::handleCountdown);
+    getCountdown()->setSeconds(context_.settings().seconds_between_capture);
+    connect(getCountdown(), &Countdown::finished, this, [this] {
+        LOG_DEBUG(collage_capture_session, "requesting capture...");
+        Q_EMIT requestedImageCapture();
+    });
+    connect(getCountdown(), &Countdown::currentCountChanged, this, &CollageCaptureSession::handleCountdown);
 
     preview_timer_.setTimerType(Qt::TimerType::PreciseTimer);
     preview_timer_.setInterval(std::chrono::seconds{5});
     preview_timer_.setSingleShot(true);
     connect(&preview_timer_, &QTimer::timeout, this, &CollageCaptureSession::handlePreviewTimeout);
-
-    connect(this, &CollageCaptureSession::requestedImageCapture, this, [this]() {
-        setCaptureStatus(ICaptureSession::CaptureStatus::WaitForCapture);
-    });
-
     setLiveViewVisible(true);
 }
 
@@ -40,32 +36,14 @@ CollageCaptureSession::~CollageCaptureSession()
     cleanup_async_scope(async_scope_);
 }
 
-void CollageCaptureSession::handleCountdown()
+void CollageCaptureSession::handleCountdown(int current_count)
 {
-    countdown_counter_--;
-    if (countdown_counter_ == 0)
+    LOG_DEBUG(collage_capture_session, "Countdown {}", current_count);
+    if (current_count <= 1)
     {
+        setCaptureStatus(ICaptureSession::CaptureStatus::BeforeCapture);
         setLiveViewVisible(false);
-        current_countdown_text_ = final_countdown_text_;
     }
-    else if (countdown_counter_ < 0)
-    {
-        countdown_counter_ = context_.settings().seconds_between_capture;
-        current_countdown_text_ = QString{};
-        countdown_timer_.stop();
-        LOG_DEBUG(collage_capture_session, "requesting capture...");
-        Q_EMIT requestedImageCapture();
-    }
-    else
-    {
-        current_countdown_text_ = QString::number(countdown_counter_);
-        if (countdown_counter_ < 1)
-        {
-            setCaptureStatus(ICaptureSession::CaptureStatus::BeforeCapture);
-        }
-    }
-    LOG_DEBUG(collage_capture_session, "Countdown {}: {}", countdown_counter_, current_countdown_text_.toStdString());
-    Q_EMIT countdownTextChanged();
 }
 
 void CollageCaptureSession::handlePreviewTimeout()
@@ -112,9 +90,7 @@ void CollageCaptureSession::startCountdownOrFinish()
         LOG_DEBUG(collage_capture_session, "Starting countdown");
         setStatus(ICaptureSession::Status::Capturing);
         setLiveViewVisible(true);
-        current_countdown_text_ = QString::number(countdown_counter_);
-        Q_EMIT countdownTextChanged();
-        countdown_timer_.start();
+        getCountdown()->start();
     }
     else if (not finished_ and saved_collage_path_.has_value())
     {
@@ -161,16 +137,6 @@ void CollageCaptureSession::triggerCapture()
     {
         startCountdownOrFinish();
     }
-}
-
-bool CollageCaptureSession::isCountdownVisible() const
-{
-    return not current_countdown_text_.isEmpty();
-}
-
-const QString &CollageCaptureSession::getCountdownText() const
-{
-    return current_countdown_text_;
 }
 
 bool CollageCaptureSession::allImagesCaptured() const

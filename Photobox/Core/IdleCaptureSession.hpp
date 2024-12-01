@@ -17,8 +17,5 @@ class IdleCaptureSession : public ICaptureSession
     void triggerCapture() override;
     void imageCaptured(const QImage &captured_image, std::uint32_t image_id) override;
     void imageSaved(const std::filesystem::path &captured_image_path) override;
-
-    bool isCountdownVisible() const override;
-    const QString &getCountdownText() const override;
 };
 } // namespace Pbox

@@ -16,17 +16,10 @@ class SingleCaptureSession : public ICaptureSession
     void imageCaptured(const QImage &captured_image, std::uint32_t image_id) override;
     void imageSaved(const std::filesystem::path &captured_image_path) override;
 
-    bool isCountdownVisible() const override;
-    const QString &getCountdownText() const override;
-
   private:
     void startCapturing();
-    void handleCountdown();
+    void handleCountdown(int count);
 
   private:
-    int countdown_counter_{};
-    QString countdown_text_;
-
-    QTimer countdown_timer_;
 };
 } // namespace Pbox

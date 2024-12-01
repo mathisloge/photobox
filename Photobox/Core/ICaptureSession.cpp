@@ -59,6 +59,11 @@ void ICaptureSession::setLiveViewVisible(bool visible)
     }
 }
 
+Countdown *ICaptureSession::getCountdown()
+{
+    return std::addressof(countdown_);
+}
+
 const QString &ICaptureSession::getPreviewImage() const
 {
     return preview_image_;
