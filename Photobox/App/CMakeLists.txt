@@ -6,8 +6,8 @@ target_link_libraries(PhotoboxApp PRIVATE
     Qt6::Qml
     Qt6::Quick
     Qt6::PrintSupport
-    PhotoboxCore
-    PhotoboxCoreplugin
+    Photobox::Core
+    Photobox::CorePlugin
     PhotoboxUiplugin
     PhotoboxPeripheral
 )
@@ -17,6 +17,8 @@ qt_add_qml_module(PhotoboxApp
     VERSION 1.0
     QML_FILES
       Main.qml
+    DEPENDENCIES
+        Photobox::Core
 )
 
 

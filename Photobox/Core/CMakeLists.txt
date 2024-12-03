@@ -56,6 +56,9 @@ qt_add_qml_module(
         Fonts/Roboto/Roboto-Regular.ttf
 )
 
+add_library(Photobox::Core ALIAS PhotoboxCore)
+add_library(Photobox::CorePlugin ALIAS PhotoboxCoreplugin)
+
 target_include_directories(PhotoboxCore PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(PhotoboxCore PUBLIC
     Qt6::Quick
