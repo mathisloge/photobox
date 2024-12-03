@@ -23,6 +23,7 @@
 #include "CaptureManager.hpp"
 #include "CollageCaptureSession.hpp"
 #include "CollageContext.hpp"
+#include "SingleCaptureSession.hpp"
 #include "SystemStatusManager.hpp"
 
 Q_IMPORT_QML_PLUGIN(Photobox_CorePlugin)
@@ -66,11 +67,11 @@ int main(int argc, char *argv[])
         parser.addOption(developer_option);
 
         QCommandLineOption trigger_button_host_option(
-            QStringList() << "trigger-btn", "The hostname of the trigger button", "url", "http://192.168.0.31");
+            QStringList() << "trigger-btn", "The hostname of the trigger button", "url", "http://192.168.178.30");
         parser.addOption(trigger_button_host_option);
 
         QCommandLineOption camera_led_host_option(
-            QStringList() << "camera-led", "The hostname of the camera led controller", "url", "http://192.168.0.31");
+            QStringList() << "camera-led", "The hostname of the camera led controller", "url", "http://192.168.178.31");
         parser.addOption(camera_led_host_option);
 
         QCommandLineOption fullscreen_option{QStringList{QStringLiteral("f"), QStringLiteral("fullscreen")},
