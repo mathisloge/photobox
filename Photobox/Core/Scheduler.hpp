@@ -35,7 +35,7 @@ struct Scheduler
      */
     QThreadScheduler getQtEventLoopScheduler();
 
-    exec::static_thread_pool compute_thread_pool_{2};
+    exec::static_thread_pool compute_thread_pool_{3};
     exec::single_thread_context svg_thread_pool_;
 };
 } // namespace Pbox

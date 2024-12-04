@@ -1,0 +1,70 @@
+{
+    "name": "hochzeit-xyz",
+    "remote-triggers": [
+        {
+            "name": "CollageTrigger",
+            "url": "http://192.168.178.30"
+        },
+        {
+            "name": "SingleTrigger",
+            "url": "http://192.168.178.31"
+        }
+    ],
+    "camera-led": {
+        "url": "http://192.168.178.33"
+    },
+    "sessions": [
+        {
+            "name": "SingleCaptureSession",
+            "when": [
+                {
+                    "type": "remote-trigger",
+                    "name": "SingleTrigger"
+                },
+                {
+                    "type": "click"
+                }
+            ]
+        },
+        {
+            "name": "CollageCaptureSession",
+            "when": [
+                {
+                    "type": "remote-trigger",
+                    "name": "CollageTrigger"
+                },
+                {
+                    "type": "click"
+                }
+            ]
+        }
+    ],
+    "capture-outdir": "./captures",
+    "collage": {
+        "automatic_capture": true,
+        "image_elements": [
+            "image-1",
+            "image-2"
+        ],
+        "seconds_between_capture": 5,
+        "svg": "collage.svg"
+    },
+    "printer": {
+        "fullPage": false,
+        "name": "",
+        "pageLayout": {
+            "margins": {
+                "bottom": 3.53,
+                "left": 3.53,
+                "right": 3.53,
+                "top": 3.53
+            },
+            "orientation": 0,
+            "pageSize": {
+                "pageSizeId": 7
+            },
+            "units": 0
+        },
+        "resolution": 96
+    }
+}
