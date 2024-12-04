@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
         const QString capture_directory = parser.value(capture_directory_option);
         const QString collage_directory = parser.value(collage_directory_option);
         const QString printer_settings = parser.value(printer_settings_option);
-        const bool developer_mode = parser.isSet(developer_option);
+        const bool developer_mode = true or parser.isSet(developer_option);
         const QString trigger_button_host = parser.value(trigger_button_host_option);
         const QString camera_led_host = parser.value(camera_led_host_option);
         const QWindow::Visibility window_mode =
@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
         app_state->camera_led = camera_led.get();
         app_state->capture_manager = std::addressof(capture_manager);
 
-        engine.loadFromModule("Photobox.App", "Main");
+        engine.loadFromModule("Photobox.SettingsApp", "Main");
         engine.addImageProvider(QLatin1String("preview-image"), capture_manager.createImageProvider());
 
         app_return_code = app.exec();
