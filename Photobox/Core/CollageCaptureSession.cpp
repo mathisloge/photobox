@@ -117,9 +117,6 @@ void CollageCaptureSession::startCountdownOrFinish()
 void CollageCaptureSession::finish()
 {
     setStatus(ICaptureSession::Status::Busy);
-
-    stdexec::sync_wait(stdexec::then(stdexec::just(2), [](int i) {}));
-
     auto finish =
         stdexec::continues_on(context_.scheduler().getQtEventLoopScheduler()) |
         stdexec::then([this](auto &&saved_image_path) {

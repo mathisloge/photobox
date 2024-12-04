@@ -1,6 +1,9 @@
 // SPDX-FileCopyrightText: 2024 Mathis Logemann <mathisloge.opensource@pm.me>
+// SPDX-FileCopyrightText: 2024 Ville Voutilainen
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
+
+// FROM https://git.qt.io/vivoutil/libunifex-with-qt
 
 #ifndef QTHREADSENDER_H
 #define QTHREADSENDER_H
