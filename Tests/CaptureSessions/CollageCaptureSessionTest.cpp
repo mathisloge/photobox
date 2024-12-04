@@ -38,18 +38,21 @@ TEST_CASE("Test CollageCaptureSession", "[UnitTest]")
     REQUIRE(finished_spy.size() == 0);
     session.imageCaptured(QImage{}, 2);
     session.imageSaved(asset_path / "capture_5.png");
-    finished_spy.wait(std::chrono::seconds{context.settings().seconds_between_capture} + std::chrono::seconds{5});
+    QString finished_collage;
+    QObject::connect(&session, &CollageCaptureSession::previewImageChanged, [&session, &finished_collage]() {
+        if (not session.getPreviewImage().isEmpty())
+        {
+            finished_collage = session.getPreviewImage();
+            finished_collage.remove(QLatin1StringView{"file://"});
+        }
+    });
+    QTest::qWait(std::chrono::seconds{context.settings().seconds_between_capture} + std::chrono::seconds{10});
     REQUIRE(finished_spy.size() == 1);
-
-    // should not be added anywhere and the signal schould not be emitted
-    // session.imageSaved(asset_path / "capture_5.png");
-    // REQUIRE(finished_spy.size() == 1);
 
     const QImage expected_img =
         QImage{(asset_path / "expected_collage.png").c_str()}.convertToFormat(QImage::Format_RGBA8888);
-    const QImage acutal_img =
-        QImage{(std::filesystem::current_path() / "collage_session_test.png").c_str()}.convertToFormat(
-            QImage::Format_RGBA8888);
+    LOG_DEBUG(testlog, "Collage path: {}", finished_collage.toStdString());
+    const QImage acutal_img = QImage{finished_collage}.convertToFormat(QImage::Format_RGBA8888);
 
     QImage diff_image;
     const auto diff = pixel_match(expected_img, acutal_img, PixelCompareOptions{}, diff_image);
