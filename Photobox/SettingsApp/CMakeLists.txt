@@ -1,6 +1,6 @@
-qt_add_executable(PhotoboxApp main.cpp)
+qt_add_executable(PhotoboxSettingsApp main.cpp)
 
-target_link_libraries(PhotoboxApp PRIVATE
+target_link_libraries(PhotoboxSettingsApp PRIVATE
     Qt6::Core
     Qt6::Gui
     Qt6::Qml
@@ -13,17 +13,18 @@ target_link_libraries(PhotoboxApp PRIVATE
     PhotoboxPeripheral
 )
 
-qt_add_qml_module(PhotoboxApp
-    URI "Photobox.App"
+qt_add_qml_module(PhotoboxSettingsApp
+    URI "Photobox.SettingsApp"
     VERSION 1.0
     QML_FILES
       Main.qml
     DEPENDENCIES
         Photobox::Core
+        Photobox::Settings
 )
 
 
-install(TARGETS PhotoboxApp
+install(TARGETS PhotoboxSettingsApp
     BUNDLE  DESTINATION .
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

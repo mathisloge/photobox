@@ -7,15 +7,19 @@
 
 namespace Pbox
 {
-class IdleCaptureSession : public ICaptureSession
+class SingleCaptureSession : public ICaptureSession
 {
     Q_OBJECT
   public:
-    static constexpr std::string kName = "IdleSession";
-
-    IdleCaptureSession();
+    SingleCaptureSession();
     void triggerCapture() override;
     void imageCaptured(const QImage &captured_image, std::uint32_t image_id) override;
     void imageSaved(const std::filesystem::path &captured_image_path) override;
+
+  private:
+    void startCapturing();
+    void handleCountdown(int count);
+
+  private:
 };
 } // namespace Pbox
