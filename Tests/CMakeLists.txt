@@ -6,11 +6,11 @@ include(Catch)
 add_executable(tests
     main.cpp
     CollageRendererTest.cpp
-    #TestCollageCaptureSession.cpp
     TestEspHomeRemoteTrigger.cpp
     pixel_match.cpp
     pixel_match.hpp
 )
+add_subdirectory(CaptureSessions)
 target_link_libraries(tests PRIVATE
     Qt6::Test
     Catch2::Catch2
