@@ -32,9 +32,6 @@
                 {
                     "type": "remote-trigger",
                     "name": "CollageTrigger"
-                },
-                {
-                    "type": "click"
                 }
             ],
             "collage": {
