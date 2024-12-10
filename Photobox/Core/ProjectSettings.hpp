@@ -21,10 +21,10 @@ struct adl_serializer<std::optional<T>>
 } // namespace nlohmann
 namespace Pbox
 {
-
+using RemoteTriggerId = std::string;
 struct RemoteTriggerConfig
 {
-    std::string name;
+    RemoteTriggerId name;
     std::string uri;
 };
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(RemoteTriggerConfig, name, uri);
@@ -71,6 +71,6 @@ struct ProjectConfig
     std::vector<RemoteTriggerConfig> remote_triggers;
     std::vector<SessionConfig> sessions;
 };
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ProjectConfig, name, capture_dir, camera_led, remote_triggers, sessions);
+//NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ProjectConfig, name, capture_dir, camera_led, remote_triggers, sessions);
 
 } // namespace Pbox

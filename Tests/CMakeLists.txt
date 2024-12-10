@@ -9,6 +9,7 @@ add_executable(tests
     TestEspHomeRemoteTrigger.cpp
     pixel_match.cpp
     pixel_match.hpp
+    ProjectTest.cpp
 )
 add_subdirectory(CaptureSessions)
 target_link_libraries(tests PRIVATE
