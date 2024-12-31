@@ -51,6 +51,9 @@ qt_add_qml_module(
         SystemStatusClient.cpp
         Countdown.hpp
         Countdown.cpp
+        Project.hpp
+        Project.cpp
+        ProjectSettings.hpp
     RESOURCES
         Fonts/GreatVibes/GreatVibes-Regular.ttf
         Fonts/Roboto/Roboto-Regular.ttf
