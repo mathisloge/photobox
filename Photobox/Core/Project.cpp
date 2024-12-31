@@ -7,6 +7,8 @@
 #include "ProjectSettings.hpp"
 #include "RemoteTrigger.hpp"
 #include "SingleCaptureSession.hpp"
+#include <fstream>
+#include "ProjectSettings.hpp"
 
 DEFINE_LOGGER(abstract_caputure_session_factory);
 
@@ -54,7 +56,16 @@ CaptureSessionPtr AbstractCaptureSessionFactory::createFromTriggerCondition(cons
 }
 
 Project::Project(const std::filesystem::path &config_file)
-{}
+{
+    std::ifstream settings_file{config_file};
+    nlohmann::json json;
+    settings_file >> json;
+
+    ProjectConfig settings;
+    json.get_to(settings);
+
+    
+}
 
 Project::~Project() = default;
 

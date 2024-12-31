@@ -1,37 +1,41 @@
 {
     "name": "hochzeit-xyz",
-    "remote-triggers": [
+    "capture_dir": "./output",
+    "remote_triggers": [
         {
             "name": "CollageTrigger",
-            "url": "http://192.168.178.30"
+            "uri": "http://192.168.178.30"
         },
         {
             "name": "SingleTrigger",
-            "url": "http://192.168.178.31"
+            "uri": "http://192.168.178.31"
         }
     ],
-    "camera-led": {
-        "url": "http://192.168.178.33"
+    "camera_led": {
+        "uri": "http://192.168.178.33"
     },
     "sessions": [
         {
             "name": "SingleCaptureSession",
-            "when": [
+            "type": "single-capture",
+            "trigger_conditions": [
                 {
                     "type": "remote-trigger",
-                    "name": "SingleTrigger"
+                    "id": "SingleTrigger"
                 },
                 {
-                    "type": "click"
+                    "id": "display",
+                    "type": "display-touch"
                 }
             ]
         },
         {
             "name": "CollageCaptureSession",
-            "when": [
+            "type": "collage-capture",
+            "trigger_conditions": [
                 {
                     "type": "remote-trigger",
-                    "name": "CollageTrigger"
+                    "id": "CollageTrigger"
                 }
             ],
             "collage": {
