@@ -5,6 +5,7 @@
 #include "pixel_match.hpp"
 #include <cstdint>
 #include <span>
+#include <fmt/core.h>
 using PixelData = std::span<uint8_t>;
 using CPixelData = std::span<const uint8_t>;
 
@@ -205,17 +206,31 @@ int pixel_match(const QImage &expected_img,
     constexpr int kChannels = 4;
     output_image = QImage{expected_img.size(), QImage::Format_RGBA8888};
 
-    expected_img.constBits();
-    if (!is_pixel_data(CPixelData{expected_img.bits(), static_cast<std::size_t>(expected_img.sizeInBytes())}) ||
-        !is_pixel_data(CPixelData{actual_img.bits(), static_cast<std::size_t>(actual_img.sizeInBytes())}) ||
-        (!is_pixel_data(CPixelData{output_image.constBits(), static_cast<std::size_t>(output_image.sizeInBytes())})))
+    const auto expected_has_data =
+        is_pixel_data(CPixelData{expected_img.bits(), static_cast<std::size_t>(expected_img.sizeInBytes())});
+    const auto actual_has_data =
+        is_pixel_data(CPixelData{actual_img.bits(), static_cast<std::size_t>(actual_img.sizeInBytes())});
+    const auto output_has_data =
+        is_pixel_data(CPixelData{output_image.constBits(), static_cast<std::size_t>(output_image.sizeInBytes())});
+    if (not expected_has_data or not actual_has_data or not output_has_data)
     {
-        return std::numeric_limits<int>::max();
+        throw std::runtime_error(fmt::format("Could not run pixel_match since one of the given images doesn't have any "
+                                             "size. expected_has_data={}; actual_has_data={}; output_has_data={}",
+                                             expected_has_data,
+                                             actual_has_data,
+                                             output_has_data));
     }
 
-    if (expected_img.size() != actual_img.size())
+    const auto expected_img_size = expected_img.size();
+    const auto actual_img_size = actual_img.size();
+    if (expected_img_size != actual_img_size)
     {
-        return std::numeric_limits<int>::max();
+        throw std::runtime_error(
+            fmt::format("Image sizes are not matching. expected_img.size()={}x{}; actual_img.size()={}x{}",
+                        expected_img_size.width(),
+                        expected_img_size.height(),
+                        actual_img_size.width(),
+                        actual_img_size.height()));
     }
 
     // check if images are identical
