@@ -12,6 +12,7 @@ RowLayout {
     id: root
     required property string title
     required property int status
+    property int fontSize: 42
 
     readonly property color errorStatus: "#E51400"
     readonly property color errorStatusBorder: "#A20025"
@@ -32,7 +33,7 @@ RowLayout {
     Label {
         id: label
         text: root.title
-        font.pixelSize: 42
+        font.pixelSize: root.fontSize
     }
 
     Component {
