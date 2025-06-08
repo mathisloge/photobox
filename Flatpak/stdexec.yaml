@@ -28,5 +28,5 @@ sources:
     dest-filename: CPM.cmake
   - type: git
     url: https://github.com/NVIDIA/stdexec.git
-    commit: f2576ce22cea0981a7bb6ee484bf394250451dd3
+    commit: 0f1b477daf3ff20076ae0cfcbbf0a18ca2726be5
     branch: main
