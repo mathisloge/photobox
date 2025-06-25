@@ -23,14 +23,9 @@ class CollageCaptureSession : public ICaptureSession
     void imageCaptured(const QImage &captured_image, std::uint32_t image_id) override;
     void imageSaved(const std::filesystem::path &captured_image_path) override;
 
-    /// vvv property methods
-    bool isCountdownVisible() const override;
-    const QString &getCountdownText() const override;
-    /// ^^^ property methods
-
   private:
     void startCountdownOrFinish();
-    void handleCountdown();
+    void handleCountdown(int current_count);
     void handlePreviewTimeout();
     void finish();
     bool allImagesCaptured() const;
@@ -40,11 +35,7 @@ class CollageCaptureSession : public ICaptureSession
     CollageContext &context_;
     int current_capture_{0};
     bool preview_visible_{true};
-    int countdown_counter_{0};
     bool finished_{false};
-    QString final_countdown_text_{QStringLiteral("Smile!")};
-    QString current_countdown_text_;
-    QTimer countdown_timer_;
     QTimer preview_timer_;
     std::optional<std::filesystem::path> saved_collage_path_;
 };
