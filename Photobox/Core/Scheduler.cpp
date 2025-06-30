@@ -9,6 +9,6 @@ namespace Pbox
 {
 auto Scheduler::getQtEventLoopScheduler() -> QThreadScheduler
 {
-    return qThreadAsScheduler(QCoreApplication::instance()->thread());
+    return qthread_as_scheduler(QCoreApplication::instance()->thread());
 }
 } // namespace Pbox

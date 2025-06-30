@@ -3,7 +3,7 @@ macro(declare_photobox_dependencies)
     FetchContent_Declare(
         lunasvg
         GIT_REPOSITORY https://github.com/sammycage/lunasvg.git
-        GIT_TAG        v3.0.1
+        GIT_TAG        v3.3.0
         FIND_PACKAGE_ARGS
     )
     set(FMT_INSTALL OFF)
@@ -11,7 +11,7 @@ macro(declare_photobox_dependencies)
     FetchContent_Declare(
         fmt
         GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-        GIT_TAG        11.0.2
+        GIT_TAG        11.2.0
         FIND_PACKAGE_ARGS
     )
     set(JSON_BuildTests OFF)
@@ -19,7 +19,7 @@ macro(declare_photobox_dependencies)
     FetchContent_Declare(
         nlohmann_json
         GIT_REPOSITORY https://github.com/nlohmann/json.git
-        GIT_TAG        v3.11.3
+        GIT_TAG        v3.12.0
         FIND_PACKAGE_ARGS
     )
 
@@ -27,7 +27,7 @@ macro(declare_photobox_dependencies)
     FetchContent_Declare(
         cpptrace
         GIT_REPOSITORY https://github.com/jeremy-rifkin/cpptrace.git
-        GIT_TAG        v0.7.3
+        GIT_TAG        v1.0.2
         FIND_PACKAGE_ARGS
     )
 
@@ -35,8 +35,8 @@ macro(declare_photobox_dependencies)
     set(STDEXEC_BUILD_EXAMPLES OFF)
     FetchContent_Declare(
         stdexec
-        GIT_REPOSITORY https://github.com/NVIDIA/stdexec.git
-        GIT_TAG        15dcdbcc464891d369ab46a9e8d5521ddc7853d7
+        GIT_REPOSITORY https://github.com/mathisloge/stdexec.git
+        GIT_TAG        246e116f8efa9e3234cd3ce84991959538170ba8
         FIND_PACKAGE_ARGS
     )
 
@@ -44,7 +44,7 @@ macro(declare_photobox_dependencies)
     FetchContent_Declare(
         quill
         GIT_REPOSITORY https://github.com/odygrd/quill.git
-        GIT_TAG        v7.5.0
+        GIT_TAG        v10.0.1
         FIND_PACKAGE_ARGS
     )
 
@@ -53,7 +53,7 @@ macro(declare_photobox_dependencies)
         FetchContent_Declare(
             Catch2
             GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-            GIT_TAG        v3.7.1
+            GIT_TAG        v3.8.1
             FIND_PACKAGE_ARGS
         )
         FetchContent_MakeAvailable(Catch2)
