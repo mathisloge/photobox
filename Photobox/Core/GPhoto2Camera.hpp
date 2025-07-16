@@ -28,7 +28,7 @@ class GPhoto2Camera : public ICamera
 
   private:
     SystemStatusClient status_client_;
-    std::stop_source stoken_;
+    stdexec::inplace_stop_source stop_source_;
     exec::async_scope async_scope_;
     bool capture_photo_{false};
 };
