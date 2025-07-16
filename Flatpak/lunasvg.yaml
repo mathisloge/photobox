@@ -10,8 +10,8 @@ config-opts:
 sources:
   - type: git
     url: https://github.com/sammycage/plutovg.git
-    tag: v0.0.9
+    tag: v1.2.0
     dest: deps/plutovg
   - type: git
     url: https://github.com/sammycage/lunasvg.git
-    tag: v3.0.1
+    tag: v3.3.0

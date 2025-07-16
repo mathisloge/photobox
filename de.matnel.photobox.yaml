@@ -1,6 +1,6 @@
 id: de.matnel.photobox
 runtime: org.kde.Platform
-runtime-version: "6.8"
+runtime-version: "6.9"
 sdk: org.kde.Sdk
 command: launcher.sh
 finish-args:
@@ -28,7 +28,7 @@ modules:
     builddir: true
     config-opts:
       - -DCMAKE_BUILD_TYPE=RelWithDebInfo
-      - -DFETCHCONTENT_FULLY_DISCONNECTED=ON
+      - -DCPM_LOCAL_PACKAGES_ONLY=ON
       - -DBUILD_TESTING=OFF
     sources:
       - type: dir
