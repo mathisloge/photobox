@@ -11,4 +11,4 @@ config-opts:
 sources:
   - type: git
     url: https://github.com/jeremy-rifkin/cpptrace.git
-    tag: v0.7.3
+    tag: v1.0.3
