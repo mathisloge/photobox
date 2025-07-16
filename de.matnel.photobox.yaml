@@ -30,7 +30,6 @@ modules:
       - -DCMAKE_BUILD_TYPE=RelWithDebInfo
       - -DCPM_LOCAL_PACKAGES_ONLY=ON
       - -DBUILD_TESTING=OFF
-      - -DCPM_DONT_UPDATE_MODULE_PATH=ON
     sources:
       - type: dir
         path: .
