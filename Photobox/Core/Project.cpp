@@ -1,4 +1,9 @@
+// SPDX-FileCopyrightText: 2025 Mathis Logemann <mathisloge.opensource@pm.me>
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "Project.hpp"
+#include <fstream>
 #include <Pbox/Logger.hpp>
 #include "CameraLed.hpp"
 #include "CollageCaptureSession.hpp"
@@ -7,8 +12,6 @@
 #include "ProjectSettings.hpp"
 #include "RemoteTrigger.hpp"
 #include "SingleCaptureSession.hpp"
-#include <fstream>
-#include "ProjectSettings.hpp"
 
 DEFINE_LOGGER(abstract_caputure_session_factory);
 
@@ -63,8 +66,6 @@ Project::Project(const std::filesystem::path &config_file)
 
     ProjectConfig settings;
     json.get_to(settings);
-
-    
 }
 
 Project::~Project() = default;

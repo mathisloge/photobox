@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 Mathis Logemann <mathisloge.opensource@pm.me>
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #pragma once
 
 #include <QAbstractEventDispatcher>
@@ -254,4 +258,4 @@ inline auto qobject_as_tuple_sender(QObj *obj, Ret (QObj::*ptr)(Args...))
            stdexec::then([](Args... args) { return std::tuple<std::remove_reference_t<Args>...>(std::move(args)...); });
 }
 
-} // namespace quite
+} // namespace Pbox
