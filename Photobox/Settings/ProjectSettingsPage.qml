@@ -9,8 +9,8 @@ import Photobox.Ui
 
 Page {
     ListView {
-        width: 180
-        height: 200
+        anchors.fill: parent
+        spacing: 10
 
         model: ListModel {
             ListElement {
@@ -26,8 +26,15 @@ Page {
             id: delegate
             required property string name
             required property string url
+            
+            width: parent.width
+
             RowLayout {
+                id: layout
+                width: parent.width
                 ColumnLayout {
+                    Layout.fillWidth: true
+
                     SystemStatusDelegate {
                         fontSize: 24
                         title: delegate.name
