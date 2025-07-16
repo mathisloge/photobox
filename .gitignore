@@ -1,6 +1,7 @@
 build
 .cache
 venv
+.venv
 .esphome
 outdir
 dist
