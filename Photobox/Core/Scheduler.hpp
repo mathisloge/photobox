@@ -28,7 +28,7 @@ struct Scheduler
      */
     auto getSvgRenderScheduler()
     {
-        return svg_thread_pool_.get_scheduler();
+        return compute_thread_pool_.get_scheduler();
     }
 
     /**
@@ -36,7 +36,6 @@ struct Scheduler
      */
     QThreadScheduler getQtEventLoopScheduler();
 
-    exec::static_thread_pool compute_thread_pool_{3};
-    exec::single_thread_context svg_thread_pool_;
+    execpools::asio_thread_pool compute_thread_pool_{4};
 };
 } // namespace Pbox

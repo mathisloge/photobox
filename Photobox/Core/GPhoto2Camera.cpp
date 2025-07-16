@@ -11,6 +11,7 @@
 #include <Pbox/Conditional.hpp>
 #include <Pbox/Logger.hpp>
 #include <Pbox/QStdexec.hpp>
+#include <exec/env.hpp>
 #include <exec/repeat_effect_until.hpp>
 #include <exec/static_thread_pool.hpp>
 #include "GPhoto2Exeption.hpp"
@@ -47,7 +48,7 @@ GPhoto2Camera::GPhoto2Camera(Scheduler &scheduler)
                             | stdexec::then([this]() {
                                   GPhoto2::Context context;
                                   status_client_.setSystemStatus(SystemStatusCode::Code::Connecting);
-                                  while (not autodetectAndConnectCamera(context) and not stoken_.stop_requested())
+                                  while (not autodetectAndConnectCamera(context) and not stop_source_.stop_requested())
                                   {
                                   }
                                   return context;
@@ -84,29 +85,43 @@ GPhoto2Camera::GPhoto2Camera(Scheduler &scheduler)
                                 return conditional(capture_photo_, std::move(capture), std::move(preview));
                             });
 
-                            return stdexec::schedule(scheduler.getWorkScheduler())                          //
-                                   | std::move(capture_flow)                                                //
-                                   | stdexec::then([this](auto &&...) { return stoken_.stop_requested(); }) //
-                                   | exec::repeat_effect_until()                                            //
+                            return stdexec::schedule(scheduler.getWorkScheduler())                               //
+                                   | std::move(capture_flow)                                                     //
+                                   | stdexec::then([this](auto &&...) { return stop_source_.stop_requested(); }) //
+                                   | exec::repeat_effect_until()                                                 //
                                    | stdexec::upon_error([this](auto &&error) {
                                          status_client_.setSystemStatus(SystemStatusCode::Code::Error);
-                                         LOG_ERROR(gphoto2camera, "GPHOTO2 error");
+                                         try
+                                         {
+                                             if (error)
+                                             {
+                                                 std::rethrow_exception(error);
+                                             }
+                                         }
+                                         catch (const std::exception &e)
+                                         {
+                                             LOG_ERROR(gphoto2camera, "GPhoto2 Exception: {}", e.what());
+                                         }
+                                         status_client_.setSystemStatus(SystemStatusCode::Code::Error);
                                      });
                         }) |
                       stdexec::then([this]() {
-                          const bool restart = stoken_.stop_requested();
+                          const bool restart = stop_source_.stop_requested();
                           LOG_DEBUG(gphoto2camera, "Camera exited. Restart = {}", restart);
                           return restart;
                       }) |
                       exec::repeat_effect_until();
 
-    async_scope_.spawn(std::move(final_flow));
+    auto flow_with_stop_token =
+        exec::write_env(std::move(final_flow), stdexec::prop{stdexec::get_stop_token, stop_source_.get_token()});
+
+    async_scope_.spawn(std::move(flow_with_stop_token));
 }
 
 GPhoto2Camera::~GPhoto2Camera()
 {
     LOG_DEBUG(gphoto2camera, "Camera stop");
-    stoken_.request_stop();
+    stop_source_.request_stop();
     cleanup_async_scope(async_scope_);
 
     LOG_DEBUG(gphoto2camera, "Async scope cleaned up");

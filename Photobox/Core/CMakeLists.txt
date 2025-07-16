@@ -67,6 +67,7 @@ target_link_libraries(PhotoboxCore PUBLIC
     Qt6::Quick
     Qt6::PrintSupport
     Qt6::Multimedia
+    asio::asio
     Photobox::Utils
     Photobox::GPhoto2
     cpptrace::cpptrace
