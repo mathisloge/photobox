@@ -17,6 +17,8 @@ qt_add_qml_module(
         Pointer.svg
         ImageBorder.svg
         Logo.svg
+    DEPENDENCIES
+        TARGET Photobox::Core
 )
 add_library(Photobox::Ui ALIAS PhotoboxUi)
 
