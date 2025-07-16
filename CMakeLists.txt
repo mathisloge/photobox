@@ -10,26 +10,26 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/runtime")
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
-
+include(CPM)
 include(CTest)
-include(FetchContent)
 include(GenerateExportHeader)
-include(Dependencies)
 include(Options)
 
 declare_photobox_options()
-declare_photobox_dependencies()
+CPMAddPackage(URI "gh:sammycage/lunasvg@3.3.0" OPTIONS "LUNASVG_BUILD_EXAMPLES OFF")
+CPMAddPackage("gh:fmtlib/fmt#11.2.0")
+CPMAddPackage("gh:nlohmann/json@3.12.0")
+CPMAddPackage(URI "gh:jeremy-rifkin/cpptrace@1.0.3" OPTIONS "CPPTRACE_UNWIND_WITH_LIBUNWIND ON")
+CPMAddPackage(URI "gh:NVIDIA/stdexec#2674bebb8389ce2faaadbea9c1d230b98ee56770" OPTIONS "STDEXEC_BUILD_TESTS OFF" "STDEXEC_BUILD_EXAMPLES OFF")
+CPMAddPackage(URI "gh:odygrd/quill@10.0.1" OPTIONS "QUILL_DISABLE_NON_PREFIXED_MACROS OFF")
+
+if(BUILD_TESTING)
+    CPMAddPackage("gh:catchorg/Catch2@3.8.1")
+endif()
 
 find_package(Qt6 6.8 REQUIRED COMPONENTS Core Gui Qml Quick Network Multimedia PrintSupport)
 qt_policy(SET QTP0001 NEW)
 qt_standard_project_setup()
-
-find_package(fmt CONFIG REQUIRED)
-find_package(lunasvg CONFIG REQUIRED)
-find_package(nlohmann_json CONFIG REQUIRED)
-find_package(cpptrace CONFIG REQUIRED)
-find_package(stdexec CONFIG REQUIRED)
-find_package(quill CONFIG REQUIRED)
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(gphoto2 REQUIRED IMPORTED_TARGET libgphoto2)
