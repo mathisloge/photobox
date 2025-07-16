@@ -27,8 +27,11 @@ if(BUILD_TESTING)
     CPMAddPackage("gh:catchorg/Catch2@3.8.1")
 endif()
 
-find_package(Qt6 6.8 REQUIRED COMPONENTS Core Gui Qml Quick Network Multimedia PrintSupport)
+find_package(Qt6 6.9 REQUIRED COMPONENTS Core Gui Qml Quick Network Multimedia PrintSupport)
 qt_policy(SET QTP0001 NEW)
+qt_policy(SET QTP0003 NEW)
+qt_policy(SET QTP0004 NEW)
+qt_policy(SET QTP0005 NEW)
 qt_standard_project_setup()
 
 find_package(PkgConfig REQUIRED)

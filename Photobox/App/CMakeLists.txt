@@ -19,7 +19,8 @@ qt_add_qml_module(PhotoboxApp
     QML_FILES
       Main.qml
     DEPENDENCIES
-        Photobox::Core
+        TARGET Photobox::Core
+        TARGET Photobox::Ui
 )
 
 

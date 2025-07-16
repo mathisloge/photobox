@@ -18,6 +18,7 @@ qt_add_qml_module(
         ImageBorder.svg
         Logo.svg
 )
+add_library(Photobox::Ui ALIAS PhotoboxUi)
 
 target_include_directories(PhotoboxUi PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(PhotoboxUi PUBLIC
