@@ -6,6 +6,7 @@
 #pragma once
 #include <GPhoto2Context.hpp>
 #include <exec/async_scope.hpp>
+#include <exec/task.hpp>
 #include "ICamera.hpp"
 #include "Scheduler.hpp"
 #include "SystemStatusClient.hpp"
@@ -26,9 +27,12 @@ class GPhoto2Camera : public ICamera
   private:
     void processPreviewImage(const QImage &image);
 
+    exec::task<void> asyncCaptureLoop();
+    exec::task<GPhoto2::Context> asyncAutoconnect();
+
   private:
+    Scheduler &scheduler_;
     SystemStatusClient status_client_;
-    stdexec::inplace_stop_source stop_source_;
     exec::async_scope async_scope_;
     bool capture_photo_{false};
 };

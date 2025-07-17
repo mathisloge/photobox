@@ -14,7 +14,7 @@ namespace Pbox
 SingleCaptureSession::SingleCaptureSession()
     : ICaptureSession{"SingleCaptureSession"}
 {
-    getCountdown()->setSeconds(6);
+    getCountdown()->setSeconds(3);
     connect(getCountdown(), &Countdown::finished, this, &SingleCaptureSession::requestedImageCapture);
     connect(getCountdown(), &Countdown::currentCountChanged, this, &SingleCaptureSession::handleCountdown);
 }
