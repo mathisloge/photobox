@@ -11,18 +11,24 @@
 #include <Pbox/Conditional.hpp>
 #include <Pbox/Logger.hpp>
 #include <Pbox/QStdexec.hpp>
+#include "GPhoto2Exeption.hpp"
+
+#undef emit // stupid qt...
+#include <asio/steady_timer.hpp>
+#include <asioexec/use_sender.hpp>
 #include <exec/env.hpp>
 #include <exec/repeat_effect_until.hpp>
 #include <exec/static_thread_pool.hpp>
-#include "GPhoto2Exeption.hpp"
 
 DEFINE_LOGGER(gphoto2camera);
-
+namespace Pbox
+{
 namespace
 {
-inline auto flowCapturePreview(Pbox::GPhoto2::Context &context)
+auto flowCapturePreview(Pbox::GPhoto2::Context &context)
 {
     return stdexec::then([&context]() -> QImage {
+        LOG_DEBUG(gphoto2camera, "capture preview...");
         std::optional<QImage> image;
         int error_count{0};
         while (not image.has_value() and error_count < 5)
@@ -39,89 +45,86 @@ inline auto flowCapturePreview(Pbox::GPhoto2::Context &context)
     });
 }
 } // namespace
-namespace Pbox
-{
+
 GPhoto2Camera::GPhoto2Camera(Scheduler &scheduler)
-    : status_client_{QStringLiteral("GPhoto2 Kamera"), true}
+    : scheduler_{scheduler}
+    , status_client_{QStringLiteral("GPhoto2 Kamera"), true}
 {
-    auto autoconnect_flow = stdexec::schedule(scheduler.getWorkScheduler()) //
-                            | stdexec::then([this]() {
-                                  GPhoto2::Context context;
-                                  status_client_.setSystemStatus(SystemStatusCode::Code::Connecting);
-                                  while (not autodetectAndConnectCamera(context) and not stop_source_.stop_requested())
-                                  {
-                                  }
-                                  return context;
-                              }) |
-                            stdexec::continues_on(scheduler.getQtEventLoopScheduler()) |
-                            stdexec::then([this](auto &&context) {
-                                status_client_.setSystemStatus(SystemStatusCode::Code::Ok);
-                                return context;
-                            });
-    //! TODO: stop source does not really work :D
-    auto final_flow = stdexec::when_all(std::move(autoconnect_flow)) //
-                      | stdexec::let_value([&scheduler, this](Pbox::GPhoto2::Context &context) {
-                            auto capture_flow = stdexec::let_value([this, &context, &scheduler]() {
-                                auto capture =
-                                    stdexec::schedule(scheduler.getWorkScheduler()) //
-                                    | stdexec::then([this, &context]() {
-                                          capture_photo_ = false;
-                                          return GPhoto2::captureImage(context);
-                                      })                                                         //
-                                    | stdexec::continues_on(scheduler.getQtEventLoopScheduler()) //
-                                    | stdexec::then([this](auto &&image) {
-                                          if (image.has_value())
-                                          {
-                                              Q_EMIT imageCaptured(image.value());
-                                          }
-                                          return image.has_value();
-                                      })                           //
-                                    | exec::repeat_effect_until(); // todo: this now retries forever to capture a image.
-                                                                   // maybe retry_n times and emit an error?
-                                auto preview = stdexec::schedule(scheduler.getWorkScheduler()) //
-                                               | flowCapturePreview(context)                   //
-                                               | stdexec::then([this](auto &&image) { processPreviewImage(image); });
+    async_scope_.spawn(asyncCaptureLoop());
+}
 
-                                return conditional(capture_photo_, std::move(capture), std::move(preview));
-                            });
+exec::task<void> GPhoto2Camera::asyncCaptureLoop()
+{
+    auto token = co_await stdexec::get_stop_token();
+    while (not token.stop_requested())
+    {
+        auto context = co_await stdexec::stopped_as_optional(asyncAutoconnect());
+        if (not context.has_value())
+        {
+            continue;
+        }
+        LOG_DEBUG(gphoto2camera, "Got a camera...");
 
-                            return stdexec::schedule(scheduler.getWorkScheduler())                               //
-                                   | std::move(capture_flow)                                                     //
-                                   | stdexec::then([this](auto &&...) { return stop_source_.stop_requested(); }) //
-                                   | exec::repeat_effect_until()                                                 //
-                                   | stdexec::upon_error([this](auto &&error) {
-                                         status_client_.setSystemStatus(SystemStatusCode::Code::Error);
-                                         try
-                                         {
-                                             if (error)
-                                             {
-                                                 std::rethrow_exception(error);
-                                             }
-                                         }
-                                         catch (const std::exception &e)
-                                         {
-                                             LOG_ERROR(gphoto2camera, "GPhoto2 Exception: {}", e.what());
-                                         }
-                                         status_client_.setSystemStatus(SystemStatusCode::Code::Error);
-                                     });
-                        }) |
-                      stdexec::then([this]() {
-                          const bool restart = stop_source_.stop_requested();
-                          LOG_DEBUG(gphoto2camera, "Camera exited. Restart = {}", restart);
-                          return restart;
-                      }) |
-                      exec::repeat_effect_until();
+        auto capture = stdexec::schedule(scheduler_.getWorkScheduler()) //
+                       | stdexec::then([this, &context]() {
+                             LOG_DEBUG(gphoto2camera, "capture image...");
+                             capture_photo_ = false;
+                             return GPhoto2::captureImage(*context);
+                         })                                                          //
+                       | stdexec::continues_on(scheduler_.getQtEventLoopScheduler()) //
+                       | stdexec::then([this](auto &&image) {
+                             if (image.has_value())
+                             {
+                                 Q_EMIT imageCaptured(image.value());
+                             }
+                             return image.has_value();
+                         })                           //
+                       | exec::repeat_effect_until(); // todo: this now retries forever to capture a image.
+                                                      // maybe retry_n times and emit an error?
+        auto preview = stdexec::schedule(scheduler_.getWorkScheduler()) //
+                       | flowCapturePreview(*context)                   //
+                       | stdexec::then([this](auto &&image) { processPreviewImage(image); });
 
-    auto flow_with_stop_token =
-        exec::write_env(std::move(final_flow), stdexec::prop{stdexec::get_stop_token, stop_source_.get_token()});
+        while (status_client_.systemStatus() == SystemStatusCode::Code::Ok and not token.stop_requested())
+        {
+            co_await stdexec::starts_on(exec::inline_scheduler{},
+                                        conditional(capture_photo_, capture, preview) |
+                                            stdexec::upon_error([this](auto &&error) {
+                                                status_client_.setSystemStatus(SystemStatusCode::Code::Error);
+                                                try
+                                                {
+                                                    if (error)
+                                                    {
+                                                        std::rethrow_exception(error);
+                                                    }
+                                                }
+                                                catch (const std::exception &e)
+                                                {
+                                                    LOG_ERROR(gphoto2camera, "GPhoto2 Exception: {}", e.what());
+                                                }
+                                            }));
+        }
+    }
+}
 
-    async_scope_.spawn(std::move(flow_with_stop_token));
+exec::task<GPhoto2::Context> GPhoto2Camera::asyncAutoconnect()
+{
+    GPhoto2::Context context;
+    status_client_.setSystemStatus(SystemStatusCode::Code::Connecting);
+
+    while (not autodetectAndConnectCamera(context))
+    {
+        co_await asio::steady_timer{scheduler_.getWorkExecutor(), std::chrono::milliseconds{100}}.async_wait(
+            asioexec::use_sender);
+    }
+    status_client_.setSystemStatus(SystemStatusCode::Code::Ok);
+    co_return context;
 }
 
 GPhoto2Camera::~GPhoto2Camera()
 {
     LOG_DEBUG(gphoto2camera, "Camera stop");
-    stop_source_.request_stop();
+    async_scope_.request_stop();
     cleanup_async_scope(async_scope_);
 
     LOG_DEBUG(gphoto2camera, "Async scope cleaned up");
@@ -129,6 +132,7 @@ GPhoto2Camera::~GPhoto2Camera()
 
 void GPhoto2Camera::requestCapturePhoto()
 {
+    LOG_DEBUG(gphoto2camera, "image requested...");
     capture_photo_ = true;
 }
 

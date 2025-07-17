@@ -22,6 +22,11 @@ struct Scheduler
         return compute_thread_pool_.get_scheduler();
     }
 
+    auto getWorkExecutor() const
+    {
+        return compute_thread_pool_.get_executor();
+    }
+
     /**
      * @brief The svg libs uses a lot of thread local storage (e.g. for fonts etc.). Therefore any rendering
      * of the svg should happen with the svg scheduler. The update can happen anywhere.
