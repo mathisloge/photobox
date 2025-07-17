@@ -28,7 +28,6 @@ namespace
 auto flowCapturePreview(Pbox::GPhoto2::Context &context)
 {
     return stdexec::then([&context]() -> QImage {
-        LOG_DEBUG(gphoto2camera, "capture preview...");
         std::optional<QImage> image;
         int error_count{0};
         while (not image.has_value() and error_count < 5)
