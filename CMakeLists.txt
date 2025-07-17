@@ -16,7 +16,6 @@ include(GenerateExportHeader)
 include(Options)
 
 declare_photobox_options()
-
 find_package(Threads REQUIRED)
 CPMAddPackage("gh:chriskohlhoff/asio#asio-1-34-2")
 add_library(asio INTERFACE)
@@ -28,11 +27,9 @@ target_link_libraries(asio INTERFACE Threads::Threads)
 CPMAddPackage(URI "gh:sammycage/lunasvg@3.3.0" OPTIONS "LUNASVG_BUILD_EXAMPLES OFF")
 CPMAddPackage("gh:fmtlib/fmt#11.2.0")
 CPMAddPackage(NAME "nlohmann_json" VERSION 3.12.0 GITHUB_REPOSITORY "nlohmann/json")
-CPMAddPackage(URI "gh:jeremy-rifkin/cpptrace@1.0.3" OPTIONS "CPPTRACE_UNWIND_WITH_LIBUNWIND ON")
-CPMAddPackage(URI "gh:NVIDIA/stdexec#dd8bd6be263efac9da5bed20caf999e3a112440f" OPTIONS "STDEXEC_BUILD_TESTS OFF" "STDEXEC_BUILD_EXAMPLES OFF" "STDEXEC_ENABLE_ASIO ON" "STDEXEC_ASIO_IMPLEMENTATION standalone")
+CPMAddPackage(URI "gh:jeremy-rifkin/cpptrace@1.0.3" VERSION 1.0.2 OPTIONS "CPPTRACE_UNWIND_WITH_LIBUNWIND ON" FIND_PACKAGE_ARGUMENTS "CONFIG")
+CPMAddPackage(URI "gh:NVIDIA/stdexec#dd8bd6be263efac9da5bed20caf999e3a112440f" VERSION 0.9.0 OPTIONS "STDEXEC_BUILD_TESTS OFF" "STDEXEC_BUILD_EXAMPLES OFF" "STDEXEC_ENABLE_ASIO ON" "STDEXEC_ASIO_IMPLEMENTATION standalone" FIND_PACKAGE_ARGUMENTS "CONFIG")
 CPMAddPackage(URI "gh:odygrd/quill@10.0.1" OPTIONS "QUILL_DISABLE_NON_PREFIXED_MACROS OFF")
-
-
 
 if(BUILD_TESTING)
     CPMAddPackage("gh:catchorg/Catch2@3.8.1")
