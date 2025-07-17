@@ -33,7 +33,10 @@ class Project
     explicit Project(const std::filesystem::path &config_file);
     ~Project();
 
+    const std::string &name() const;
+
   private:
+    std::string name_;
     std::filesystem::path output_directory_;
     std::unique_ptr<CameraLed> camera_led_;
     std::unordered_map<RemoteTriggerId, std::unique_ptr<RemoteTrigger>> remote_triggers_;
