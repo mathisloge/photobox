@@ -30,7 +30,7 @@ repos:
 
       - id: reuse-annotate
         name: reuse-annotate
-        entry: reuse annotate --copyright="Mathis Logemann <mathisloge.opensource@pm.me>" --license="GPL-3.0-or-later"
+        entry: reuse annotate --copyright="Mathis Logemann <mathis.opensource@tuta.io>" --license="GPL-3.0-or-later"
         types_or: [c++, qml]
         pass_filenames: true
         language: system
