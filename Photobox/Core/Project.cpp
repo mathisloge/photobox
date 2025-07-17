@@ -66,6 +66,13 @@ Project::Project(const std::filesystem::path &config_file)
 
     ProjectConfig settings;
     json.get_to(settings);
+
+    name_ = settings.name;
+}
+
+const std::string &Project::name() const
+{
+    return name_;
 }
 
 Project::~Project() = default;

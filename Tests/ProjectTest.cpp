@@ -11,4 +11,6 @@ using namespace Pbox;
 TEST_CASE("Project test", "[settings]")
 {
     Project project{std::filesystem::path{kAssetsPath} / "TestProject.json"};
+
+    REQUIRE(project.name() == "hochzeit-xyz");
 }

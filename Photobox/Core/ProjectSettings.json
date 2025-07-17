@@ -22,9 +22,12 @@
                     "name": "SingleTrigger"
                 },
                 {
-                    "type": "click"
+                    "type": "display-touch"
                 }
-            ]
+            ],
+            "settings": {
+                "seconds_between_capture": 3
+            }
         },
         {
             "name": "CollageCaptureSession",
@@ -34,17 +37,17 @@
                     "name": "CollageTrigger"
                 },
                 {
-                    "type": "click"
+                    "type": "display-touch"
                 }
             ],
-            "collage": {
+            "settings": {
                 "automatic_capture": true,
                 "image_elements": [
                     "image-1",
                     "image-2"
                 ],
                 "seconds_between_capture": 5,
-                "svg": "collage.svg"
+                "svg": "collage1.svg"
             }
         }
     ],
