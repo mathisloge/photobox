@@ -13,6 +13,7 @@ finish-args:
   - --device=all
   - --filesystem=host
 modules:
+  - Flatpak/boost.yaml
   - Flatpak/lunasvg.yaml
   - Flatpak/fmt.yaml
   - Flatpak/json.yaml
@@ -23,18 +24,13 @@ modules:
   - Flatpak/stdexec.yaml
   - Flatpak/quill.yaml
 
-  - name: DigitalerApp
+  - name: PhotoboxApp
     buildsystem: cmake-ninja
     builddir: true
     config-opts:
       - -DCMAKE_BUILD_TYPE=RelWithDebInfo
       - -DCPM_LOCAL_PACKAGES_ONLY=ON
       - -DBUILD_TESTING=OFF
-      - -DCPM_asio_SOURCE=../deps/asio
     sources:
-      - type: git
-        url: https://github.com/chriskohlhoff/asio.git
-        tag: asio-1-34-2
-        dest: deps/asio
       - type: dir
         path: .

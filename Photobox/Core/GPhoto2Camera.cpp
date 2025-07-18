@@ -14,8 +14,8 @@
 #include "GPhoto2Exeption.hpp"
 
 #undef emit // stupid qt...
-#include <asio/steady_timer.hpp>
 #include <asioexec/use_sender.hpp>
+#include <boost/asio/steady_timer.hpp>
 #include <exec/env.hpp>
 #include <exec/repeat_effect_until.hpp>
 #include <exec/static_thread_pool.hpp>
@@ -113,7 +113,7 @@ exec::task<GPhoto2::Context> GPhoto2Camera::asyncAutoconnect()
 
     while (not autodetectAndConnectCamera(context))
     {
-        co_await asio::steady_timer{scheduler_.getWorkExecutor(), std::chrono::milliseconds{100}}.async_wait(
+        co_await boost::asio::steady_timer{scheduler_.getWorkExecutor(), std::chrono::milliseconds{100}}.async_wait(
             asioexec::use_sender);
     }
     status_client_.setSystemStatus(SystemStatusCode::Code::Ok);
