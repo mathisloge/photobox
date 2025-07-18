@@ -1,0 +1,11 @@
+@startuml
+
+[*] --> Idle
+
+Idle --> SingleCaptureSession : triggerRemote1
+SingleCaptureSession --> Countdown : light for triggerRemote1
+Countdown --> Capture : Timeout
+Capture --> SingleCaptureSession : onSave
+SingleCaptureSession --> Idle : finished
+
+@enduml

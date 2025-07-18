@@ -38,6 +38,10 @@ CPMAddPackage(URI "gh:odygrd/quill@10.0.1" OPTIONS "QUILL_DISABLE_NON_PREFIXED_M
 
 if(BUILD_TESTING)
     CPMAddPackage(URI "gh:catchorg/Catch2@3.8.1" FIND_PACKAGE_ARGUMENTS "CONFIG")
+    list(APPEND CMAKE_MODULE_PATH "${Catch2_SOURCE_DIR}/extras") # local builds
+    list(APPEND CMAKE_MODULE_PATH "${Catch2_DIR}") # flatpak builds
+    include(Catch)
+    find_package(Qt6 REQUIRED COMPONENTS Test)
 endif()
 
 find_package(Qt6 6.9 REQUIRED COMPONENTS Core Gui Qml Quick Network Multimedia PrintSupport)

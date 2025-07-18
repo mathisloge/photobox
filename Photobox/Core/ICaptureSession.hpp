@@ -31,7 +31,7 @@ class ICaptureSession : public QObject
         Idle,      //!< The session waits for user input and does nothing currently
         Capturing, //!< The session is activly working on capturing the necessary images
         Busy //!< The session is currently busy and won't accept user inputs and won't capture any images, set only if
-             //!< the user should know about the busy state, otherwise ude capturing
+             //!< the user should know about the busy state, otherwise use Capturing
     };
     Q_ENUM(Status);
 

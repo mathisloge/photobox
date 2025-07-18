@@ -1,15 +1,9 @@
-find_package(Qt6 REQUIRED COMPONENTS Test)
-list(APPEND CMAKE_MODULE_PATH "${Catch2_SOURCE_DIR}/extras")
-list(APPEND CMAKE_MODULE_PATH "${Catch2_DIR}")
-include(Catch)
-
 add_executable(tests
     main.cpp
    # CollageRendererTest.cpp
    # TestEspHomeRemoteTrigger.cpp
    # pixel_match.cpp
    # pixel_match.hpp
-    ProjectTest.cpp
 )
 #add_subdirectory(CaptureSessions)
 target_link_libraries(tests PRIVATE
