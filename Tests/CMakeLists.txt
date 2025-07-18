@@ -1,5 +1,6 @@
 find_package(Qt6 REQUIRED COMPONENTS Test)
 list(APPEND CMAKE_MODULE_PATH "${Catch2_SOURCE_DIR}/extras")
+list(APPEND CMAKE_MODULE_PATH "${Catch2_DIR}")
 include(Catch)
 
 add_executable(tests
