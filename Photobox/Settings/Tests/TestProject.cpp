@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <Project.hpp>
+#include <Pbox/Settings/Project.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include "TestAssets.hpp"
 
@@ -10,7 +10,7 @@ using namespace Pbox;
 
 TEST_CASE("Project test", "[settings]")
 {
-    Project project{std::filesystem::path{kAssetsPath} / "TestProject.json"};
+    Project project{std::filesystem::path{kAssetsPath} / "ProjectSettings.json"};
 
     REQUIRE(project.name() == "hochzeit-xyz");
 }

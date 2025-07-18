@@ -2,18 +2,21 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "Project.hpp"
+#include "Pbox/Settings/Project.hpp"
 #include <fstream>
 #include <Pbox/Logger.hpp>
+#include <Pbox/Settings/Detail/TypesSerialization.hpp>
 #include "CameraLed.hpp"
 #include "CollageCaptureSession.hpp"
 #include "CollageContext.hpp"
+#include "EspHomeClient.hpp"
+#include "EspHomeRemoteTrigger.hpp"
 #include "ICaptureSession.hpp"
-#include "ProjectSettings.hpp"
 #include "RemoteTrigger.hpp"
 #include "SingleCaptureSession.hpp"
 
 DEFINE_LOGGER(abstract_caputure_session_factory);
+DEFINE_LOGGER(log_project);
 
 namespace Pbox
 {
@@ -46,6 +49,20 @@ class CollageCaptureSessionFactory : public CaptureSessionFactory
 
 AbstractCaptureSessionFactory::~AbstractCaptureSessionFactory() = default;
 
+class DefaultRemoteTriggerFactory final : public IRemoteTriggerFactory
+{
+  public:
+    std::unique_ptr<RemoteTrigger> create(const EspHomeRemoteTriggerConfig &config) override
+    {
+        return std::make_unique<EspHomeRemoteTrigger>(
+            std::make_unique<EspHomeClient>(QUrl{QString::fromStdString(config.uri)}));
+    }
+};
+std::unique_ptr<IRemoteTriggerFactory> createDefaultRemoteTriggerFactory()
+{
+    return std::make_unique<DefaultRemoteTriggerFactory>();
+}
+
 CaptureSessionPtr AbstractCaptureSessionFactory::createFromTriggerCondition(const RemoteTriggerId &trigger_id)
 {
     const auto it = factories_.find(trigger_id);
@@ -58,7 +75,7 @@ CaptureSessionPtr AbstractCaptureSessionFactory::createFromTriggerCondition(cons
     return it->second->create();
 }
 
-Project::Project(const std::filesystem::path &config_file)
+Project::Project(const std::filesystem::path &config_file, std::unique_ptr<IRemoteTriggerFactory> remoteTriggerFactory)
 {
     std::ifstream settings_file{config_file};
     nlohmann::json json;
@@ -68,6 +85,12 @@ Project::Project(const std::filesystem::path &config_file)
     json.get_to(settings);
 
     name_ = settings.name;
+
+    for (auto &&trigger : settings.remote_triggers)
+    {
+        LOG_DEBUG(log_project, "Creating remote trigger '{}'", trigger.name);
+        remote_triggers_.emplace(trigger.name, remoteTriggerFactory->create(trigger));
+    }
 }
 
 const std::string &Project::name() const

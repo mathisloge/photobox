@@ -39,12 +39,20 @@ CaptureManager::CaptureManager(Scheduler &scheduler,
         const auto image_id = image_ids_++;
         Q_EMIT imageCaptured(image, image_id);
         session_->imageCaptured(image, image_id);
-        async_scope_.spawn(
-            stdexec::schedule(scheduler_.getWorkScheduler()) |
-            stdexec::then([this, image = image]() { return image_storage_.saveImage(image); }) |
-            stdexec::continues_on(scheduler_.getQtEventLoopScheduler()) |
-            stdexec::then([this](auto &&saved_image_path) { session_->imageSaved(saved_image_path); }) |
-            stdexec::upon_error([](auto &&ex_ptr) { LOG_ERROR(capture_manager, "Error while saving image"); }));
+        async_scope_.spawn(stdexec::schedule(scheduler_.getWorkScheduler()) |
+                           stdexec::then([this, image = image]() { return image_storage_.saveImage(image); }) |
+                           stdexec::continues_on(scheduler_.getQtEventLoopScheduler()) |
+                           stdexec::then([this](auto &&saved_image_path) { session_->imageSaved(saved_image_path); }) |
+                           stdexec::upon_error([](auto &&ex_ptr) {
+                               try
+                               {
+                                   std::rethrow_exception(ex_ptr);
+                               }
+                               catch (const std::exception &ex)
+                               {
+                                   LOG_ERROR(capture_manager, "Error while saving image. {}", ex.what());
+                               }
+                           }));
     });
     connect(&remote_trigger_, &RemoteTrigger::triggered, this, &CaptureManager::triggerButtonPressed);
     switchToSession(std::make_unique<IdleCaptureSession>());
