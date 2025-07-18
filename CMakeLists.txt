@@ -26,6 +26,8 @@ CPMAddPackage(
   URL_HASH SHA256=f48b48390380cfb94a629872346e3a81370dc498896f16019ade727ab72eb1ec
   OPTIONS "BOOST_ENABLE_CMAKE ON" "BOOST_SKIP_INSTALL_RULES ${CMAKE_SKIP_INSTALL_RULES}"
   FIND_PACKAGE_ARGUMENTS "GLOBAL CONFIG REQUIRED NAMES Boost-${BOOST_VERSION} CONFIGS BoostConfig.cmake"
+  EXCLUDE_FROM_ALL ON
+  SYSTEM ON
 )
 CPMAddPackage(URI "gh:sammycage/lunasvg@3.3.0" OPTIONS "LUNASVG_BUILD_EXAMPLES OFF")
 CPMAddPackage("gh:fmtlib/fmt#11.2.0")
@@ -35,7 +37,7 @@ CPMAddPackage(URI "gh:NVIDIA/stdexec#dd8bd6be263efac9da5bed20caf999e3a112440f" V
 CPMAddPackage(URI "gh:odygrd/quill@10.0.1" OPTIONS "QUILL_DISABLE_NON_PREFIXED_MACROS OFF")
 
 if(BUILD_TESTING)
-    CPMAddPackage("gh:catchorg/Catch2@3.8.1")
+    CPMAddPackage(URI "gh:catchorg/Catch2@3.8.1" FIND_PACKAGE_ARGUMENTS "CONFIG")
 endif()
 
 find_package(Qt6 6.9 REQUIRED COMPONENTS Core Gui Qml Quick Network Multimedia PrintSupport)
