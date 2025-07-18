@@ -1,0 +1,12 @@
+name: boost
+buildsystem: cmake-ninja
+builddir: true
+config-opts:
+  - -DBOOST_ENABLE_CMAKE=ON
+  - -DBOOST_PROCESS_USE_STD_FS=ON
+  - -DBOOST_ENABLE_COMPATIBILITY_TARGETS=OFF
+  - -DBOOST_INCLUDE_LIBRARIES="asio"
+sources:
+  - type: archive
+    url: https://github.com/boostorg/boost/releases/download/boost-1.88.0/boost-1.88.0-cmake.tar.xz
+    sha256: f48b48390380cfb94a629872346e3a81370dc498896f16019ade727ab72eb1ec
