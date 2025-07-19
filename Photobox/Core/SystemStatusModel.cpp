@@ -6,7 +6,7 @@
 #include "SystemStatusModel.hpp"
 #include <Pbox/Logger.hpp>
 
-DEFINE_LOGGER(systemStatusModel);
+DEFINE_LOGGER(log_system_status_model);
 
 namespace Pbox
 {
@@ -24,7 +24,7 @@ QVariant SystemStatusModel::data(const QModelIndex &index, int role) const
     const auto &client = clients_.at(index.row());
     if (client.isNull())
     {
-        LOG_WARNING(systemStatusModel, "Got dangling system client.");
+        LOG_WARNING(log_system_status_model, "Got dangling system client.");
         return {};
     }
     switch (Role{role})

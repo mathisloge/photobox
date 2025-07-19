@@ -124,7 +124,7 @@ int main(int argc, char *argv[])
 
         CaptureManager capture_manager{
             scheduler, image_storage, *camera, *remote_trigger, *camera_led, [&collage_context] {
-                return std::make_unique<SingleCaptureSession>();
+                return make_unique_object_ptr_as<ICaptureSession, SingleCaptureSession>();
             }};
         system_status_manager.registerClient(std::addressof(camera->systemStatusClient()));
 

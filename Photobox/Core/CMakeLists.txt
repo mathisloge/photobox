@@ -49,6 +49,8 @@ qt_add_qml_module(
         SystemStatusModel.hpp
         SystemStatusClient.hpp
         SystemStatusClient.cpp
+        TriggerManager.hpp
+        TriggerManager.cpp
         Countdown.hpp
         Countdown.cpp
     RESOURCES

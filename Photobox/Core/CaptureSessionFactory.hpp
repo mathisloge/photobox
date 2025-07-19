@@ -5,12 +5,12 @@
 
 #pragma once
 #include <functional>
-#include <memory>
+#include "ObjectUniquePtr.hpp"
 namespace Pbox
 {
 class ICaptureSession;
 
-using CaptureSessionPtr = std::unique_ptr<ICaptureSession>;
+using CaptureSessionPtr = unique_object_ptr<ICaptureSession>;
 using CaptureSessionFactoryFnc = std::function<CaptureSessionPtr()>;
 
 } // namespace Pbox
