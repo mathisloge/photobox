@@ -23,16 +23,16 @@ namespace Pbox
 class CaptureSessionFactory
 {
   public:
-    virtual std::unique_ptr<ICaptureSession> create() = 0;
+    virtual CaptureSessionPtr create() = 0;
     virtual ~CaptureSessionFactory();
 };
 
 class SingleCaptureSessionFactory : public CaptureSessionFactory
 {
   public:
-    std::unique_ptr<ICaptureSession> create() override
+    CaptureSessionPtr create() override
     {
-        return std::make_unique<SingleCaptureSession>();
+        return make_unique_object_ptr_as<ICaptureSession, SingleCaptureSession>();
     }
 };
 
@@ -41,13 +41,25 @@ class CollageCaptureSessionFactory : public CaptureSessionFactory
     CollageContext collage_context_;
 
   public:
-    std::unique_ptr<ICaptureSession> create() override
+    CaptureSessionPtr create() override
     {
-        return std::make_unique<CollageCaptureSession>(collage_context_);
+        return make_unique_object_ptr_as<ICaptureSession, CollageCaptureSession>(collage_context_);
     }
 };
 
 AbstractCaptureSessionFactory::~AbstractCaptureSessionFactory() = default;
+
+CaptureSessionPtr AbstractCaptureSessionFactory::createFromTriggerCondition(const RemoteTriggerId &trigger_id)
+{
+    const auto it = factories_.find(trigger_id);
+    if (it == factories_.end())
+    {
+        LOG_ERROR(
+            abstract_caputure_session_factory, "Could not find a session factory for the trigger '{}'", trigger_id);
+        return nullptr;
+    }
+    return it->second->create();
+}
 
 class DefaultRemoteTriggerFactory final : public IRemoteTriggerFactory
 {
@@ -63,18 +75,6 @@ std::unique_ptr<IRemoteTriggerFactory> createDefaultRemoteTriggerFactory()
     return std::make_unique<DefaultRemoteTriggerFactory>();
 }
 
-CaptureSessionPtr AbstractCaptureSessionFactory::createFromTriggerCondition(const RemoteTriggerId &trigger_id)
-{
-    const auto it = factories_.find(trigger_id);
-    if (it == factories_.end())
-    {
-        LOG_ERROR(
-            abstract_caputure_session_factory, "Could not find a session factory for the trigger '{}'", trigger_id);
-        return nullptr;
-    }
-    return it->second->create();
-}
-
 Project::Project(const std::filesystem::path &config_file, std::unique_ptr<IRemoteTriggerFactory> remoteTriggerFactory)
 {
     std::ifstream settings_file{config_file};
@@ -88,14 +88,18 @@ Project::Project(const std::filesystem::path &config_file, std::unique_ptr<IRemo
 
     for (auto &&trigger : settings.remote_triggers)
     {
-        LOG_DEBUG(log_project, "Creating remote trigger '{}'", trigger.name);
-        remote_triggers_.emplace(trigger.name, remoteTriggerFactory->create(trigger));
+        trigger_manager_.registerTrigger(trigger.name, remoteTriggerFactory->create(trigger));
     }
 }
 
 const std::string &Project::name() const
 {
     return name_;
+}
+
+const TriggerManager &Project::triggerManager() const
+{
+    return trigger_manager_;
 }
 
 Project::~Project() = default;

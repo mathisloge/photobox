@@ -6,6 +6,8 @@
 #include <filesystem>
 #include <unordered_map>
 #include <Pbox/DisableCopyMove.hpp>
+#include "ObjectUniquePtr.hpp"
+#include "TriggerManager.hpp"
 #include "Types.hpp"
 
 namespace Pbox
@@ -13,7 +15,7 @@ namespace Pbox
 class CameraLed;
 class RemoteTrigger;
 class ICaptureSession;
-using CaptureSessionPtr = std::unique_ptr<ICaptureSession>;
+using CaptureSessionPtr = unique_object_ptr<ICaptureSession>;
 
 class CaptureSessionFactory;
 class AbstractCaptureSessionFactory
@@ -58,11 +60,12 @@ class Project
     ~Project();
 
     const std::string &name() const;
+    const TriggerManager &triggerManager() const;
 
   private:
     std::string name_;
     std::filesystem::path output_directory_;
     std::unique_ptr<CameraLed> camera_led_;
-    std::unordered_map<RemoteTriggerId, std::unique_ptr<RemoteTrigger>> remote_triggers_;
+    TriggerManager trigger_manager_;
 };
 } // namespace Pbox

@@ -29,7 +29,7 @@ CaptureManager::CaptureManager(Scheduler &scheduler,
     , camera_{camera}
     , remote_trigger_{remote_trigger}
     , camera_led_{camera_led}
-    , session_{std::make_unique<IdleCaptureSession>()}
+    , session_{make_unique_object_ptr_as<ICaptureSession, IdleCaptureSession>()}
     , collage_session_factory_{std::move(collage_session_factory)}
 {
     connect(&camera_, &ICamera::imageCaptured, this, [this](auto &&image) {
@@ -55,7 +55,7 @@ CaptureManager::CaptureManager(Scheduler &scheduler,
                            }));
     });
     connect(&remote_trigger_, &RemoteTrigger::triggered, this, &CaptureManager::triggerButtonPressed);
-    switchToSession(std::make_unique<IdleCaptureSession>());
+    switchToSession(make_unique_object_ptr_as<ICaptureSession, IdleCaptureSession>());
 }
 
 CaptureManager::~CaptureManager()
@@ -73,7 +73,7 @@ void CaptureManager::triggerButtonPressed()
 
 ImageProvider *CaptureManager::createImageProvider()
 {
-    auto *image_provider = new ImageProvider();
+    auto *image_provider = new ImageProvider(); // NOLINT(cppcoreguidelines-owning-memory)
     connect(this, &CaptureManager::imageCaptured, image_provider, &ImageProvider::addImage);
     connect(this, &CaptureManager::resetImages, image_provider, &ImageProvider::resetCache);
     return image_provider;
@@ -100,7 +100,7 @@ void CaptureManager::sessionFinished()
     }
     else
     {
-        switchToSession(std::make_unique<IdleCaptureSession>());
+        switchToSession(make_unique_object_ptr_as<ICaptureSession, IdleCaptureSession>());
     }
 }
 
