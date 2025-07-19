@@ -1,4 +1,5 @@
-// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathisloge.opensource@pm.me>
+// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathis.opensource@tuta.io>
+// SPDX-FileCopyrightText: 2025 Mathis Logemann <mathis.opensource@tuta.io>
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -57,6 +58,11 @@ void ICaptureSession::setLiveViewVisible(bool visible)
         live_view_visible_ = visible;
         Q_EMIT liveViewVisibleChanged();
     }
+}
+
+Countdown *ICaptureSession::getCountdown()
+{
+    return std::addressof(countdown_);
 }
 
 const QString &ICaptureSession::getPreviewImage() const

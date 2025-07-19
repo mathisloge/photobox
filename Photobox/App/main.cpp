@@ -1,4 +1,5 @@
-// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathisloge.opensource@pm.me>
+// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathis.opensource@tuta.io>
+// SPDX-FileCopyrightText: 2025 Mathis Logemann <mathis.opensource@tuta.io>
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -23,10 +24,12 @@
 #include "CaptureManager.hpp"
 #include "CollageCaptureSession.hpp"
 #include "CollageContext.hpp"
+#include "SingleCaptureSession.hpp"
 #include "SystemStatusManager.hpp"
 
 Q_IMPORT_QML_PLUGIN(Photobox_CorePlugin)
 Q_IMPORT_QML_PLUGIN(Photobox_UiPlugin)
+Q_IMPORT_QML_PLUGIN(Photobox_SettingsPlugin)
 
 DEFINE_ROOT_LOGGER(rootlogger)
 
@@ -36,6 +39,7 @@ int main(int argc, char *argv[])
 {
     install_crash_handler();
     setupLogging();
+    installQtMessageHandler();
     int app_return_code{EXIT_FAILURE};
     Scheduler scheduler;
 
@@ -66,11 +70,11 @@ int main(int argc, char *argv[])
         parser.addOption(developer_option);
 
         QCommandLineOption trigger_button_host_option(
-            QStringList() << "trigger-btn", "The hostname of the trigger button", "url", "http://192.168.0.31");
+            QStringList() << "trigger-btn", "The hostname of the trigger button", "url", "http://192.168.178.30");
         parser.addOption(trigger_button_host_option);
 
         QCommandLineOption camera_led_host_option(
-            QStringList() << "camera-led", "The hostname of the camera led controller", "url", "http://192.168.0.31");
+            QStringList() << "camera-led", "The hostname of the camera led controller", "url", "http://192.168.178.31");
         parser.addOption(camera_led_host_option);
 
         QCommandLineOption fullscreen_option{QStringList{QStringLiteral("f"), QStringLiteral("fullscreen")},
@@ -102,7 +106,7 @@ int main(int argc, char *argv[])
         ImageStorage image_storage{capture_directory.toStdString()};
         CollageContext collage_context{
             scheduler, image_storage, collage_directory.toStdString(), printer_settings.toStdString()};
-        system_status_manager.registerClient(std::addressof(collage_context.systemStatusClient()));
+        //  system_status_manager.registerClient(std::addressof(collage_context.systemStatusClient()));
 
         std::unique_ptr<RemoteTrigger> remote_trigger =
             std::make_unique<EspHomeRemoteTrigger>(std::make_unique<EspHomeClient>(trigger_button_host));
@@ -121,7 +125,7 @@ int main(int argc, char *argv[])
 
         CaptureManager capture_manager{
             scheduler, image_storage, *camera, *remote_trigger, *camera_led, [&collage_context] {
-                return std::make_unique<CollageCaptureSession>(collage_context);
+                return make_unique_object_ptr_as<ICaptureSession, SingleCaptureSession>();
             }};
         system_status_manager.registerClient(std::addressof(camera->systemStatusClient()));
 

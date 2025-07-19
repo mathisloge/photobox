@@ -1,4 +1,5 @@
-// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathisloge.opensource@pm.me>
+// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathis.opensource@tuta.io>
+// SPDX-FileCopyrightText: 2025 Mathis Logemann <mathis.opensource@tuta.io>
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -6,6 +7,7 @@
 #include <QObject>
 #include <QtQmlIntegration>
 #include <Pbox/DisableCopyMove.hpp>
+#include "Countdown.hpp"
 namespace Pbox
 {
 class ICaptureSession : public QObject
@@ -18,10 +20,8 @@ class ICaptureSession : public QObject
     Q_PROPERTY(Pbox::ICaptureSession::Status status READ getStatus NOTIFY statusChanged FINAL);
     //! @brief True if the live view images of the camera should be visible
     Q_PROPERTY(bool liveViewVisible READ isLiveViewVisible NOTIFY liveViewVisibleChanged FINAL);
-    //! @brief True if the countdown should be visible
-    Q_PROPERTY(bool countdownVisible READ isCountdownVisible NOTIFY countdownVisibleChanged FINAL);
-    //! @brief The current text to show in the countdown ui
-    Q_PROPERTY(QString countdownText READ getCountdownText NOTIFY countdownTextChanged FINAL);
+    //! @brief The countdown for the session
+    Q_PROPERTY(Countdown *countdown READ getCountdown CONSTANT FINAL);
     //! @brief A string containing the preview image or empty if nothing should be shown
     Q_PROPERTY(QString previewImage READ getPreviewImage NOTIFY previewImageChanged FINAL)
 
@@ -31,7 +31,7 @@ class ICaptureSession : public QObject
         Idle,      //!< The session waits for user input and does nothing currently
         Capturing, //!< The session is activly working on capturing the necessary images
         Busy //!< The session is currently busy and won't accept user inputs and won't capture any images, set only if
-             //!< the user should know about the busy state, otherwise ude capturing
+             //!< the user should know about the busy state, otherwise use Capturing
     };
     Q_ENUM(Status);
 
@@ -62,8 +62,7 @@ class ICaptureSession : public QObject
     Status getStatus() const;
     CaptureStatus getCaptureStatus() const;
     bool isLiveViewVisible() const;
-    virtual bool isCountdownVisible() const = 0;
-    virtual const QString &getCountdownText() const = 0;
+    Countdown *getCountdown();
     const QString &getPreviewImage() const;
     /// ^^^ property methods
 
@@ -77,8 +76,6 @@ class ICaptureSession : public QObject
     void statusChanged();
     void captureStatusChanged();
     void liveViewVisibleChanged();
-    void countdownVisibleChanged();
-    void countdownTextChanged();
     void previewImageChanged();
     /// ^^^ property signals
 
@@ -89,6 +86,7 @@ class ICaptureSession : public QObject
     void setPreviewImage(QString preview_image);
 
   private:
+    Countdown countdown_;
     std::string name_;
     Status status_{Status::Idle};
     CaptureStatus capture_status_{CaptureStatus::Idle};

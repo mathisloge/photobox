@@ -1,5 +1,5 @@
 add_library(PhotoboxPeripheral STATIC)
-
+add_library(Photobox::Peripheral ALIAS PhotoboxPeripheral)
 target_sources(PhotoboxPeripheral PRIVATE
     EspHomeClient.cpp
     EspHomeClient.hpp
@@ -9,6 +9,7 @@ target_sources(PhotoboxPeripheral PRIVATE
     EspHomeCameraLed.hpp
     IEspHomeClient.hpp
 )
+
 
 target_include_directories(PhotoboxPeripheral PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(PhotoboxPeripheral PUBLIC

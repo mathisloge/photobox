@@ -10,26 +10,46 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/runtime")
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
-
+include(CPM)
 include(CTest)
-include(FetchContent)
 include(GenerateExportHeader)
-include(Dependencies)
 include(Options)
 
 declare_photobox_options()
-declare_photobox_dependencies()
 
-find_package(Qt6 6.8 REQUIRED COMPONENTS Core Gui Qml Quick Network Multimedia PrintSupport)
+set(BOOST_VERSION "1.88.0")
+list(APPEND BOOST_INCLUDE_LIBRARIES asio)
+CPMAddPackage(
+  NAME Boost
+  VERSION ${BOOST_VERSION}
+  URL https://github.com/boostorg/boost/releases/download/boost-${BOOST_VERSION}/boost-${BOOST_VERSION}-cmake.tar.xz
+  URL_HASH SHA256=f48b48390380cfb94a629872346e3a81370dc498896f16019ade727ab72eb1ec
+  OPTIONS "BOOST_ENABLE_CMAKE ON" "BOOST_SKIP_INSTALL_RULES ${CMAKE_SKIP_INSTALL_RULES}"
+  FIND_PACKAGE_ARGUMENTS "GLOBAL CONFIG REQUIRED NAMES Boost-${BOOST_VERSION} CONFIGS BoostConfig.cmake"
+  EXCLUDE_FROM_ALL ON
+  SYSTEM ON
+)
+CPMAddPackage(URI "gh:sammycage/lunasvg@3.3.0" OPTIONS "LUNASVG_BUILD_EXAMPLES OFF")
+CPMAddPackage("gh:fmtlib/fmt#11.2.0")
+CPMAddPackage(NAME "nlohmann_json" VERSION 3.12.0 GITHUB_REPOSITORY "nlohmann/json")
+CPMAddPackage(URI "gh:jeremy-rifkin/cpptrace@1.0.3" VERSION 1.0.2 OPTIONS "CPPTRACE_UNWIND_WITH_LIBUNWIND ON" FIND_PACKAGE_ARGUMENTS "CONFIG")
+CPMAddPackage(URI "gh:NVIDIA/stdexec#dd8bd6be263efac9da5bed20caf999e3a112440f" VERSION 0.9.0 OPTIONS "CPM_LOCAL_PACKAGES ON" "STDEXEC_BUILD_TESTS OFF" "STDEXEC_BUILD_EXAMPLES OFF" "STDEXEC_ENABLE_ASIO ON" "STDEXEC_ASIO_IMPLEMENTATION boost" FIND_PACKAGE_ARGUMENTS "CONFIG")
+CPMAddPackage(URI "gh:odygrd/quill@10.0.1" OPTIONS "QUILL_DISABLE_NON_PREFIXED_MACROS OFF")
+
+if(BUILD_TESTING)
+    CPMAddPackage(URI "gh:catchorg/Catch2@3.8.1" FIND_PACKAGE_ARGUMENTS "CONFIG")
+    list(APPEND CMAKE_MODULE_PATH "${Catch2_SOURCE_DIR}/extras") # local builds
+    list(APPEND CMAKE_MODULE_PATH "${Catch2_DIR}") # flatpak builds
+    include(Catch)
+    find_package(Qt6 REQUIRED COMPONENTS Test)
+endif()
+
+find_package(Qt6 6.9 REQUIRED COMPONENTS Core Gui Qml Quick Network Multimedia PrintSupport)
 qt_policy(SET QTP0001 NEW)
+qt_policy(SET QTP0003 NEW)
+qt_policy(SET QTP0004 NEW)
+qt_policy(SET QTP0005 NEW)
 qt_standard_project_setup()
-
-find_package(fmt CONFIG REQUIRED)
-find_package(lunasvg CONFIG REQUIRED)
-find_package(nlohmann_json CONFIG REQUIRED)
-find_package(cpptrace CONFIG REQUIRED)
-find_package(stdexec CONFIG REQUIRED)
-find_package(quill CONFIG REQUIRED)
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(gphoto2 REQUIRED IMPORTED_TARGET libgphoto2)

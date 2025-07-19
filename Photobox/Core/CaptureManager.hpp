@@ -1,4 +1,5 @@
-// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathisloge.opensource@pm.me>
+// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathis.opensource@tuta.io>
+// SPDX-FileCopyrightText: 2025 Mathis Logemann <mathis.opensource@tuta.io>
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -9,6 +10,7 @@
 #include "CaptureSessionFactory.hpp"
 #include "ICaptureSession.hpp"
 #include "ImageProvider.hpp"
+#include "ObjectUniquePtr.hpp"
 namespace Pbox
 {
 class Scheduler;
@@ -64,7 +66,7 @@ class CaptureManager : public QObject
     RemoteTrigger &remote_trigger_;
     CameraLed &camera_led_;
     CaptureSessionFactoryFnc collage_session_factory_;
-    std::unique_ptr<ICaptureSession> session_{nullptr};
+    unique_object_ptr<ICaptureSession> session_{nullptr};
     exec::async_scope async_scope_;
     std::atomic_uint32_t image_ids_;
 };

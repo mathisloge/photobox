@@ -1,0 +1,52 @@
+esphome:
+  name: test_host_device
+
+logger:
+  level: DEBUG
+
+# Run on your local host (Linux, macOS, or WSL)
+host:
+  mac_address: "06:35:69:ab:f6:79"
+
+display:
+  - platform: sdl
+    dimensions:
+      width: 450
+      height: 600
+    auto_clear_enabled: false
+    update_interval: never
+
+
+touchscreen:
+  platform: sdl
+
+
+light:
+  - platform: lvgl
+    widget: lvgl_led
+    name: LVGL light
+
+binary_sensor:
+  - platform: lvgl
+    widget: trigger_btn_lvgl
+    name: Trigger Button
+
+lvgl:
+  pages:
+    - id: main_page
+      widgets:
+        - led:
+            id: lvgl_led
+            x: 0
+            y: 0
+            width: 50
+            height: 50
+
+        - button:
+            x: 60
+            y: 0
+            width: 50
+            height: 50
+            id: trigger_btn_lvgl
+
+api:

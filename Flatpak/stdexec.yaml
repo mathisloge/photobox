@@ -4,6 +4,8 @@ builddir: false
 config-opts:
   - -DSTDEXEC_BUILD_TESTS=OFF
   - -DSTDEXEC_BUILD_EXAMPLES=OFF
+  - -DSTDEXEC_ENABLE_ASIO=ON
+  - -DSTDEXEC_ASIO_IMPLEMENTATION=boost
   - -DCMAKE_BUILD_TYPE=Release
   - -DFETCHCONTENT_FULLY_DISCONNECTED=ON
   - -DFETCHCONTENT_SOURCE_DIR_RAPIDS-CMAKE=deps/rapids-cmake
@@ -27,6 +29,6 @@ sources:
     dest: deps/cpm
     dest-filename: CPM.cmake
   - type: git
-    url: https://github.com/NVIDIA/stdexec.git
-    commit: 2674bebb8389ce2faaadbea9c1d230b98ee56770
+    url: https://github.com/mathisloge/stdexec.git
+    commit: e211be3ff0dca25b682bfb4d878934fda21e3235
     branch: main

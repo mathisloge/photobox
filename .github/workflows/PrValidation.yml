@@ -8,11 +8,11 @@ jobs:
     name: "Build flatpak and run tests"
     runs-on: ubuntu-latest
     container:
-      image: bilelmoussaoui/flatpak-github-actions:kde-6.7
+      image: ghcr.io/flathub-infra/flatpak-github-actions:kde-6.9
       options: --privileged
     steps:
       - uses: actions/checkout@v4
-      - uses: flathub-infra/flatpak-github-actions/flatpak-builder@master
+      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
         with:
           bundle: photobox.flatpak
           manifest-path: de.matnel.photobox.Devel.yaml

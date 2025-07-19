@@ -35,6 +35,8 @@ qt_add_qml_module(
         Scheduler.hpp
         ICaptureSession.cpp
         ICaptureSession.hpp
+        SingleCaptureSession.hpp
+        SingleCaptureSession.cpp
         CaptureSessionFactory.hpp
         IdleCaptureSession.hpp
         IdleCaptureSession.cpp
@@ -47,16 +49,24 @@ qt_add_qml_module(
         SystemStatusModel.hpp
         SystemStatusClient.hpp
         SystemStatusClient.cpp
+        TriggerManager.hpp
+        TriggerManager.cpp
+        Countdown.hpp
+        Countdown.cpp
     RESOURCES
         Fonts/GreatVibes/GreatVibes-Regular.ttf
         Fonts/Roboto/Roboto-Regular.ttf
 )
+
+add_library(Photobox::Core ALIAS PhotoboxCore)
+add_library(Photobox::CorePlugin ALIAS PhotoboxCoreplugin)
 
 target_include_directories(PhotoboxCore PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(PhotoboxCore PUBLIC
     Qt6::Quick
     Qt6::PrintSupport
     Qt6::Multimedia
+    Boost::headers
     Photobox::Utils
     Photobox::GPhoto2
     cpptrace::cpptrace

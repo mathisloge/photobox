@@ -9,7 +9,7 @@ repos:
       - id: check-yaml
 
   - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: "v19.1.4"
+    rev: "v20.1.8"
     hooks:
       - id: clang-format
         types_or: [c++, c, proto]
@@ -23,14 +23,14 @@ repos:
     hooks:
       - id: format-qml
         name: format-qml
-        entry: /home/mathis/Qt/6.8.0/gcc_64/bin/qmlformat -i -l native
+        entry: qmlformat -i -l native
         types_or: ["qml"]
         pass_filenames: true
         language: system
 
       - id: reuse-annotate
         name: reuse-annotate
-        entry: reuse annotate --copyright="Mathis Logemann <mathisloge.opensource@pm.me>" --license="GPL-3.0-or-later"
+        entry: reuse annotate --copyright="Mathis Logemann <mathis.opensource@tuta.io>" --license="GPL-3.0-or-later"
         types_or: [c++, qml]
         pass_filenames: true
         language: system

@@ -1,10 +1,12 @@
-// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathisloge.opensource@pm.me>
+// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathis.opensource@tuta.io>
+// SPDX-FileCopyrightText: 2025 Mathis Logemann <mathis.opensource@tuta.io>
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #pragma once
 #include <GPhoto2Context.hpp>
 #include <exec/async_scope.hpp>
+#include <exec/task.hpp>
 #include "ICamera.hpp"
 #include "Scheduler.hpp"
 #include "SystemStatusClient.hpp"
@@ -25,9 +27,12 @@ class GPhoto2Camera : public ICamera
   private:
     void processPreviewImage(const QImage &image);
 
+    exec::task<void> asyncCaptureLoop();
+    exec::task<GPhoto2::Context> asyncAutoconnect();
+
   private:
+    Scheduler &scheduler_;
     SystemStatusClient status_client_;
-    std::stop_source stoken_;
     exec::async_scope async_scope_;
     bool capture_photo_{false};
 };

@@ -1,4 +1,5 @@
-// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathisloge.opensource@pm.me>
+// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathis.opensource@tuta.io>
+// SPDX-FileCopyrightText: 2025 Mathis Logemann <mathis.opensource@tuta.io>
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -16,7 +17,7 @@ TEST_CASE("CollageRenderer save as png", "[CollageRenderer]")
     init_lunasvg(font_cache);
     CollageRenderer renderer{};
 
-    renderer.loadDocument(asset_path / "Collage.svg");
+    renderer.loadDocument(asset_path / "collage.svg");
     renderer.addPhotoElement("image-1");
     renderer.addPhotoElement("image-2");
 

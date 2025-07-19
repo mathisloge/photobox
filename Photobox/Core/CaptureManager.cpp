@@ -1,4 +1,5 @@
-// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathisloge.opensource@pm.me>
+// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathis.opensource@tuta.io>
+// SPDX-FileCopyrightText: 2025 Mathis Logemann <mathis.opensource@tuta.io>
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -28,7 +29,7 @@ CaptureManager::CaptureManager(Scheduler &scheduler,
     , camera_{camera}
     , remote_trigger_{remote_trigger}
     , camera_led_{camera_led}
-    , session_{std::make_unique<IdleCaptureSession>()}
+    , session_{make_unique_object_ptr_as<ICaptureSession, IdleCaptureSession>()}
     , collage_session_factory_{std::move(collage_session_factory)}
 {
     connect(&camera_, &ICamera::imageCaptured, this, [this](auto &&image) {
@@ -38,15 +39,23 @@ CaptureManager::CaptureManager(Scheduler &scheduler,
         const auto image_id = image_ids_++;
         Q_EMIT imageCaptured(image, image_id);
         session_->imageCaptured(image, image_id);
-        async_scope_.spawn(
-            stdexec::schedule(scheduler_.getWorkScheduler()) |
-            stdexec::then([this, image = image]() { return image_storage_.saveImage(image); }) |
-            stdexec::continues_on(scheduler_.getQtEventLoopScheduler()) |
-            stdexec::then([this](auto &&saved_image_path) { session_->imageSaved(saved_image_path); }) |
-            stdexec::upon_error([](auto &&ex_ptr) { LOG_ERROR(capture_manager, "Error while saving image"); }));
+        async_scope_.spawn(stdexec::schedule(scheduler_.getWorkScheduler()) |
+                           stdexec::then([this, image = image]() { return image_storage_.saveImage(image); }) |
+                           stdexec::continues_on(scheduler_.getQtEventLoopScheduler()) |
+                           stdexec::then([this](auto &&saved_image_path) { session_->imageSaved(saved_image_path); }) |
+                           stdexec::upon_error([](auto &&ex_ptr) {
+                               try
+                               {
+                                   std::rethrow_exception(ex_ptr);
+                               }
+                               catch (const std::exception &ex)
+                               {
+                                   LOG_ERROR(capture_manager, "Error while saving image. {}", ex.what());
+                               }
+                           }));
     });
     connect(&remote_trigger_, &RemoteTrigger::triggered, this, &CaptureManager::triggerButtonPressed);
-    switchToSession(std::make_unique<IdleCaptureSession>());
+    switchToSession(make_unique_object_ptr_as<ICaptureSession, IdleCaptureSession>());
 }
 
 CaptureManager::~CaptureManager()
@@ -64,7 +73,7 @@ void CaptureManager::triggerButtonPressed()
 
 ImageProvider *CaptureManager::createImageProvider()
 {
-    auto *image_provider = new ImageProvider();
+    auto *image_provider = new ImageProvider(); // NOLINT(cppcoreguidelines-owning-memory)
     connect(this, &CaptureManager::imageCaptured, image_provider, &ImageProvider::addImage);
     connect(this, &CaptureManager::resetImages, image_provider, &ImageProvider::resetCache);
     return image_provider;
@@ -91,7 +100,7 @@ void CaptureManager::sessionFinished()
     }
     else
     {
-        switchToSession(std::make_unique<IdleCaptureSession>());
+        switchToSession(make_unique_object_ptr_as<ICaptureSession, IdleCaptureSession>());
     }
 }
 
@@ -102,6 +111,12 @@ void CaptureManager::switchToSession(CaptureSessionPtr &&new_session)
     connect(session_.get(), &ICaptureSession::requestedImageCapture, &camera_, &ICamera::requestCapturePhoto);
     connect(session_.get(), &ICaptureSession::finished, this, &CaptureManager::sessionFinished);
     connect(session_.get(), &ICaptureSession::statusChanged, this, &CaptureManager::handleSessionStatusChange);
+    connect(session_.get(),
+            &ICaptureSession::captureStatusChanged,
+            this,
+            &CaptureManager::handleSessionCaptureStatusChange);
+    handleSessionStatusChange();
+    handleSessionCaptureStatusChange();
     Q_EMIT sessionChanged();
     LOG_INFO(capture_manager, "Switched session from '{}' to '{}'", old_session_name, session_->name());
 }
@@ -129,12 +144,15 @@ void CaptureManager::handleSessionCaptureStatusChange()
     switch (status)
     {
     case ICaptureSession::CaptureStatus::Idle:
+        LOG_DEBUG(capture_manager, "Camera LED => off");
         camera_led_.turnOff();
         break;
     case ICaptureSession::CaptureStatus::BeforeCapture:
+        LOG_DEBUG(capture_manager, "Camera LED => Pulsate");
         camera_led_.playEffect(CameraLed::Effect::Pulsate);
         break;
     case ICaptureSession::CaptureStatus::WaitForCapture:
+        LOG_DEBUG(capture_manager, "Camera LED => Capture");
         camera_led_.playEffect(CameraLed::Effect::Capture);
         break;
     }

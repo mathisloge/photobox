@@ -1,4 +1,5 @@
-// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathisloge.opensource@pm.me>
+// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathis.opensource@tuta.io>
+// SPDX-FileCopyrightText: 2025 Mathis Logemann <mathis.opensource@tuta.io>
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -12,6 +13,7 @@ RowLayout {
     id: root
     required property string title
     required property int status
+    property int fontSize: 42
 
     readonly property color errorStatus: "#E51400"
     readonly property color errorStatusBorder: "#A20025"
@@ -32,7 +34,7 @@ RowLayout {
     Label {
         id: label
         text: root.title
-        font.pixelSize: 42
+        font.pixelSize: root.fontSize
     }
 
     Component {

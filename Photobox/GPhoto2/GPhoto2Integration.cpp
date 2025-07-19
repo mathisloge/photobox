@@ -1,4 +1,5 @@
-// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathisloge.opensource@pm.me>
+// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathis.opensource@tuta.io>
+// SPDX-FileCopyrightText: 2025 Mathis Logemann <mathis.opensource@tuta.io>
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -22,7 +23,7 @@ bool autodetectAndConnectCamera(Context &context)
     const auto autodetect_count = gp_camera_autodetect(cam_list.get(), context.context.get());
     if (autodetect_count <= GP_OK)
     {
-        LOG_DEBUG(gphoto2log, "got no possible cameras");
+        LOG_DEBUG_LIMIT(std::chrono::seconds{1}, gphoto2log, "got no possible cameras");
         return false;
     }
     LOG_DEBUG(gphoto2log, "autoconnect count: {}", autodetect_count);
