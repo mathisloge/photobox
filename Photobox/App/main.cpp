@@ -39,6 +39,7 @@ int main(int argc, char *argv[])
 {
     install_crash_handler();
     setupLogging();
+    installQtMessageHandler();
     int app_return_code{EXIT_FAILURE};
     Scheduler scheduler;
 

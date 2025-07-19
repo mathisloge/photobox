@@ -8,4 +8,5 @@
 namespace Pbox
 {
 PHOTOBOXLOGGING_EXPORT void setupLogging();
-}
+PHOTOBOXLOGGING_EXPORT void installQtMessageHandler();
+} // namespace Pbox

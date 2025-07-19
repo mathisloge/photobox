@@ -12,6 +12,7 @@ target_include_directories(PhotoboxLogging PUBLIC
 )
 
 target_link_libraries(PhotoboxLogging PUBLIC
+    Qt6::Core
     quill::quill
 )
 
