@@ -86,7 +86,7 @@ exec::task<void> GPhoto2Camera::asyncCaptureLoop()
         while (status_client_.systemStatus() == SystemStatusCode::Code::Ok and not token.stop_requested())
         {
             co_await stdexec::starts_on(
-                exec::inline_scheduler{},
+                stdexec::inline_scheduler{},
                 conditional(capture_photo_, capture, preview) | stdexec::upon_error([this](auto &&error) {
                     status_client_.setSystemStatus(SystemStatusCode::Code::Error);
                     try
