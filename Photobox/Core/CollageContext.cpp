@@ -24,7 +24,7 @@ void logError(std::exception_ptr ex)
     }
     catch (const std::exception &e)
     {
-        LOG_ERROR(collage_context, "Error while initializing the collage: {}", e.what());
+        LOG_ERROR(logger_collage_context(), "Error while initializing the collage: {}", e.what());
     }
 }
 } // namespace

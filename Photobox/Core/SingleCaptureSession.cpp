@@ -46,7 +46,7 @@ void SingleCaptureSession::startCapturing()
 
 void SingleCaptureSession::handleCountdown(int count)
 {
-    LOG_DEBUG(single_capture_session, "Countdown {}", count);
+    LOG_DEBUG(logger_single_capture_session(), "Countdown {}", count);
     if (count == 1)
     {
         setLiveViewVisible(false);

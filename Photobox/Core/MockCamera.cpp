@@ -32,9 +32,9 @@ MockCamera::MockCamera()
     connect(this, &ICamera::videoSinkChanged, this, [this]() { capture_session_.setVideoSink(getVideoSink()); });
 
     connect(&image_capture_, &QImageCapture::imageCaptured, this, [this](auto, auto &&preview) {
-        LOG_INFO(mock_camera, "Got image. Delaying publishing...");
+        LOG_INFO(logger_mock_camera(), "Got image. Delaying publishing...");
         QTimer::singleShot(std::chrono::seconds{3}, this, [this, preview]() {
-            LOG_INFO(mock_camera, "Publishing image...");
+            LOG_INFO(logger_mock_camera(), "Publishing image...");
             Q_EMIT imageCaptured(preview);
         });
     });

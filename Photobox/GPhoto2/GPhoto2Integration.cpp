@@ -7,7 +7,7 @@
 #include <Pbox/Logger.hpp>
 #include "GPhoto2Context.hpp"
 
-DEFINE_LOGGER(gphoto2log);
+DEFINE_LOGGER(gphoto2);
 
 namespace Pbox::GPhoto2
 {
@@ -22,28 +22,28 @@ bool autodetectAndConnectCamera(Context &context)
     const auto autodetect_count = gp_camera_autodetect(cam_list.get(), context.context.get());
     if (autodetect_count <= GP_OK)
     {
-        LOG_DEBUG_LIMIT(std::chrono::seconds{1}, gphoto2log, "got no possible cameras");
+        LOG_DEBUG_LIMIT(std::chrono::seconds{1}, logger_gphoto2(), "got no possible cameras");
         return false;
     }
-    LOG_DEBUG(gphoto2log, "autoconnect count: {}", autodetect_count);
+    LOG_DEBUG(logger_gphoto2(), "autoconnect count: {}", autodetect_count);
 
     const char *model_name = nullptr;
     const char *port_value = nullptr;
     gp_list_get_name(cam_list.get(), 0, &model_name);
     gp_list_get_value(cam_list.get(), 0, &port_value);
-    LOG_INFO(gphoto2log, "Got camera model: {} on port {}", model_name, port_value);
+    LOG_INFO(logger_gphoto2(), "Got camera model: {} on port {}", model_name, port_value);
 
     const auto camera_index = gp_abilities_list_lookup_model(context.camera_abilities_list.get(), model_name);
     if (camera_index < GP_OK)
     {
-        LOG_ERROR(gphoto2log, "Could not lookup camera abilities");
+        LOG_ERROR(logger_gphoto2(), "Could not lookup camera abilities");
         return false;
     }
 
     const auto port_lookup_result = gp_port_info_list_lookup_path(context.port_list.get(), port_value);
     if (port_lookup_result < GP_OK)
     {
-        LOG_ERROR(gphoto2log,
+        LOG_ERROR(logger_gphoto2(),
                   "Could not obtain specified port ({}). Failed with: {}",
                   port_value,
                   gp_port_result_as_string(port_lookup_result));
@@ -53,32 +53,32 @@ bool autodetectAndConnectCamera(Context &context)
     GPPortInfo port_info{};
     if (gp_port_info_list_get_info(context.port_list.get(), port_lookup_result, &port_info) < GP_OK)
     {
-        LOG_ERROR(gphoto2log, "Could not get port info");
+        LOG_ERROR(logger_gphoto2(), "Could not get port info");
         return false;
     }
 
     auto camera = makeUniqueCamera(context.context.get());
     if (camera == nullptr)
     {
-        LOG_ERROR(gphoto2log, "could not allocate camera");
+        LOG_ERROR(logger_gphoto2(), "could not allocate camera");
         return false;
     }
 
     if (gp_abilities_list_get_abilities(context.camera_abilities_list.get(), camera_index, &context.camera_abilities) <
         GP_OK)
     {
-        LOG_ERROR(gphoto2log, "Could not get camera abilities");
+        LOG_ERROR(logger_gphoto2(), "Could not get camera abilities");
         return false;
     }
     if (gp_camera_set_abilities(camera.get(), context.camera_abilities) < GP_OK)
     {
-        LOG_ERROR(gphoto2log, "Could not set camera abilities");
+        LOG_ERROR(logger_gphoto2(), "Could not set camera abilities");
         return false;
     }
 
     if (gp_camera_set_port_info(camera.get(), port_info) < GP_OK)
     {
-        LOG_ERROR(gphoto2log, "Could not set camera port info");
+        LOG_ERROR(logger_gphoto2(), "Could not set camera port info");
         return false;
     }
 
@@ -109,7 +109,7 @@ std::optional<QImage> captureImage(Context &context)
         gp_camera_capture(context.camera.get(), GP_CAPTURE_IMAGE, &camera_file_path, context.context.get());
     if (ret_val < GP_OK)
     {
-        LOG_ERROR(gphoto2log, "could invoke gphoto2 capture");
+        LOG_ERROR(logger_gphoto2(), "could invoke gphoto2 capture");
         return std::nullopt;
     }
     gp_camera_file_get(context.camera.get(),
@@ -131,13 +131,13 @@ std::optional<QImage> readImageFromFile(CameraFile *file)
     const auto size_result = gp_file_get_data_and_size(file, &buffer, &size);
     if (size_result < GP_OK)
     {
-        LOG_DEBUG(gphoto2log, "could not get size of file. result code: {}", size_result);
+        LOG_DEBUG(logger_gphoto2(), "could not get size of file. result code: {}", size_result);
         return std::nullopt;
     }
     QImage img;
     if (!img.loadFromData(reinterpret_cast<const uchar *>(buffer), static_cast<int>(size)))
     {
-        LOG_ERROR(gphoto2log, "Could not create image from data");
+        LOG_ERROR(logger_gphoto2(), "Could not create image from data");
         return std::nullopt;
     }
     return img;
