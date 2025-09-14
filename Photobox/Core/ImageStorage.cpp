@@ -7,7 +7,7 @@
 #include <Pbox/Logger.hpp>
 #include <fmt/format.h>
 
-DEFINE_LOGGER(imageStorageLog)
+DEFINE_LOGGER(image_store)
 
 using namespace Qt::Literals::StringLiterals;
 namespace Pbox
@@ -37,7 +37,7 @@ ImageStorage::ImageStorage(std::filesystem::path storage_dir)
         }
         catch (const std::exception &exception)
         {
-            LOG_CRITICAL(imageStorageLog,
+            LOG_CRITICAL(logger_image_store(),
                          "Could not create directories to path '{}'. Failed with: '{}'",
                          storage_dir_.string(),
                          exception.what());

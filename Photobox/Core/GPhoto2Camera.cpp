@@ -19,7 +19,7 @@
 #include <exec/repeat_effect_until.hpp>
 #include <exec/static_thread_pool.hpp>
 
-DEFINE_LOGGER(gphoto2camera);
+DEFINE_LOGGER(gphoto2_camera);
 namespace Pbox
 {
 namespace
@@ -61,11 +61,11 @@ exec::task<void> GPhoto2Camera::asyncCaptureLoop()
         {
             continue;
         }
-        LOG_DEBUG(gphoto2camera, "Got a camera...");
+        LOG_DEBUG(logger_gphoto2_camera(), "Got a camera...");
 
         auto capture = stdexec::schedule(scheduler_.getWorkScheduler()) //
                        | stdexec::then([this, &context]() {
-                             LOG_DEBUG(gphoto2camera, "capture image...");
+                             LOG_DEBUG(logger_gphoto2_camera(), "capture image...");
                              capture_photo_ = false;
                              return GPhoto2::captureImage(*context);
                          })                                                          //
@@ -85,22 +85,22 @@ exec::task<void> GPhoto2Camera::asyncCaptureLoop()
 
         while (status_client_.systemStatus() == SystemStatusCode::Code::Ok and not token.stop_requested())
         {
-            co_await stdexec::starts_on(exec::inline_scheduler{},
-                                        conditional(capture_photo_, capture, preview) |
-                                            stdexec::upon_error([this](auto &&error) {
-                                                status_client_.setSystemStatus(SystemStatusCode::Code::Error);
-                                                try
-                                                {
-                                                    if (error)
-                                                    {
-                                                        std::rethrow_exception(error);
-                                                    }
-                                                }
-                                                catch (const std::exception &e)
-                                                {
-                                                    LOG_ERROR(gphoto2camera, "GPhoto2 Exception: {}", e.what());
-                                                }
-                                            }));
+            co_await stdexec::starts_on(
+                exec::inline_scheduler{},
+                conditional(capture_photo_, capture, preview) | stdexec::upon_error([this](auto &&error) {
+                    status_client_.setSystemStatus(SystemStatusCode::Code::Error);
+                    try
+                    {
+                        if (error)
+                        {
+                            std::rethrow_exception(error);
+                        }
+                    }
+                    catch (const std::exception &e)
+                    {
+                        LOG_ERROR(logger_gphoto2_camera(), "GPhoto2 Exception: {}", e.what());
+                    }
+                }));
         }
     }
 }
@@ -121,16 +121,16 @@ exec::task<GPhoto2::Context> GPhoto2Camera::asyncAutoconnect()
 
 GPhoto2Camera::~GPhoto2Camera()
 {
-    LOG_DEBUG(gphoto2camera, "Camera stop");
+    LOG_DEBUG(logger_gphoto2_camera(), "Camera stop");
     async_scope_.request_stop();
     cleanup_async_scope(async_scope_);
 
-    LOG_DEBUG(gphoto2camera, "Async scope cleaned up");
+    LOG_DEBUG(logger_gphoto2_camera(), "Async scope cleaned up");
 }
 
 void GPhoto2Camera::requestCapturePhoto()
 {
-    LOG_DEBUG(gphoto2camera, "image requested...");
+    LOG_DEBUG(logger_gphoto2_camera(), "image requested...");
     capture_photo_ = true;
 }
 
@@ -152,14 +152,14 @@ void GPhoto2Camera::processPreviewImage(const QImage &image)
         }
         else
         {
-            LOG_ERROR(gphoto2camera, "Error while accessing the frame data");
+            LOG_ERROR(logger_gphoto2_camera(), "Error while accessing the frame data");
         }
 
         video_frame.unmap();
     }
     else
     {
-        LOG_ERROR(gphoto2camera, "Could not map video frame");
+        LOG_ERROR(logger_gphoto2_camera(), "Could not map video frame");
     }
 
     QPointer<QVideoSink> video_sink{getVideoSink()};

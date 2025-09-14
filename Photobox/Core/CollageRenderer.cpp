@@ -11,7 +11,7 @@
 #include <nlohmann/json.hpp>
 #include "CollageFontCache.hpp"
 
-DEFINE_LOGGER(collagerenderer);
+DEFINE_LOGGER(collage_renderer);
 namespace Pbox
 {
 
@@ -23,7 +23,8 @@ void CollageRenderer::loadDocument(const std::string &file_path)
 {
     base_image_file_path_ = file_path;
     document_ = lunasvg::Document::loadFromFile(file_path);
-    LOG_DEBUG(collagerenderer, "loaded image from {}. Is valid document: {}", file_path, (document_ != nullptr));
+    LOG_DEBUG(
+        logger_collage_renderer(), "loaded image from {}. Is valid document: {}", file_path, (document_ != nullptr));
 }
 
 void CollageRenderer::addPhotoElement(const std::string &element_id)
@@ -31,7 +32,7 @@ void CollageRenderer::addPhotoElement(const std::string &element_id)
     auto el = document_->getElementById(element_id);
     if (el.isNull())
     {
-        LOG_ERROR(collagerenderer, "The element '{}' could not be found in the SVG.", element_id);
+        LOG_ERROR(logger_collage_renderer(), "The element '{}' could not be found in the SVG.", element_id);
         return;
     }
     images_[element_id] = std::move(el);
@@ -47,7 +48,7 @@ void CollageRenderer::setSourceOfPhoto(const std::string &element_id, const std:
     auto it = images_.find(element_id);
     if (it == images_.end())
     {
-        LOG_ERROR(collagerenderer,
+        LOG_ERROR(logger_collage_renderer(),
                   "Can't set image '{}' to element href since the element '{}' could not be found",
                   file_path,
                   element_id);

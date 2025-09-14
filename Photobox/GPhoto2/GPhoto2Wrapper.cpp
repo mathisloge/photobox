@@ -7,7 +7,7 @@
 #include "GPhoto2Exeption.hpp"
 #include <gphoto2-port-result.h>
 
-DEFINE_LOGGER(gphoto2log);
+DEFINE_LOGGER(gphoto2);
 
 namespace Pbox::GPhoto2
 {
@@ -15,12 +15,12 @@ namespace
 {
 void handleGPhoto2Error(GPContext * /*context*/, const char *str, void * /*data*/)
 {
-    LOG_ERROR(gphoto2log, "{}", str);
+    LOG_ERROR(logger_gphoto2(), "{}", str);
 }
 
 void handleGPhoto2Status(GPContext * /*context*/, const char *str, void * /*data*/)
 {
-    LOG_INFO(gphoto2log, "{}", str);
+    LOG_INFO(logger_gphoto2(), "{}", str);
 }
 } // namespace
 
@@ -109,7 +109,7 @@ void CameraDeleter::operator()(Camera *c) const
     {
         if (context != nullptr)
         {
-            LOG_DEBUG(gphoto2log, "Camera will exit now.");
+            LOG_DEBUG(logger_gphoto2(), "Camera will exit now.");
             gp_camera_exit(c, context);
         }
         gp_camera_free(c);
