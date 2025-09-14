@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 Mathis Logemann <mathis.opensource@tuta.io>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 qt_add_qml_module(
     PhotoboxCore
     URI "Photobox.Core"
@@ -62,15 +66,17 @@ add_library(Photobox::Core ALIAS PhotoboxCore)
 add_library(Photobox::CorePlugin ALIAS PhotoboxCoreplugin)
 
 target_include_directories(PhotoboxCore PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
-target_link_libraries(PhotoboxCore PUBLIC
-    Qt6::Quick
-    Qt6::PrintSupport
-    Qt6::Multimedia
-    Boost::headers
-    Photobox::Utils
-    Photobox::GPhoto2
-    cpptrace::cpptrace
-    lunasvg::lunasvg
-    nlohmann_json::nlohmann_json
-    fmt::fmt
+target_link_libraries(
+    PhotoboxCore
+    PUBLIC
+        Qt6::Quick
+        Qt6::PrintSupport
+        Qt6::Multimedia
+        Boost::headers
+        Photobox::Utils
+        Photobox::GPhoto2
+        cpptrace::cpptrace
+        lunasvg::lunasvg
+        nlohmann_json::nlohmann_json
+        fmt::fmt
 )

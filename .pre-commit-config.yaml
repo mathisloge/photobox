@@ -1,36 +1,61 @@
+default_install_hook_types:
+  - pre-commit
+  - commit-msg
+
 repos:
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v4.2.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+        args: [--no-color]
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
-        files: ^.*\.cmake|CMakeLists\.txt|.*\.yml$
       - id: end-of-file-fixer
-        files: ^.*\.cmake|CMakeLists\.txt|.*\.yml$
       - id: check-yaml
+        exclude: ^(mkdocs|.clang-format)
+      - id: check-added-large-files
 
+  - repo: https://github.com/BlankSpruce/gersemi
+    rev: 0.22.2
+    hooks:
+      - id: gersemi
+        name: CMake linting
+
+  - repo: https://github.com/psf/black
+    rev: 25.1.0
+    hooks:
+      - id: black
   - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: "v20.1.8"
+    rev: v21.1.0
     hooks:
       - id: clang-format
         types_or: [c++, c, proto]
-  # TODO: annotate fonts with correct licenses
-  #- repo: https://github.com/fsfe/reuse-tool
-  #  rev: v5.0.2
-  #  hooks:
-  #    - id: reuse-lint-file
+  # Check linting and style issues
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: "v0.13.0"
+    hooks:
+      # Run the linter.
+      - id: ruff-check
+        args: [--fix, --show-fixes]
+      # Run the formatter.
+      - id: ruff-format
+        exclude: ^(docs)
+
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.1
+    hooks:
+      - id: codespell
+        exclude: ^(pyproject.toml)
 
   - repo: local
     hooks:
-      - id: format-qml
-        name: format-qml
-        entry: qmlformat -i -l native
-        types_or: ["qml"]
-        pass_filenames: true
-        language: system
-
       - id: reuse-annotate
         name: reuse-annotate
-        entry: reuse annotate --copyright="Mathis Logemann <mathis.opensource@tuta.io>" --license="GPL-3.0-or-later"
-        types_or: [c++, qml]
+        entry: reuse annotate -l "GPL-3.0-or-later" --merge-copyrights --single-line -c "Mathis Logemann <mathis.opensource@tuta.io>"
+        types_or: [c++, qml, proto, cmake, python, pyi]
         pass_filenames: true
         language: system
+        stages: [ manual ]

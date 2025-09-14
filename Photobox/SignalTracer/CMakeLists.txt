@@ -1,9 +1,14 @@
+# SPDX-FileCopyrightText: 2025 Mathis Logemann <mathis.opensource@tuta.io>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # see https://github.com/jeremy-rifkin/cpptrace/blob/main/docs/signal-safe-tracing.md
 add_executable(PhotoboxSignalTracer main.cpp)
 target_link_libraries(PhotoboxSignalTracer PRIVATE cpptrace::cpptrace)
 
-install(TARGETS PhotoboxSignalTracer
-    BUNDLE  DESTINATION .
+install(
+    TARGETS PhotoboxSignalTracer
+    BUNDLE DESTINATION .
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
