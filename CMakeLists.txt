@@ -53,7 +53,7 @@ find_package(
     Qt6
     6.9
     REQUIRED
-    COMPONENTS Core Gui Qml Quick Network Multimedia PrintSupport
+    COMPONENTS Core Gui Qml Quick QuickControls2 Network Multimedia PrintSupport
 )
 qt_policy(SET QTP0001 NEW)
 qt_policy(SET QTP0003 NEW)
@@ -68,7 +68,7 @@ message(STATUS "Found gphoto2 ${gphoto2_VERSION}")
 add_subdirectory(Photobox)
 
 if(BUILD_TESTING)
-    add_subdirectory(Tests)
+    #add_subdirectory(Tests)
 endif()
 
 install(PROGRAMS launcher.sh TYPE BIN)

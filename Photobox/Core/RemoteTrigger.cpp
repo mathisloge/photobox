@@ -5,6 +5,14 @@
 #include "RemoteTrigger.hpp"
 namespace Pbox
 {
-RemoteTrigger::RemoteTrigger() = default;
+RemoteTrigger::RemoteTrigger(QString name)
+    : system_status_client_{std::move(name), false}
+{}
+
 RemoteTrigger::~RemoteTrigger() = default;
+
+const SystemStatusClient &RemoteTrigger::systemStatusClient() const
+{
+    return system_status_client_;
+}
 } // namespace Pbox

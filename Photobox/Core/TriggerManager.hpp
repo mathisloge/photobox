@@ -4,22 +4,29 @@
 
 #pragma once
 #include <QObject>
+#include "Pbox/Instance.hpp"
 #include "RemoteTrigger.hpp"
+#include "TriggerId.hpp"
 
 namespace Pbox
 {
-using TriggerId = std::string;
+class SystemStatusManager;
+
 class TriggerManager : public QObject
 {
     Q_OBJECT
 
   public:
+    PBOX_DISABLE_COPY_MOVE(TriggerManager);
+    explicit TriggerManager(Instance<SystemStatusManager> system_status_manager);
+    ~TriggerManager() override = default;
     void registerTrigger(TriggerId triggerId, std::unique_ptr<RemoteTrigger> trigger);
 
   Q_SIGNALS:
     void triggerFired(TriggerId triggerId);
 
   private:
+    Instance<SystemStatusManager> system_status_manager_;
     std::unordered_map<TriggerId, std::unique_ptr<RemoteTrigger>> remote_triggers_;
 };
 } // namespace Pbox

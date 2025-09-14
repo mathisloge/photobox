@@ -4,18 +4,27 @@
 
 #include "TriggerManager.hpp"
 #include <Pbox/Logger.hpp>
+#include "SystemStatusManager.hpp"
 
-DEFINE_LOGGER(log_trigger_manager);
+DEFINE_LOGGER(trigger_manager);
 
 namespace Pbox
 {
+TriggerManager::TriggerManager(Instance<SystemStatusManager> system_status_manager)
+    : system_status_manager_{std::move(system_status_manager)}
+{}
+
 void TriggerManager::registerTrigger(TriggerId triggerId, std::unique_ptr<RemoteTrigger> trigger)
 {
-    LOG_DEBUG(log_trigger_manager, "Register remote trigger '{}'", triggerId);
+    LOG_DEBUG(logger_trigger_manager(), "Register remote trigger '{}'", triggerId);
     const auto [entry, emplaced] = remote_triggers_.emplace(std::move(triggerId), std::move(trigger));
     if (not emplaced)
     {
-        LOG_ERROR(log_trigger_manager, "Could not register trigger '{}', it already exists.", entry->first);
+        LOG_ERROR(logger_trigger_manager(), "Could not register trigger '{}', it already exists.", entry->first);
+    }
+    else
+    {
+        system_status_manager_->registerClient(entry->second->systemStatusClient());
     }
 }
 } // namespace Pbox

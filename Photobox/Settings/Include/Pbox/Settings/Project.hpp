@@ -55,17 +55,21 @@ class Project
 {
   public:
     PBOX_DISABLE_COPY_MOVE(Project);
-    explicit Project(const std::filesystem::path &config_file,
-                     std::unique_ptr<IRemoteTriggerFactory> remoteTriggerFactory = createDefaultRemoteTriggerFactory());
+    explicit Project(
+        Instance<TriggerManager> trigger_manager,
+        std::unique_ptr<IRemoteTriggerFactory> remote_trigger_factory = createDefaultRemoteTriggerFactory());
     ~Project();
 
+    void initFromConfig(const std::filesystem::path &config_file);
+
     const std::string &name() const;
-    const TriggerManager &triggerManager() const;
+    CameraLed &cameraLed();
 
   private:
+    Instance<TriggerManager> trigger_manager_;
+    std::unique_ptr<IRemoteTriggerFactory> remote_trigger_factory_;
     std::string name_;
     std::filesystem::path output_directory_;
     std::unique_ptr<CameraLed> camera_led_;
-    TriggerManager trigger_manager_;
 };
 } // namespace Pbox

@@ -16,4 +16,5 @@ target_sources(
                 include/Pbox/QStdexec.hpp
                 include/Pbox/DisableCopyMove.hpp
                 include/Pbox/CleanupAsyncScope.hpp
+                include/Pbox/Instance.hpp
 )

@@ -12,7 +12,7 @@ class EspHomeRemoteTrigger : public RemoteTrigger
 {
   public:
     Q_DISABLE_COPY_MOVE(EspHomeRemoteTrigger);
-    explicit EspHomeRemoteTrigger(std::unique_ptr<IEspHomeClient> client);
+    explicit EspHomeRemoteTrigger(QString name, std::unique_ptr<IEspHomeClient> client);
     ~EspHomeRemoteTrigger() override;
 
     void playEffect(RemoteTrigger::Effect effect) override;
