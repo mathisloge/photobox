@@ -13,5 +13,4 @@ add_subdirectory(Settings)
 add_subdirectory(CollageEditorApp)
 
 add_subdirectory(App)
-add_subdirectory(SettingsApp)
 add_subdirectory(SignalTracer)

@@ -5,6 +5,7 @@
 #include <QApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlExtensionPlugin>
+#include <QQuickStyle>
 #include <QWindow>
 #include <ApplicationState.hpp>
 #include <CollagePrinter.hpp>
@@ -17,8 +18,10 @@
 #include <ImageStorage.hpp>
 #include <MockCamera.hpp>
 #include <Pbox/Logger.hpp>
+#include <Pbox/Settings/Project.hpp>
 #include <Pbox/SetupLogging.hpp>
 #include <Scheduler.hpp>
+#include <TriggerManager.hpp>
 #include <fmt/core.h>
 #include "CaptureManager.hpp"
 #include "CollageCaptureSession.hpp"
@@ -47,6 +50,7 @@ int main(int argc, char *argv[])
         QCoreApplication::setApplicationName(QStringLiteral("PhotoBox"));
         QCoreApplication::setOrganizationName(QStringLiteral("com.mathisloge.photobox"));
         QCoreApplication::setApplicationVersion(QStringLiteral(QT_VERSION_STR));
+        QQuickStyle::setStyle("FluentWinUI3");
 
         QCommandLineParser parser;
         parser.addHelpOption();
@@ -82,6 +86,10 @@ int main(int argc, char *argv[])
 
         parser.process(app);
 
+        Instance<SystemStatusManager> system_status_manager = std::make_shared<SystemStatusManager>();
+        Instance<TriggerManager> trigger_manager = std::make_shared<TriggerManager>(system_status_manager);
+        Project project{trigger_manager};
+
         const QString capture_directory = parser.value(capture_directory_option);
         const QString collage_directory = parser.value(collage_directory_option);
         const QString printer_settings = parser.value(printer_settings_option);
@@ -100,15 +108,13 @@ int main(int argc, char *argv[])
         LOG_NOTICE(rootlogger, "window_mode={}", static_cast<int>(window_mode));
         LOG_NOTICE(rootlogger, "capture_directory={}", capture_directory.toStdString());
 
-        SystemStatusManager system_status_manager;
-
         ImageStorage image_storage{capture_directory.toStdString()};
         CollageContext collage_context{
             scheduler, image_storage, collage_directory.toStdString(), printer_settings.toStdString()};
         //  system_status_manager.registerClient(std::addressof(collage_context.systemStatusClient()));
 
         std::unique_ptr<RemoteTrigger> remote_trigger =
-            std::make_unique<EspHomeRemoteTrigger>(std::make_unique<EspHomeClient>(trigger_button_host));
+            std::make_unique<EspHomeRemoteTrigger>("", std::make_unique<EspHomeClient>(trigger_button_host));
         std::unique_ptr<CameraLed> camera_led =
             std::make_unique<EspHomeCameraLed>(std::make_unique<EspHomeClient>(camera_led_host));
         std::shared_ptr<ICamera> camera;
@@ -126,7 +132,7 @@ int main(int argc, char *argv[])
             scheduler, image_storage, *camera, *remote_trigger, *camera_led, [&collage_context] {
                 return make_unique_object_ptr_as<ICaptureSession, SingleCaptureSession>();
             }};
-        system_status_manager.registerClient(std::addressof(camera->systemStatusClient()));
+        system_status_manager->registerClient(camera->systemStatusClient());
 
         QQmlApplicationEngine engine;
 
@@ -136,7 +142,7 @@ int main(int argc, char *argv[])
         auto &&app_state = engine.singletonInstance<ApplicationState *>("Photobox.Core", "ApplicationState");
         Q_ASSERT(app_state != nullptr);
 
-        app_state->system_status_manager = std::addressof(system_status_manager);
+        app_state->system_status_manager = system_status_manager;
         app_state->camera = camera;
         app_state->remote_trigger = remote_trigger.get();
         app_state->camera_led = camera_led.get();

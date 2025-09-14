@@ -38,7 +38,7 @@ Page {
                     SystemStatusDelegate {
                         fontSize: 24
                         title: delegate.name
-                        status: 1
+                        status: 0
                     }
 
                     Label {

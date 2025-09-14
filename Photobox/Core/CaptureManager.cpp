@@ -49,7 +49,7 @@ CaptureManager::CaptureManager(Scheduler &scheduler,
                                }
                                catch (const std::exception &ex)
                                {
-                                   LOG_ERROR(capture_manager, "Error while saving image. {}", ex.what());
+                                   LOG_ERROR(logger_capture_manager(), "Error while saving image. {}", ex.what());
                                }
                            }));
     });
@@ -90,7 +90,7 @@ ICamera *CaptureManager::getCamera()
 
 void CaptureManager::sessionFinished()
 {
-    LOG_DEBUG(capture_manager, "Session '{}' finished", session_->name());
+    LOG_DEBUG(logger_capture_manager(), "Session '{}' finished", session_->name());
     Q_EMIT resetImages();
     if (session_->name() == IdleCaptureSession::kName)
     {
@@ -117,7 +117,7 @@ void CaptureManager::switchToSession(CaptureSessionPtr &&new_session)
     handleSessionStatusChange();
     handleSessionCaptureStatusChange();
     Q_EMIT sessionChanged();
-    LOG_INFO(capture_manager, "Switched session from '{}' to '{}'", old_session_name, session_->name());
+    LOG_INFO(logger_capture_manager(), "Switched session from '{}' to '{}'", old_session_name, session_->name());
 }
 
 void CaptureManager::handleSessionStatusChange()
@@ -143,15 +143,15 @@ void CaptureManager::handleSessionCaptureStatusChange()
     switch (status)
     {
     case ICaptureSession::CaptureStatus::Idle:
-        LOG_DEBUG(capture_manager, "Camera LED => off");
+        LOG_DEBUG(logger_capture_manager(), "Camera LED => off");
         camera_led_.turnOff();
         break;
     case ICaptureSession::CaptureStatus::BeforeCapture:
-        LOG_DEBUG(capture_manager, "Camera LED => Pulsate");
+        LOG_DEBUG(logger_capture_manager(), "Camera LED => Pulsate");
         camera_led_.playEffect(CameraLed::Effect::Pulsate);
         break;
     case ICaptureSession::CaptureStatus::WaitForCapture:
-        LOG_DEBUG(capture_manager, "Camera LED => Capture");
+        LOG_DEBUG(logger_capture_manager(), "Camera LED => Capture");
         camera_led_.playEffect(CameraLed::Effect::Capture);
         break;
     }

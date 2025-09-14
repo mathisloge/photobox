@@ -15,8 +15,7 @@
 #include "RemoteTrigger.hpp"
 #include "SingleCaptureSession.hpp"
 
-DEFINE_LOGGER(abstract_caputure_session_factory);
-DEFINE_LOGGER(log_project);
+DEFINE_LOGGER(project);
 
 namespace Pbox
 {
@@ -54,8 +53,7 @@ CaptureSessionPtr AbstractCaptureSessionFactory::createFromTriggerCondition(cons
     const auto it = factories_.find(trigger_id);
     if (it == factories_.end())
     {
-        LOG_ERROR(
-            abstract_caputure_session_factory, "Could not find a session factory for the trigger '{}'", trigger_id);
+        LOG_ERROR(logger_project(), "Could not find a session factory for the trigger '{}'", trigger_id);
         return nullptr;
     }
     return it->second->create();
@@ -67,6 +65,7 @@ class DefaultRemoteTriggerFactory final : public IRemoteTriggerFactory
     std::unique_ptr<RemoteTrigger> create(const EspHomeRemoteTriggerConfig &config) override
     {
         return std::make_unique<EspHomeRemoteTrigger>(
+            QString::fromStdString(config.name),
             std::make_unique<EspHomeClient>(QUrl{QString::fromStdString(config.uri)}));
     }
 };
@@ -75,7 +74,13 @@ std::unique_ptr<IRemoteTriggerFactory> createDefaultRemoteTriggerFactory()
     return std::make_unique<DefaultRemoteTriggerFactory>();
 }
 
-Project::Project(const std::filesystem::path &config_file, std::unique_ptr<IRemoteTriggerFactory> remoteTriggerFactory)
+Project::Project(Instance<TriggerManager> trigger_manager,
+                 std::unique_ptr<IRemoteTriggerFactory> remote_trigger_factory)
+    : trigger_manager_{std::move(trigger_manager)}
+    , remote_trigger_factory_{std::move(remote_trigger_factory)}
+{}
+
+void Project::initFromConfig(const std::filesystem::path &config_file)
 {
     std::ifstream settings_file{config_file};
     nlohmann::json json;
@@ -88,7 +93,7 @@ Project::Project(const std::filesystem::path &config_file, std::unique_ptr<IRemo
 
     for (auto &&trigger : settings.remote_triggers)
     {
-        trigger_manager_.registerTrigger(trigger.name, remoteTriggerFactory->create(trigger));
+        trigger_manager_->registerTrigger(trigger.name, remote_trigger_factory_->create(trigger));
     }
 }
 
@@ -97,9 +102,9 @@ const std::string &Project::name() const
     return name_;
 }
 
-const TriggerManager &Project::triggerManager() const
+CameraLed &Project::cameraLed()
 {
-    return trigger_manager_;
+    return *camera_led_;
 }
 
 Project::~Project() = default;

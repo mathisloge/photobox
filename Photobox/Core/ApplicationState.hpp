@@ -9,6 +9,7 @@
 #include <RemoteTrigger.hpp>
 #include "CameraLed.hpp"
 #include "CaptureManager.hpp"
+#include "Pbox/Instance.hpp"
 #include "SystemStatusManager.hpp"
 
 namespace Pbox
@@ -43,7 +44,7 @@ class ApplicationState : public QObject
 
     SystemStatusManager *getSystemStatusManager() const
     {
-        return system_status_manager;
+        return system_status_manager.get();
     }
 
     CaptureManager *getCaptureManager() const
@@ -55,7 +56,7 @@ class ApplicationState : public QObject
     std::shared_ptr<ICamera> camera;
     RemoteTrigger *remote_trigger{};
     CameraLed *camera_led{};
-    SystemStatusManager *system_status_manager{};
+    Instance<SystemStatusManager> system_status_manager;
     CaptureManager *capture_manager{};
 };
 } // namespace Pbox

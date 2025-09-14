@@ -5,6 +5,7 @@
 #pragma once
 #include <QObject>
 #include <QtQmlIntegration>
+#include "SystemStatusClient.hpp"
 
 namespace Pbox
 {
@@ -23,12 +24,16 @@ class RemoteTrigger : public QObject
 
   public:
     Q_DISABLE_COPY_MOVE(RemoteTrigger);
-    RemoteTrigger();
+    explicit RemoteTrigger(QString name);
     ~RemoteTrigger() override;
 
     Q_INVOKABLE virtual void playEffect(RemoteTrigger::Effect effect) = 0;
+    const SystemStatusClient &systemStatusClient() const;
 
   Q_SIGNALS:
     void triggered();
+
+  protected:
+    SystemStatusClient system_status_client_; // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes)
 };
 } // namespace Pbox
