@@ -45,14 +45,28 @@ QHash<int, QByteArray> SystemStatusModel::roleNames() const
     return kRoles;
 }
 
-void SystemStatusModel::addClient(const SystemStatusClient *client)
+void SystemStatusModel::addClient(const SystemStatusClient &client)
 {
     const int new_index = static_cast<int>(clients_.size());
     beginInsertRows(QModelIndex{}, new_index, new_index);
-    clients_.emplace_back(client);
-    connect(client, &SystemStatusClient::systemStatusChanged, this, [this, row = new_index]() {
+    clients_.emplace_back(&client);
+    connect(&client, &SystemStatusClient::systemStatusChanged, this, [this, row = new_index]() {
         Q_EMIT dataChanged(index(row), index(row), {std::to_underlying(Role::Status)});
     });
     endInsertRows();
+}
+
+void SystemStatusModel::removeClient(const SystemStatusClient &client)
+{
+    const auto it = std::ranges::find(clients_, QPointer{&client});
+    if (it == clients_.end())
+    {
+        return;
+    }
+    const auto pos = static_cast<int>(std::distance(clients_.begin(), it));
+    beginRemoveRows(QModelIndex{}, pos, pos);
+    disconnect(&client, nullptr, this, nullptr);
+    clients_.erase(it);
+    endRemoveRows();
 }
 } // namespace Pbox

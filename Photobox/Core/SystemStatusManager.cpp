@@ -6,12 +6,25 @@
 
 namespace Pbox
 {
-void SystemStatusManager::registerClient(const Pbox::SystemStatusClient *client)
+void SystemStatusManager::registerClient(const Pbox::SystemStatusClient &client)
 {
-    model_.addClient(client);
-    clients_.emplace_back(client);
-    connect(client, &SystemStatusClient::systemStatusChanged, this, &SystemStatusManager::evaluateSystemStatus);
-    evaluateSystemStatus();
+    const auto [_, emplaced] = clients_.emplace(&client);
+    if (emplaced)
+    {
+        model_.addClient(client);
+        connect(&client, &QObject::destroyed, this, [this](QObject *obj) {
+            const auto *client = qobject_cast<SystemStatusClient *>(obj);
+            if (client != nullptr)
+            {
+                if (clients_.erase(client) > 0)
+                {
+                    evaluateSystemStatus();
+                }
+            }
+        });
+        connect(&client, &SystemStatusClient::systemStatusChanged, this, &SystemStatusManager::evaluateSystemStatus);
+        evaluateSystemStatus();
+    }
 }
 
 void SystemStatusManager::evaluateSystemStatus()
