@@ -1,13 +1,19 @@
+# SPDX-FileCopyrightText: 2025 Mathis Logemann <mathis.opensource@tuta.io>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 qt_add_executable(CollageEditorApp main.cpp)
 
-target_link_libraries(CollageEditorApp PRIVATE
-    Qt6::Core
-    Qt6::Gui
-    Qt6::Qml
-    Qt6::Quick
-    PhotoboxCore
-    PhotoboxCoreplugin
-    PhotoboxUiplugin
+target_link_libraries(
+    CollageEditorApp
+    PRIVATE
+        Qt6::Core
+        Qt6::Gui
+        Qt6::Qml
+        Qt6::Quick
+        PhotoboxCore
+        PhotoboxCoreplugin
+        PhotoboxUiplugin
 )
 
 qt_add_qml_module(CollageEditorApp
@@ -24,8 +30,9 @@ qt_add_qml_module(CollageEditorApp
         PrintController.cpp
 )
 
-install(TARGETS CollageEditorApp
-    BUNDLE  DESTINATION .
+install(
+    TARGETS CollageEditorApp
+    BUNDLE DESTINATION .
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )

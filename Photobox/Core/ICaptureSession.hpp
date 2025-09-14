@@ -1,5 +1,4 @@
-// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathis.opensource@tuta.io>
-// SPDX-FileCopyrightText: 2025 Mathis Logemann <mathis.opensource@tuta.io>
+// SPDX-FileCopyrightText: 2024 - 2025 Mathis Logemann <mathis.opensource@tuta.io>
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -29,7 +28,7 @@ class ICaptureSession : public QObject
     enum class Status
     {
         Idle,      //!< The session waits for user input and does nothing currently
-        Capturing, //!< The session is activly working on capturing the necessary images
+        Capturing, //!< The session is actively working on capturing the necessary images
         Busy //!< The session is currently busy and won't accept user inputs and won't capture any images, set only if
              //!< the user should know about the busy state, otherwise use Capturing
     };
@@ -39,7 +38,7 @@ class ICaptureSession : public QObject
     {
         Idle,           //!< Nothing related to the camera currently happening
         BeforeCapture,  //!< The session is working towards a capture
-        WaitForCapture, //!< The session is activly waiting for the completion of the capture
+        WaitForCapture, //!< The session is actively waiting for the completion of the capture
     };
     Q_ENUM(CaptureStatus);
 
@@ -69,7 +68,7 @@ class ICaptureSession : public QObject
   Q_SIGNALS:
     //! @brief Will be emitted if the session has captured all images and a new session can begin.
     void finished();
-    //! @brief Should be emitted if the session want's to capture an image with the camera.
+    //! @brief Should be emitted if the session wants to capture an image with the camera.
     void requestedImageCapture();
 
     /// vvv property signals

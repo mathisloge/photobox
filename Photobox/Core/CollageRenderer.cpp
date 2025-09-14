@@ -1,5 +1,4 @@
-// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathis.opensource@tuta.io>
-// SPDX-FileCopyrightText: 2025 Mathis Logemann <mathis.opensource@tuta.io>
+// SPDX-FileCopyrightText: 2024 - 2025 Mathis Logemann <mathis.opensource@tuta.io>
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -24,7 +23,7 @@ void CollageRenderer::loadDocument(const std::string &file_path)
 {
     base_image_file_path_ = file_path;
     document_ = lunasvg::Document::loadFromFile(file_path);
-    LOG_DEBUG(collagerenderer, "loded image from {}. Is valid document: {}", file_path, (document_ != nullptr));
+    LOG_DEBUG(collagerenderer, "loaded image from {}. Is valid document: {}", file_path, (document_ != nullptr));
 }
 
 void CollageRenderer::addPhotoElement(const std::string &element_id)

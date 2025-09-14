@@ -1,5 +1,4 @@
-// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathis.opensource@tuta.io>
-// SPDX-FileCopyrightText: 2025 Mathis Logemann <mathis.opensource@tuta.io>
+// SPDX-FileCopyrightText: 2024 - 2025 Mathis Logemann <mathis.opensource@tuta.io>
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -34,7 +33,7 @@ CaptureManager::CaptureManager(Scheduler &scheduler,
 {
     connect(&camera_, &ICamera::imageCaptured, this, [this](auto &&image) {
         //! important: first emit the signal so that all image providers have it saved, and only then set the image to
-        //! the session. otherwise qml will not reevalute the image and the providers don't have a signal to schedule a
+        //! the session. otherwise qml will not reevaluate the image and the providers don't have a signal to schedule a
         //! cache invalidation
         const auto image_id = image_ids_++;
         Q_EMIT imageCaptured(image, image_id);

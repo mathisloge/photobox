@@ -20,14 +20,14 @@ wifi:
   ssid: "photobox"
   password: "photobox-matnel"
   #on_connect:
-  #  - light.addressable_set: 
+  #  - light.addressable_set:
   #      id: cameraLensLed
   #      red: 0%
   #      green: 20%
   #      blue: 0%
 #
   #on_disconnect:
-  #  - light.addressable_set: 
+  #  - light.addressable_set:
   #      id: cameraLensLed
   #      red: 20%
   #      green: 0%

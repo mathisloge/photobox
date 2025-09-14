@@ -16,7 +16,7 @@ logger:
 wifi:
   ssid: "Fotobox"
   password: ""
-  fast_connect: true  
+  fast_connect: true
   ap:
     ssid: "Photobox trigger fallback"
     password: ""
