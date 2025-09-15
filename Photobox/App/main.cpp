@@ -88,7 +88,8 @@ int main(int argc, char *argv[])
 
         Instance<SystemStatusManager> system_status_manager = std::make_shared<SystemStatusManager>();
         Instance<TriggerManager> trigger_manager = std::make_shared<TriggerManager>(system_status_manager);
-        Project project{trigger_manager};
+        Instance<CaptureSessionManager> capture_session_manager = std::make_shared<CaptureSessionManager>();
+        Project project{trigger_manager, capture_session_manager};
 
         const QString capture_directory = parser.value(capture_directory_option);
         const QString collage_directory = parser.value(collage_directory_option);

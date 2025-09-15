@@ -10,8 +10,8 @@ DEFINE_LOGGER(single_capture_session)
 
 namespace Pbox
 {
-SingleCaptureSession::SingleCaptureSession()
-    : ICaptureSession{"SingleCaptureSession"}
+SingleCaptureSession::SingleCaptureSession(std::string name)
+    : ICaptureSession{std::move(name)}
 {
     getCountdown()->setSeconds(3);
     connect(getCountdown(), &Countdown::finished, this, &SingleCaptureSession::requestedImageCapture);

@@ -17,26 +17,19 @@
     "sessions": [
         {
             "name": "SingleCaptureSession",
-            "type": "single-capture",
+            "type": "SingleCapture",
+            "print": false,
             "trigger_conditions": [
-                {
-                    "type": "remote-trigger",
-                    "id": "SingleTrigger"
-                },
-                {
-                    "id": "display",
-                    "type": "display-touch"
-                }
+                "SingleTrigger",
+                "Display"
             ]
         },
         {
             "name": "CollageCaptureSession",
-            "type": "collage-capture",
+            "type": "CollageCapture",
+            "print": true,
             "trigger_conditions": [
-                {
-                    "type": "remote-trigger",
-                    "id": "CollageTrigger"
-                }
+                "CollageTrigger"
             ],
             "collage": {
                 "automatic_capture": true,

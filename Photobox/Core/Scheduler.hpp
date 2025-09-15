@@ -4,12 +4,17 @@
 
 #pragma once
 #include <Pbox/QStdexec.hpp>
-#include <exec/single_thread_context.hpp>
 #include <execpools/asio/asio_thread_pool.hpp>
+#include "Pbox/DisableCopyMove.hpp"
 namespace Pbox
 {
-struct Scheduler
+class Scheduler final
 {
+  public:
+    PBOX_DISABLE_COPY_MOVE(Scheduler);
+    Scheduler() = default;
+    ~Scheduler() = default;
+
     /**
      * @brief General scheduler to dispatch any workload.
      * @todo Sooner or later asio is required (at least when adding the native esphome api). Therefore just switch to
@@ -40,6 +45,7 @@ struct Scheduler
      */
     QThreadScheduler getQtEventLoopScheduler();
 
+  private:
     execpools::asio_thread_pool compute_thread_pool_{4};
 };
 } // namespace Pbox

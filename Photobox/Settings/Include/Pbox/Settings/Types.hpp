@@ -21,19 +21,6 @@ struct CameraLedConfig
     std::string uri;
 };
 
-enum class ConditionType
-{
-    Unknown,
-    DisplayTouch,
-    RemoteTrigger
-};
-
-struct TriggerCondition
-{
-    ConditionType type;
-    std::string id;
-};
-
 enum class SessionType
 {
     Unknown,
@@ -44,8 +31,9 @@ enum class SessionType
 struct SessionConfig
 {
     std::string name;
-    SessionType type;
-    std::vector<TriggerCondition> trigger_conditions;
+    SessionType type{};
+    bool print{};
+    std::vector<std::string> triggers;
 };
 
 struct ProjectConfig

@@ -65,7 +65,7 @@ CollagePrinter::CollagePrinter(const std::filesystem::path &settings)
 
 CollagePrinter::~CollagePrinter() = default;
 
-void CollagePrinter::print(CollageRenderer &renderer)
+void CollagePrinter::print(const CollageRenderer &renderer)
 {
     QPainter painter;
     painter.begin(printer_.get());
