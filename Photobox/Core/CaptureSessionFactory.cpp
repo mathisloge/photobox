@@ -1,12 +1,13 @@
 #include "CaptureSessionFactory.hpp"
+#include "ICaptureSession.hpp"
 #include "Pbox/Logger.hpp"
 
 DEFINE_LOGGER(capture_session_abstract_factory);
 
 namespace Pbox
 {
-void CaptureSessionAbstractFactory::registerCaptureSession(CaptureSessionId session_id,
-                                                           std::unique_ptr<ICaptureSessionFactory> session_factory)
+void CaptureSessionManager::registerCaptureSession(CaptureSessionId session_id,
+                                                   std::unique_ptr<ICaptureSessionFactory> session_factory)
 {
     auto [it, emplaced] = session_factories_.emplace(std::move(session_id), std::move(session_factory));
     if (emplaced)
@@ -19,7 +20,7 @@ void CaptureSessionAbstractFactory::registerCaptureSession(CaptureSessionId sess
     }
 }
 
-void CaptureSessionAbstractFactory::addTriggerRelation(CaptureSessionId session_id, TriggerId trigger_id)
+void CaptureSessionManager::addTriggerRelation(CaptureSessionId session_id, TriggerId trigger_id)
 {
     auto [it, emplaced] = trigger_session_relation_.emplace(std::move(trigger_id), std::move(session_id));
     if (emplaced)
@@ -38,7 +39,7 @@ void CaptureSessionAbstractFactory::addTriggerRelation(CaptureSessionId session_
     }
 }
 
-CaptureSessionPtr CaptureSessionAbstractFactory::createFromTrigger(const TriggerId &trigger_id)
+CaptureSessionPtr CaptureSessionManager::createFromTrigger(const TriggerId &trigger_id)
 {
     const auto tid = trigger_session_relation_.find(trigger_id);
     if (tid == trigger_session_relation_.end())

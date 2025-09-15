@@ -14,50 +14,12 @@
 #include "ICaptureSession.hpp"
 #include "RemoteTrigger.hpp"
 #include "SingleCaptureSession.hpp"
+#include "SingleCaptureSessionFactory.hpp"
 
 DEFINE_LOGGER(project);
 
 namespace Pbox
 {
-class CaptureSessionFactory
-{
-  public:
-    virtual CaptureSessionPtr create() = 0;
-    virtual ~CaptureSessionFactory();
-};
-
-class SingleCaptureSessionFactory : public CaptureSessionFactory
-{
-  public:
-    CaptureSessionPtr create() override
-    {
-        return make_unique_object_ptr_as<ICaptureSession, SingleCaptureSession>();
-    }
-};
-
-class CollageCaptureSessionFactory : public CaptureSessionFactory
-{
-    CollageContext collage_context_;
-
-  public:
-    CaptureSessionPtr create() override
-    {
-        return make_unique_object_ptr_as<ICaptureSession, CollageCaptureSession>(collage_context_);
-    }
-};
-
-AbstractCaptureSessionFactory::~AbstractCaptureSessionFactory() = default;
-
-CaptureSessionPtr AbstractCaptureSessionFactory::createFromTriggerCondition(const RemoteTriggerId &trigger_id)
-{
-    const auto it = factories_.find(trigger_id);
-    if (it == factories_.end())
-    {
-        LOG_ERROR(logger_project(), "Could not find a session factory for the trigger '{}'", trigger_id);
-        return nullptr;
-    }
-    return it->second->create();
-}
 
 class DefaultRemoteTriggerFactory final : public IRemoteTriggerFactory
 {
@@ -75,8 +37,10 @@ std::unique_ptr<IRemoteTriggerFactory> createDefaultRemoteTriggerFactory()
 }
 
 Project::Project(Instance<TriggerManager> trigger_manager,
+                 Instance<CaptureSessionManager> capture_session_manager,
                  std::unique_ptr<IRemoteTriggerFactory> remote_trigger_factory)
     : trigger_manager_{std::move(trigger_manager)}
+    , capture_session_manager_{std::move(capture_session_manager)}
     , remote_trigger_factory_{std::move(remote_trigger_factory)}
 {}
 
@@ -91,9 +55,31 @@ void Project::initFromConfig(const std::filesystem::path &config_file)
 
     name_ = settings.name;
 
-    for (auto &&trigger : settings.remote_triggers)
+    for (auto &&trigger : std::as_const(settings.remote_triggers))
     {
         trigger_manager_->registerTrigger(trigger.name, remote_trigger_factory_->create(trigger));
+    }
+
+    for (auto &&session : std::as_const(settings.sessions))
+    {
+        switch (session.type)
+        {
+        case SessionType::SingleCapture:
+            capture_session_manager_->registerCaptureSession(
+                session.name, std::make_unique<SingleCaptureSessionFactory>(session.name));
+            break;
+        case SessionType::CollageCapture:
+            capture_session_manager_->registerCaptureSession(session.name, nullptr);
+            break;
+        case SessionType::Unknown:
+            LOG_WARNING(logger_project(), "Got unknown session type for session '{}'", session.name);
+            break;
+        }
+
+        for (auto &&trigger : session.triggers)
+        {
+            capture_session_manager_->addTriggerRelation(session.name, trigger);
+        }
     }
 }
 

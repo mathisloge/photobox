@@ -17,7 +17,7 @@ class CollagePrinter
     explicit CollagePrinter(const std::filesystem::path &settings);
     ~CollagePrinter();
 
-    void print(CollageRenderer &renderer);
+    void print(const CollageRenderer &renderer);
 
   private:
     std::unique_ptr<QPrinter> printer_;

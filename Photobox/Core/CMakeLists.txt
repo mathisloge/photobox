@@ -27,6 +27,8 @@ qt_add_qml_module(
         CollageFontCache.cpp
         CollageCaptureSession.hpp
         CollageCaptureSession.cpp
+        CaptureSessionFactory.hpp
+        CaptureSessionFactory.cpp
         RemoteTrigger.cpp
         RemoteTrigger.hpp
         CameraLed.cpp
@@ -41,7 +43,6 @@ qt_add_qml_module(
         ICaptureSession.hpp
         SingleCaptureSession.hpp
         SingleCaptureSession.cpp
-        CaptureSessionFactory.hpp
         IdleCaptureSession.hpp
         IdleCaptureSession.cpp
         CaptureManager.hpp

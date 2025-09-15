@@ -11,7 +11,7 @@ class SingleCaptureSession : public ICaptureSession
 {
     Q_OBJECT
   public:
-    SingleCaptureSession();
+    SingleCaptureSession(std::string name = "SingleCaptureSession");
     void triggerCapture() override;
     void imageCaptured(const QImage &captured_image, std::uint32_t image_id) override;
     void imageSaved(const std::filesystem::path &captured_image_path) override;

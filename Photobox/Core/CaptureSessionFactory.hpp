@@ -17,12 +17,14 @@ using CaptureSessionFactoryFnc = std::function<CaptureSessionPtr()>;
 class ICaptureSessionFactory
 {
   public:
-    CaptureSessionPtr create() const;
+    ICaptureSessionFactory() = default;
+    virtual ~ICaptureSessionFactory() = default;
+    virtual CaptureSessionPtr create() const = 0;
 };
 
 using CaptureSessionId = std::string;
 
-class CaptureSessionAbstractFactory
+class CaptureSessionManager
 {
   public:
     void registerCaptureSession(CaptureSessionId session_id, std::unique_ptr<ICaptureSessionFactory> session_factory);

@@ -40,20 +40,13 @@ namespace Pbox
 {
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(EspHomeRemoteTriggerConfig, name, uri);
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(CameraLedConfig, uri);
-NLOHMANN_JSON_SERIALIZE_ENUM(ConditionType,
-                             {
-                                 {ConditionType::Unknown, nullptr},
-                                 {ConditionType::DisplayTouch, "display-touch"},
-                                 {ConditionType::RemoteTrigger, "remote-trigger"},
-                             });
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TriggerCondition, type, id);
 NLOHMANN_JSON_SERIALIZE_ENUM(SessionType,
                              {
                                  {SessionType::Unknown, nullptr},
-                                 {SessionType::SingleCapture, "single-capture"},
-                                 {SessionType::CollageCapture, "collage-capture"},
+                                 {SessionType::SingleCapture, "SingleCapture"},
+                                 {SessionType::CollageCapture, "CollageCapture"},
                              });
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(SessionConfig, name, trigger_conditions);
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(SessionConfig, name, print, triggers);
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ProjectConfig, name, capture_dir, camera_led, remote_triggers, sessions);
 
 } // namespace Pbox

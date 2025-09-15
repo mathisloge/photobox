@@ -4,9 +4,8 @@
 
 #pragma once
 #include <filesystem>
-#include <unordered_map>
 #include <Pbox/DisableCopyMove.hpp>
-#include "ObjectUniquePtr.hpp"
+#include "CaptureSessionFactory.hpp"
 #include "TriggerManager.hpp"
 #include "Types.hpp"
 
@@ -14,20 +13,6 @@ namespace Pbox
 {
 class CameraLed;
 class RemoteTrigger;
-class ICaptureSession;
-using CaptureSessionPtr = unique_object_ptr<ICaptureSession>;
-
-class CaptureSessionFactory;
-class AbstractCaptureSessionFactory
-{
-  public:
-    ~AbstractCaptureSessionFactory();
-    CaptureSessionPtr createFromTriggerCondition(const RemoteTriggerId &trigger_id);
-
-  private:
-    std::unordered_map<RemoteTriggerId, std::unique_ptr<CaptureSessionFactory>> factories_;
-};
-
 /**
  * @brief Interface for creating RemoteTrigger instances.
  *
@@ -57,6 +42,7 @@ class Project
     PBOX_DISABLE_COPY_MOVE(Project);
     explicit Project(
         Instance<TriggerManager> trigger_manager,
+        Instance<CaptureSessionManager> capture_session_manager,
         std::unique_ptr<IRemoteTriggerFactory> remote_trigger_factory = createDefaultRemoteTriggerFactory());
     ~Project();
 
@@ -67,6 +53,7 @@ class Project
 
   private:
     Instance<TriggerManager> trigger_manager_;
+    Instance<CaptureSessionManager> capture_session_manager_;
     std::unique_ptr<IRemoteTriggerFactory> remote_trigger_factory_;
     std::string name_;
     std::filesystem::path output_directory_;
