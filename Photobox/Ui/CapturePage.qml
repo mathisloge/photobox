@@ -47,7 +47,7 @@ Page {
         id: manualCaptureArea
         anchors.fill: parent
         onClicked: {
-            ApplicationState.captureManager.triggerButtonPressed();
+            ApplicationState.captureManager.triggerButtonPressed("Display");
         }
     }
 }

@@ -10,6 +10,8 @@
 #include "ICaptureSession.hpp"
 #include "ImageProvider.hpp"
 #include "ObjectUniquePtr.hpp"
+#include "Pbox/Instance.hpp"
+#include "TriggerManager.hpp"
 namespace Pbox
 {
 class Scheduler;
@@ -32,11 +34,11 @@ class CaptureManager : public QObject
     explicit CaptureManager(Scheduler &scheduler,
                             ImageStorage &image_storage,
                             ICamera &camera,
-                            RemoteTrigger &remote_trigger,
-                            CameraLed &camera_led,
-                            CaptureSessionFactoryFnc collage_session_factory);
+                            Instance<TriggerManager> trigger_manager,
+                            Instance<CameraLed> camera_led,
+                            Instance<CaptureSessionManager> capture_session_manager);
     ~CaptureManager() override;
-    Q_INVOKABLE void triggerButtonPressed();
+    Q_INVOKABLE void triggerButtonPressed(const QString &trigger_id);
 
     ImageProvider *createImageProvider();
 
@@ -54,7 +56,7 @@ class CaptureManager : public QObject
 
   private:
     void sessionFinished();
-    void switchToSession(CaptureSessionPtr &&new_session);
+    void switchToSession(CaptureSessionPtr new_session);
     void handleSessionStatusChange();
     void handleSessionCaptureStatusChange();
 
@@ -62,9 +64,9 @@ class CaptureManager : public QObject
     Scheduler &scheduler_;
     ImageStorage &image_storage_;
     ICamera &camera_;
-    RemoteTrigger &remote_trigger_;
-    CameraLed &camera_led_;
-    CaptureSessionFactoryFnc collage_session_factory_;
+    Instance<TriggerManager> trigger_manager_;
+    Instance<CameraLed> camera_led_;
+    Instance<CaptureSessionManager> capture_session_manager_;
     unique_object_ptr<ICaptureSession> session_{nullptr};
     exec::async_scope async_scope_;
     std::atomic_uint32_t image_ids_;

@@ -19,7 +19,7 @@
             "name": "SingleCaptureSession",
             "type": "SingleCapture",
             "print": false,
-            "trigger_conditions": [
+            "triggers": [
                 "SingleTrigger",
                 "Display"
             ]
@@ -27,8 +27,8 @@
         {
             "name": "CollageCaptureSession",
             "type": "CollageCapture",
-            "print": true,
-            "trigger_conditions": [
+            "print": false,
+            "triggers": [
                 "CollageTrigger"
             ],
             "collage": {

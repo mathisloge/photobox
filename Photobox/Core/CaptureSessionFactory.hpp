@@ -29,7 +29,8 @@ class CaptureSessionManager
   public:
     void registerCaptureSession(CaptureSessionId session_id, std::unique_ptr<ICaptureSessionFactory> session_factory);
     void addTriggerRelation(CaptureSessionId session_id, TriggerId trigger_id);
-    CaptureSessionPtr createFromTrigger(const TriggerId &trigger_id);
+    CaptureSessionPtr createIdleSession() const;
+    CaptureSessionPtr createFromTrigger(const TriggerId &trigger_id) const;
 
   private:
     std::unordered_map<CaptureSessionId, std::unique_ptr<ICaptureSessionFactory>> session_factories_;

@@ -46,7 +46,7 @@ NLOHMANN_JSON_SERIALIZE_ENUM(SessionType,
                                  {SessionType::SingleCapture, "SingleCapture"},
                                  {SessionType::CollageCapture, "CollageCapture"},
                              });
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(SessionConfig, name, print, triggers);
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(SessionConfig, name, type, print, triggers);
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ProjectConfig, name, capture_dir, camera_led, remote_triggers, sessions);
 
 } // namespace Pbox
