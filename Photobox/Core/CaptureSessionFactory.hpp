@@ -5,6 +5,7 @@
 #pragma once
 #include <functional>
 #include "ObjectUniquePtr.hpp"
+#include "Pbox/DisableCopyMove.hpp"
 #include "TriggerId.hpp"
 
 namespace Pbox
@@ -17,6 +18,7 @@ using CaptureSessionFactoryFnc = std::function<CaptureSessionPtr()>;
 class ICaptureSessionFactory
 {
   public:
+    PBOX_DISABLE_COPY_MOVE(ICaptureSessionFactory);
     ICaptureSessionFactory() = default;
     virtual ~ICaptureSessionFactory() = default;
     virtual CaptureSessionPtr create() const = 0;
