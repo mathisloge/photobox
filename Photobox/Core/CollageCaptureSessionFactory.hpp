@@ -17,6 +17,7 @@ class CollageCaptureSessionFactory : public ICaptureSessionFactory
                                  Instance<CollagePrinter> printer,
                                  Instance<ImageStorage> image_storage,
                                  CollageSettings collage_settings);
+    CaptureSessionPtr create() const override;
 
   private:
     Instance<Scheduler> scheduler_;

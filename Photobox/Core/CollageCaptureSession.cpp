@@ -13,11 +13,17 @@ DEFINE_LOGGER(collage_capture_session);
 namespace Pbox
 {
 
-CollageCaptureSession::CollageCaptureSession(CollageContext &context)
+CollageCaptureSession::CollageCaptureSession(Instance<ImageStorage> image_storage,
+                                             Instance<CollageRenderer> renderer,
+                                             Instance<Scheduler> scheduler,
+                                             CollageSettings settings)
     : ICaptureSession("CollageCaptureSession")
-    , context_{context}
+    , image_storage_{std::move(image_storage)}
+    , renderer_{std::move(renderer)}
+    , scheduler_{std::move(scheduler)}
+    , settings_{std::move(settings)}
 {
-    getCountdown()->setSeconds(context_.settings().seconds_between_capture);
+    getCountdown()->setSeconds(settings_.seconds_between_capture);
     connect(getCountdown(), &Countdown::finished, this, [this] {
         LOG_DEBUG(logger_collage_capture_session(), "requesting capture...");
         Q_EMIT requestedImageCapture();
@@ -64,8 +70,8 @@ void CollageCaptureSession::imageSaved(const std::filesystem::path &captured_ima
 {
     try
     {
-        auto &&image_element = context_.settings().image_elements.at(current_capture_);
-        context_.renderer().setSourceOfPhoto(image_element, captured_image_path);
+        auto &&image_element = settings_.image_elements.at(current_capture_);
+        renderer_->setSourceOfPhoto(image_element, captured_image_path);
         current_capture_++;
         // finish the collage to do the heavy work while the preview image from the current image is shown.
         if (allImagesCaptured())
@@ -117,15 +123,22 @@ void CollageCaptureSession::startCountdownOrFinish()
 void CollageCaptureSession::finish()
 {
     setStatus(ICaptureSession::Status::Busy);
-    auto finish =
-        stdexec::continues_on(context_.scheduler().getQtEventLoopScheduler()) |
+
+    async_scope_.spawn(
+        stdexec::schedule(scheduler_->getSvgRenderScheduler()) | //
+        stdexec::then([this]() {
+            const auto saved_path = image_storage_->storageDir() / image_storage_->generateNewImageFilePath();
+            renderer_->updateLayout();
+            renderer_->renderToFile(saved_path);
+            return saved_path;
+        }) |
+        stdexec::continues_on(scheduler_->getQtEventLoopScheduler()) | //
         stdexec::then([this](auto &&saved_image_path) {
             saved_collage_path_ = std::filesystem::absolute(saved_image_path);
             LOG_DEBUG(logger_collage_capture_session(), "collage finished. Saved to {}", saved_collage_path_->string());
             setStatus(ICaptureSession::Status::Capturing);
             startCountdownOrFinish();
-        });
-    async_scope_.spawn(context_.asyncSaveAndPrintCollage() | std::move(finish));
+        }));
 }
 
 void CollageCaptureSession::triggerCapture()
@@ -138,7 +151,7 @@ void CollageCaptureSession::triggerCapture()
 
 bool CollageCaptureSession::allImagesCaptured() const
 {
-    return current_capture_ == context_.settings().image_elements.size();
+    return current_capture_ == settings_.image_elements.size();
 }
 
 } // namespace Pbox
