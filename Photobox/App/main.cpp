@@ -90,6 +90,7 @@ int main(int argc, char *argv[])
         Instance<TriggerManager> trigger_manager = std::make_shared<TriggerManager>(system_status_manager);
         Instance<CaptureSessionManager> capture_session_manager = std::make_shared<CaptureSessionManager>();
         Project project{trigger_manager, capture_session_manager};
+        project.initFromConfig("/home/mlogemann/dev/photobox/Photobox/Settings/Tests/Assets/ProjectSettings.json");
 
         const QString capture_directory = parser.value(capture_directory_option);
         const QString collage_directory = parser.value(collage_directory_option);
@@ -116,8 +117,8 @@ int main(int argc, char *argv[])
 
         std::unique_ptr<RemoteTrigger> remote_trigger =
             std::make_unique<EspHomeRemoteTrigger>("", std::make_unique<EspHomeClient>(trigger_button_host));
-        std::unique_ptr<CameraLed> camera_led =
-            std::make_unique<EspHomeCameraLed>(std::make_unique<EspHomeClient>(camera_led_host));
+        Instance<CameraLed> camera_led =
+            std::make_shared<EspHomeCameraLed>(std::make_unique<EspHomeClient>(camera_led_host));
         std::shared_ptr<ICamera> camera;
 
         if (not developer_mode)
@@ -130,9 +131,7 @@ int main(int argc, char *argv[])
         }
 
         CaptureManager capture_manager{
-            scheduler, image_storage, *camera, *remote_trigger, *camera_led, [&collage_context] {
-                return make_unique_object_ptr_as<ICaptureSession, SingleCaptureSession>();
-            }};
+            scheduler, image_storage, *camera, trigger_manager, camera_led, capture_session_manager};
         system_status_manager->registerClient(camera->systemStatusClient());
 
         QQmlApplicationEngine engine;

@@ -1,5 +1,6 @@
 #include "CaptureSessionFactory.hpp"
 #include "ICaptureSession.hpp"
+#include "IdleCaptureSession.hpp"
 #include "Pbox/Logger.hpp"
 
 DEFINE_LOGGER(capture_session_abstract_factory);
@@ -39,7 +40,12 @@ void CaptureSessionManager::addTriggerRelation(CaptureSessionId session_id, Trig
     }
 }
 
-CaptureSessionPtr CaptureSessionManager::createFromTrigger(const TriggerId &trigger_id)
+CaptureSessionPtr CaptureSessionManager::createIdleSession() const
+{
+    return make_unique_object_ptr_as<ICaptureSession, IdleCaptureSession>();
+}
+
+CaptureSessionPtr CaptureSessionManager::createFromTrigger(const TriggerId &trigger_id) const
 {
     const auto tid = trigger_session_relation_.find(trigger_id);
     if (tid == trigger_session_relation_.end())
