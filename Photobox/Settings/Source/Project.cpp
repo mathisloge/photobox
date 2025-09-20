@@ -8,6 +8,7 @@
 #include <Pbox/Settings/Detail/TypesSerialization.hpp>
 #include "CameraLed.hpp"
 #include "CollageCaptureSession.hpp"
+#include "CollageCaptureSessionFactory.hpp"
 #include "CollageContext.hpp"
 #include "EspHomeClient.hpp"
 #include "EspHomeRemoteTrigger.hpp"
@@ -38,9 +39,13 @@ std::unique_ptr<IRemoteTriggerFactory> createDefaultRemoteTriggerFactory()
 
 Project::Project(Instance<TriggerManager> trigger_manager,
                  Instance<CaptureSessionManager> capture_session_manager,
+                 Instance<ImageStorage> image_storage,
+                 Instance<Scheduler> scheduler,
                  std::unique_ptr<IRemoteTriggerFactory> remote_trigger_factory)
     : trigger_manager_{std::move(trigger_manager)}
     , capture_session_manager_{std::move(capture_session_manager)}
+    , image_storage_{std::move(image_storage)}
+    , scheduler_{std::move(scheduler)}
     , remote_trigger_factory_{std::move(remote_trigger_factory)}
 {}
 
@@ -51,7 +56,17 @@ void Project::initFromConfig(const std::filesystem::path &config_file)
     settings_file >> json;
 
     ProjectConfig settings;
-    json.get_to(settings);
+    try
+    {
+        json.get_to(settings);
+    }
+    catch (const std::exception &ex)
+    {
+        LOG_ERROR(logger_project(),
+                  "Could not load project settings file from '{}'. Error: {}",
+                  config_file.string(),
+                  ex.what());
+    }
 
     name_ = settings.name;
 
@@ -69,7 +84,10 @@ void Project::initFromConfig(const std::filesystem::path &config_file)
                 session.name, std::make_unique<SingleCaptureSessionFactory>(session.name));
             break;
         case SessionType::CollageCapture:
-            capture_session_manager_->registerCaptureSession(session.name, nullptr);
+            capture_session_manager_->registerCaptureSession(
+                session.name,
+                std::make_unique<CollageCaptureSessionFactory>(
+                    session.name, scheduler_, nullptr, image_storage_, session.collage.value_or(CollageSettings{})));
             break;
         case SessionType::Unknown:
             LOG_WARNING(logger_project(), "Got unknown session type for session '{}'", session.name);

@@ -1,11 +1,46 @@
 #include "CollageCaptureSessionFactory.hpp"
 #include "CollageCaptureSession.hpp"
+#include "Pbox/CleanupAsyncScope.hpp"
 
 namespace Pbox
 {
+CollageCaptureSessionFactory::CollageCaptureSessionFactory(std::string name,
+                                                           Instance<Scheduler> scheduler,
+                                                           Instance<CollagePrinter> printer,
+                                                           Instance<ImageStorage> image_storage,
+                                                           CollageSettings collage_settings)
+    : name_{std::move(name)}
+    , scheduler_{std::move(scheduler)}
+    , printer_{std::move(printer)}
+    , image_storage_{std::move(image_storage)}
+    , collage_settings_{std::move(collage_settings)}
+    , renderer_{std::make_shared<CollageRenderer>()}
+{
+    loadCollage();
+}
+
+CollageCaptureSessionFactory::~CollageCaptureSessionFactory()
+{
+    async_scope_.request_stop();
+    cleanup_async_scope(async_scope_);
+}
+
+void CollageCaptureSessionFactory::loadCollage()
+{
+    auto init_collage = stdexec::schedule(scheduler_->getWorkScheduler()) | //
+                        stdexec::then([this]() {
+                            renderer_->loadDocument(collage_settings_.svg_template);
+                            for (auto &&element : collage_settings_.image_elements)
+                            {
+                                renderer_->addPhotoElement(element);
+                            }
+                        });
+    async_scope_.spawn(std::move(init_collage));
+}
+
 CaptureSessionPtr CollageCaptureSessionFactory::create() const
 {
     return make_unique_object_ptr_as<ICaptureSession, CollageCaptureSession>(
-        image_storage_, renderer_, scheduler_, collage_settings_);
+        name_, image_storage_, renderer_, scheduler_, collage_settings_);
 }
 } // namespace Pbox

@@ -22,7 +22,8 @@ class CollageCaptureSession : public ICaptureSession
     Q_OBJECT
   public:
     PBOX_DISABLE_COPY_MOVE(CollageCaptureSession);
-    explicit CollageCaptureSession(Instance<ImageStorage> image_storage,
+    explicit CollageCaptureSession(std::string name,
+                                   Instance<ImageStorage> image_storage,
                                    Instance<CollageRenderer> renderer,
                                    Instance<Scheduler> scheduler,
                                    CollageSettings settings);
@@ -33,7 +34,7 @@ class CollageCaptureSession : public ICaptureSession
 
   private:
     void startCountdownOrFinish();
-    void handleCountdown(int current_count);
+    void handleCountdown(std::chrono::seconds current_count);
     void handlePreviewTimeout();
     void finish();
     bool allImagesCaptured() const;

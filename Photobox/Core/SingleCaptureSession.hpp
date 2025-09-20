@@ -18,7 +18,7 @@ class SingleCaptureSession : public ICaptureSession
 
   private:
     void startCapturing();
-    void handleCountdown(int count);
+    void handleCountdown(std::chrono::seconds count);
 
   private:
 };

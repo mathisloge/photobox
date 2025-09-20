@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <string>
 #include <vector>
+#include <CollageSettings.hpp>
 
 namespace Pbox
 {
@@ -34,6 +35,7 @@ struct SessionConfig
     SessionType type{};
     bool print{};
     std::vector<std::string> triggers;
+    std::optional<CollageSettings> collage;
 };
 
 struct ProjectConfig

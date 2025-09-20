@@ -10,7 +10,7 @@ add_subdirectory(Ui)
 #add_subdirectory(Lumix)
 add_subdirectory(GPhoto2)
 add_subdirectory(Settings)
-add_subdirectory(CollageEditorApp)
+#add_subdirectory(CollageEditorApp)
 
 add_subdirectory(App)
 add_subdirectory(SignalTracer)

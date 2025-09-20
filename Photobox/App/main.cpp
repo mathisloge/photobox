@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
     setupLogging();
     installQtMessageHandler();
     int app_return_code{EXIT_FAILURE};
-    Scheduler scheduler;
+    Instance<Scheduler> scheduler = std::make_shared<Scheduler>();
 
     {
         QApplication app(argc, argv);
@@ -86,12 +86,6 @@ int main(int argc, char *argv[])
 
         parser.process(app);
 
-        Instance<SystemStatusManager> system_status_manager = std::make_shared<SystemStatusManager>();
-        Instance<TriggerManager> trigger_manager = std::make_shared<TriggerManager>(system_status_manager);
-        Instance<CaptureSessionManager> capture_session_manager = std::make_shared<CaptureSessionManager>();
-        Project project{trigger_manager, capture_session_manager};
-        project.initFromConfig("/home/mlogemann/dev/photobox/Photobox/Settings/Tests/Assets/ProjectSettings.json");
-
         const QString capture_directory = parser.value(capture_directory_option);
         const QString collage_directory = parser.value(collage_directory_option);
         const QString printer_settings = parser.value(printer_settings_option);
@@ -110,10 +104,16 @@ int main(int argc, char *argv[])
         LOG_NOTICE(rootlogger, "window_mode={}", static_cast<int>(window_mode));
         LOG_NOTICE(rootlogger, "capture_directory={}", capture_directory.toStdString());
 
-        ImageStorage image_storage{capture_directory.toStdString()};
-        CollageContext collage_context{
-            scheduler, image_storage, collage_directory.toStdString(), printer_settings.toStdString()};
-        //  system_status_manager.registerClient(std::addressof(collage_context.systemStatusClient()));
+        Instance<ImageStorage> image_storage = std::make_shared<ImageStorage>(capture_directory.toStdString());
+        Instance<SystemStatusManager> system_status_manager = std::make_shared<SystemStatusManager>();
+        Instance<TriggerManager> trigger_manager = std::make_shared<TriggerManager>(system_status_manager);
+        Instance<CaptureSessionManager> capture_session_manager = std::make_shared<CaptureSessionManager>();
+        Project project{trigger_manager, capture_session_manager, image_storage, scheduler};
+        project.initFromConfig("/home/mlogemann/dev/photobox/Photobox/Settings/Tests/Assets/ProjectSettings.json");
+
+        // CollageContext collage_context{
+        //     scheduler, image_storage, collage_directory.toStdString(), printer_settings.toStdString()};
+        //   system_status_manager.registerClient(std::addressof(collage_context.systemStatusClient()));
 
         std::unique_ptr<RemoteTrigger> remote_trigger =
             std::make_unique<EspHomeRemoteTrigger>("", std::make_unique<EspHomeClient>(trigger_button_host));
@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
 
         if (not developer_mode)
         {
-            camera = std::make_shared<GPhoto2Camera>(scheduler);
+            camera = std::make_shared<GPhoto2Camera>(*scheduler);
         }
         else
         {
@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
         }
 
         CaptureManager capture_manager{
-            scheduler, image_storage, *camera, trigger_manager, camera_led, capture_session_manager};
+            *scheduler, *image_storage, *camera, trigger_manager, camera_led, capture_session_manager};
         system_status_manager->registerClient(camera->systemStatusClient());
 
         QQmlApplicationEngine engine;

@@ -32,7 +32,7 @@ class Countdown : public QObject
 
     //! @brief the seconds the countdown should run
     //! @attention doesn't change the current running countdown
-    void setSeconds(std::uint8_t seconds);
+    void setSeconds(std::chrono::seconds seconds);
 
     /// vvv property methods
     const QString &getText() const;
@@ -46,7 +46,7 @@ class Countdown : public QObject
     /// vvv property signals
     void textChanged();
     void visibleChanged();
-    void currentCountChanged(int count);
+    void currentCountChanged(std::chrono::seconds count);
     /// ^^^ property signals
 
   private:
@@ -58,7 +58,7 @@ class Countdown : public QObject
     QTimer timer_;
     bool visible_{false};
     QString text_;
-    std::uint8_t seconds_{5};
-    std::uint8_t current_count_;
+    std::chrono::seconds start_{5};
+    std::chrono::seconds current_{};
 };
 } // namespace Pbox
