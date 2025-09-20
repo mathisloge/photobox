@@ -34,6 +34,21 @@ struct adl_serializer<std::optional<T>>
         }
     }
 };
+
+template <typename Rep, typename Period>
+struct adl_serializer<std::chrono::duration<Rep, Period>>
+{
+    static void from_json(const json &j, std::chrono::duration<Rep, Period> &duration)
+    {
+        duration = std::chrono::duration<Rep, Period>{j.get<int64_t>()};
+    }
+
+    static void to_json(json &j, const std::chrono::duration<Rep, Period> &duration)
+    {
+        j = duration.count();
+    }
+};
+
 } // namespace nlohmann
 
 namespace Pbox
@@ -46,7 +61,9 @@ NLOHMANN_JSON_SERIALIZE_ENUM(SessionType,
                                  {SessionType::SingleCapture, "SingleCapture"},
                                  {SessionType::CollageCapture, "CollageCapture"},
                              });
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(SessionConfig, name, type, print, triggers);
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
+    CollageSettings, automatic_capture, svg_template, image_elements, time_between_capture)
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(SessionConfig, name, type, print, triggers, collage);
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ProjectConfig, name, capture_dir, camera_led, remote_triggers, sessions);
 
 } // namespace Pbox

@@ -13,7 +13,7 @@ namespace Pbox
 SingleCaptureSession::SingleCaptureSession(std::string name)
     : ICaptureSession{std::move(name)}
 {
-    getCountdown()->setSeconds(3);
+    getCountdown()->setSeconds(std::chrono::seconds{3});
     connect(getCountdown(), &Countdown::finished, this, &SingleCaptureSession::requestedImageCapture);
     connect(getCountdown(), &Countdown::currentCountChanged, this, &SingleCaptureSession::handleCountdown);
 }
@@ -44,10 +44,10 @@ void SingleCaptureSession::startCapturing()
     getCountdown()->start();
 }
 
-void SingleCaptureSession::handleCountdown(int count)
+void SingleCaptureSession::handleCountdown(std::chrono::seconds count)
 {
-    LOG_DEBUG(logger_single_capture_session(), "Countdown {}", count);
-    if (count == 1)
+    LOG_DEBUG(logger_single_capture_session(), "Countdown {}", count.count());
+    if (count == std::chrono::seconds{1})
     {
         setLiveViewVisible(false);
         setCaptureStatus(ICaptureSession::CaptureStatus::BeforeCapture);

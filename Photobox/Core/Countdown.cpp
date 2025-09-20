@@ -19,7 +19,7 @@ Countdown::~Countdown() = default;
 void Countdown::start()
 {
     setVisible(true);
-    current_count_ = seconds_;
+    current_ = start_;
     updateText();
     timer_.start();
 }
@@ -30,9 +30,9 @@ void Countdown::stop()
     timer_.stop();
 }
 
-void Countdown::setSeconds(std::uint8_t seconds)
+void Countdown::setSeconds(std::chrono::seconds seconds)
 {
-    seconds_ = seconds;
+    start_ = seconds;
 }
 
 const QString &Countdown::getText() const
@@ -47,8 +47,8 @@ bool Countdown::isVisible() const
 
 void Countdown::updateText()
 {
-    QString new_text{QString::number(current_count_)};
-    if (current_count_ <= 1)
+    QString new_text{QString::number(current_.count())};
+    if (current_ <= std::chrono::seconds{1})
     {
         new_text = QStringLiteral("Smile!");
     }
@@ -62,8 +62,8 @@ void Countdown::updateText()
 
 void Countdown::handleTimeout()
 {
-    current_count_--;
-    if (current_count_ > 0)
+    current_--;
+    if (current_ > std::chrono::seconds{0})
     {
         updateText();
     }
@@ -72,7 +72,7 @@ void Countdown::handleTimeout()
         stop();
         Q_EMIT finished();
     }
-    Q_EMIT currentCountChanged(current_count_);
+    Q_EMIT currentCountChanged(current_);
 }
 
 void Countdown::setVisible(bool visible)

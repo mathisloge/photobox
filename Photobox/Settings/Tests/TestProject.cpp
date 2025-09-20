@@ -12,7 +12,9 @@ using namespace Pbox;
 TEST_CASE("Project test", "[settings]")
 {
     Project project{std::make_shared<TriggerManager>(std::make_shared<SystemStatusManager>()),
-                    std::make_shared<CaptureSessionManager>()};
+                    std::make_shared<CaptureSessionManager>(),
+                    std::make_shared<ImageStorage>("./"),
+                    std::make_shared<Scheduler>()};
     project.initFromConfig(std::filesystem::path{kAssetsPath} / "ProjectSettings.json");
     REQUIRE(project.name() == "hochzeit-xyz");
 }
@@ -20,7 +22,9 @@ TEST_CASE("Project test", "[settings]")
 TEST_CASE("Project create from non existing file", "[settings]")
 {
     Project project{std::make_shared<TriggerManager>(std::make_shared<SystemStatusManager>()),
-                    std::make_shared<CaptureSessionManager>()};
+                    std::make_shared<CaptureSessionManager>(),
+                    std::make_shared<ImageStorage>("./"),
+                    std::make_shared<Scheduler>()};
 
     REQUIRE(project.name() == "");
 }

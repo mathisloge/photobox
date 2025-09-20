@@ -6,6 +6,8 @@
 #include <filesystem>
 #include <Pbox/DisableCopyMove.hpp>
 #include "CaptureSessionFactory.hpp"
+#include "ImageStorage.hpp"
+#include "Scheduler.hpp"
 #include "TriggerManager.hpp"
 #include "Types.hpp"
 
@@ -43,6 +45,8 @@ class Project
     explicit Project(
         Instance<TriggerManager> trigger_manager,
         Instance<CaptureSessionManager> capture_session_manager,
+        Instance<ImageStorage> image_storage,
+        Instance<Scheduler> scheduler,
         std::unique_ptr<IRemoteTriggerFactory> remote_trigger_factory = createDefaultRemoteTriggerFactory());
     ~Project();
 
@@ -54,6 +58,8 @@ class Project
   private:
     Instance<TriggerManager> trigger_manager_;
     Instance<CaptureSessionManager> capture_session_manager_;
+    Instance<ImageStorage> image_storage_;
+    Instance<Scheduler> scheduler_;
     std::unique_ptr<IRemoteTriggerFactory> remote_trigger_factory_;
     std::string name_;
     std::filesystem::path output_directory_;

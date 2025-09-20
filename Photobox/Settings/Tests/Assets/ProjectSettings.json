@@ -22,7 +22,8 @@
             "triggers": [
                 "SingleTrigger",
                 "Display"
-            ]
+            ],
+            "collage": null
         },
         {
             "name": "CollageCaptureSession",
@@ -37,8 +38,8 @@
                     "image-1",
                     "image-2"
                 ],
-                "seconds_between_capture": 5,
-                "svg": "collage.svg"
+                "time_between_capture": 5,
+                "svg_template": "collage.svg"
             }
         }
     ],

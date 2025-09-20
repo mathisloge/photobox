@@ -13,17 +13,18 @@ DEFINE_LOGGER(collage_capture_session);
 namespace Pbox
 {
 
-CollageCaptureSession::CollageCaptureSession(Instance<ImageStorage> image_storage,
+CollageCaptureSession::CollageCaptureSession(std::string name,
+                                             Instance<ImageStorage> image_storage,
                                              Instance<CollageRenderer> renderer,
                                              Instance<Scheduler> scheduler,
                                              CollageSettings settings)
-    : ICaptureSession("CollageCaptureSession")
+    : ICaptureSession(std::move(name))
     , image_storage_{std::move(image_storage)}
     , renderer_{std::move(renderer)}
     , scheduler_{std::move(scheduler)}
     , settings_{std::move(settings)}
 {
-    getCountdown()->setSeconds(settings_.seconds_between_capture);
+    getCountdown()->setSeconds(settings_.time_between_capture);
     connect(getCountdown(), &Countdown::finished, this, [this] {
         LOG_DEBUG(logger_collage_capture_session(), "requesting capture...");
         Q_EMIT requestedImageCapture();
@@ -42,10 +43,10 @@ CollageCaptureSession::~CollageCaptureSession()
     cleanup_async_scope(async_scope_);
 }
 
-void CollageCaptureSession::handleCountdown(int current_count)
+void CollageCaptureSession::handleCountdown(std::chrono::seconds current_count)
 {
-    LOG_DEBUG(logger_collage_capture_session(), "Countdown {}", current_count);
-    if (current_count <= 1)
+    LOG_DEBUG(logger_collage_capture_session(), "Countdown {}", current_count.count());
+    if (current_count <= std::chrono::seconds{1})
     {
         setCaptureStatus(ICaptureSession::CaptureStatus::BeforeCapture);
         setLiveViewVisible(false);

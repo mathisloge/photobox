@@ -21,12 +21,12 @@ qt_add_qml_module(
         CollageSettings.hpp
         CollagePrinter.hpp
         CollagePrinter.cpp
-        CollageContext.hpp
-        CollageContext.cpp
         CollageFontCache.hpp
         CollageFontCache.cpp
         CollageCaptureSession.hpp
         CollageCaptureSession.cpp
+        CollageCaptureSessionFactory.hpp
+        CollageCaptureSessionFactory.cpp
         CaptureSessionFactory.hpp
         CaptureSessionFactory.cpp
         RemoteTrigger.cpp
