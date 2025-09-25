@@ -29,14 +29,20 @@ Q_IMPORT_QML_PLUGIN(Photobox_CorePlugin)
 Q_IMPORT_QML_PLUGIN(Photobox_UiPlugin)
 Q_IMPORT_QML_PLUGIN(Photobox_SettingsPlugin)
 
-DEFINE_ROOT_LOGGER(rootlogger)
+DEFINE_ROOT_LOGGER(root)
 
 using namespace Pbox;
 
 int main(int argc, char *argv[])
 {
-    install_crash_handler();
+    const auto crash_result = install_crash_handler();
     setupLogging();
+    if (not crash_result.has_value())
+    {
+
+        LOG_CRITICAL(logger_root(), "Could not install crash handler. Failed with: {}", crash_result.error().message());
+        exit(EXIT_FAILURE);
+    }
     installQtMessageHandler();
     int app_return_code{EXIT_FAILURE};
     Instance<Scheduler> scheduler = std::make_shared<Scheduler>();
@@ -91,21 +97,21 @@ int main(int argc, char *argv[])
         const QWindow::Visibility window_mode =
             parser.isSet(fullscreen_option) ? QWindow::Visibility::FullScreen : QWindow::Visibility::Windowed;
 
-        LOG_NOTICE(rootlogger, "capture_directory={}", capture_directory.toStdString());
-        LOG_NOTICE(rootlogger, "collage_directory={}", collage_directory.toStdString());
-        LOG_NOTICE(rootlogger, "printer_settings={}", printer_settings.toStdString());
-        LOG_NOTICE(rootlogger, "developer_mode={}", developer_mode);
-        LOG_NOTICE(rootlogger, "trigger_button_host={}", trigger_button_host.toStdString());
-        LOG_NOTICE(rootlogger, "camera_led_host={}", camera_led_host.toStdString());
-        LOG_NOTICE(rootlogger, "window_mode={}", static_cast<int>(window_mode));
-        LOG_NOTICE(rootlogger, "capture_directory={}", capture_directory.toStdString());
+        LOG_NOTICE(logger_root(), "capture_directory={}", capture_directory.toStdString());
+        LOG_NOTICE(logger_root(), "collage_directory={}", collage_directory.toStdString());
+        LOG_NOTICE(logger_root(), "printer_settings={}", printer_settings.toStdString());
+        LOG_NOTICE(logger_root(), "developer_mode={}", developer_mode);
+        LOG_NOTICE(logger_root(), "trigger_button_host={}", trigger_button_host.toStdString());
+        LOG_NOTICE(logger_root(), "camera_led_host={}", camera_led_host.toStdString());
+        LOG_NOTICE(logger_root(), "window_mode={}", static_cast<int>(window_mode));
+        LOG_NOTICE(logger_root(), "capture_directory={}", capture_directory.toStdString());
 
         Instance<ImageStorage> image_storage = std::make_shared<ImageStorage>(capture_directory.toStdString());
         Instance<SystemStatusManager> system_status_manager = std::make_shared<SystemStatusManager>();
         Instance<TriggerManager> trigger_manager = std::make_shared<TriggerManager>(system_status_manager);
         Instance<CaptureSessionManager> capture_session_manager = std::make_shared<CaptureSessionManager>();
         Project project{trigger_manager, capture_session_manager, image_storage, scheduler};
-        project.initFromConfig("/home/mlogemann/dev/photobox/Photobox/Settings/Tests/Assets/ProjectSettings.json");
+        project.initFromConfig("/home/mlogemann/dev/photobox/Photobox/Settings/Tests/Assets/ProjaaectSettings.json");
 
         std::unique_ptr<RemoteTrigger> remote_trigger =
             std::make_unique<EspHomeRemoteTrigger>("", std::make_unique<EspHomeClient>(trigger_button_host));

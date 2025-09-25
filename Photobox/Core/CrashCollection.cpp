@@ -3,90 +3,146 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "CrashCollection.hpp"
+
 #include <array>
 #include <csignal>
-#include <cstring>
+#include <expected>
+#include <span>
+#include <string_view>
+#include <system_error>
+
 #include <cpptrace/utils.hpp>
 #include <sys/wait.h>
 #include <unistd.h>
 
 namespace
 {
-struct pipe_t
-{
-    union {
-        struct
-        {
-            int read_end;
-            int write_end;
-        };
-        int data[2];
-    };
-};
-static_assert(sizeof(pipe_t) == 2 * sizeof(int), "Unexpected struct packing");
 
-void handler(int /*signo*/, siginfo_t * /*info*/, void * /*context*/)
+class FileDescriptor
 {
-    const char *message = "SIGSEGV occurred:\n";
-    write(STDERR_FILENO, message, strlen(message));
+  public:
+    explicit FileDescriptor(int fd = -1) noexcept
+        : fd_(fd)
+    {}
+
+    ~FileDescriptor() noexcept
+    {
+        if (fd_ >= 0)
+        {
+            ::close(fd_);
+        }
+    }
+
+    FileDescriptor(const FileDescriptor &) = delete;
+    FileDescriptor &operator=(const FileDescriptor &) = delete;
+
+    FileDescriptor(FileDescriptor &&other) noexcept
+        : fd_(other.fd_)
+    {
+        other.fd_ = -1;
+    }
+    FileDescriptor &operator=(FileDescriptor &&other) noexcept
+    {
+        if (this != &other)
+        {
+            if (fd_ >= 0)
+            {
+                ::close(fd_);
+            }
+            fd_ = other.fd_;
+            other.fd_ = -1;
+        }
+        return *this;
+    }
+
+    [[nodiscard]] int get() const noexcept
+    {
+        return fd_;
+    }
+
+  private:
+    int fd_;
+};
+
+void safe_write(int fd, std::string_view msg) noexcept
+{
+    ::write(fd, msg.data(), msg.size());
+}
+
+void crash_handler(int /*signo*/, siginfo_t * /*info*/, void * /*context*/) noexcept
+{
+    safe_write(STDERR_FILENO, "SIGSEGV occurred:\n");
+
     std::array<cpptrace::frame_ptr, 100> buffer{};
-    std::size_t count = cpptrace::safe_generate_raw_trace(buffer.data(), buffer.size());
-    pipe_t input_pipe{};
-    pipe(input_pipe.data);
-    const pid_t pid = fork();
+    const auto count = cpptrace::safe_generate_raw_trace(buffer.data(), buffer.size());
+
+    std::array<int, 2> pipe_fds{};
+    if (::pipe(pipe_fds.data()) == -1)
+    {
+        return;
+    }
+
+    FileDescriptor read_fd(pipe_fds[0]);
+    FileDescriptor write_fd(pipe_fds[1]);
+
+    const pid_t pid = ::fork();
     if (pid == -1)
     {
         return;
     }
+
     if (pid == 0)
-    { // child
-        dup2(input_pipe.read_end, STDIN_FILENO);
-        close(input_pipe.read_end);
-        close(input_pipe.write_end);
-        execl("PhotoboxSignalTracer", "PhotoboxSignalTracer", nullptr);
-        const char *exec_failure_message =
-            "exec(PhotoboxSignalTracer) failed: Make sure the PhotoboxSignalTracer executable is in "
-            "the current working directory and the binary's permissions are correct.\n";
-        write(STDERR_FILENO, exec_failure_message, strlen(exec_failure_message));
-        _exit(1);
+    {
+        ::dup2(read_fd.get(), STDIN_FILENO);
+        ::execl("PhotoboxSignalTracer", "PhotoboxSignalTracer", nullptr);
+        safe_write(STDERR_FILENO,
+                   "exec(PhotoboxSignalTracer) failed: Make sure the PhotoboxSignalTracer "
+                   "executable is in the current working directory.\n");
+        ::_exit(1);
     }
-    for (std::size_t i = 0; i < count; i++)
+
+    for (const auto frame_ptr : std::span(buffer.data(), count))
     {
         cpptrace::safe_object_frame frame{};
-        cpptrace::get_safe_object_frame(buffer[i], &frame);
-        write(input_pipe.write_end, &frame, sizeof(frame));
+        cpptrace::get_safe_object_frame(frame_ptr, &frame);
+        ::write(write_fd.get(), &frame, sizeof(frame));
     }
-    close(input_pipe.read_end);
-    close(input_pipe.write_end);
-    waitpid(pid, nullptr, 0);
-    _exit(1);
+
+    ::waitpid(pid, nullptr, 0);
+    ::_exit(1);
 }
 
-void warmup_cpptrace()
+void warmup_cpptrace() noexcept
 {
     std::array<cpptrace::frame_ptr, 10> buffer{};
-    std::size_t count = cpptrace::safe_generate_raw_trace(buffer.data(), buffer.size());
-    cpptrace::safe_object_frame frame{};
-    cpptrace::get_safe_object_frame(buffer[0], &frame);
+    const auto count = cpptrace::safe_generate_raw_trace(buffer.data(), buffer.size());
+    if (count > 0)
+    {
+        cpptrace::safe_object_frame frame{};
+        cpptrace::get_safe_object_frame(buffer[0], &frame);
+    }
 }
 
 } // namespace
 
 namespace Pbox
 {
-void install_crash_handler()
+
+std::expected<void, std::error_code> install_crash_handler() noexcept
 {
     cpptrace::absorb_trace_exceptions(false);
     cpptrace::register_terminate_handler();
     warmup_cpptrace();
 
-    struct sigaction action = {0};
-    action.sa_flags = 0;
-    action.sa_sigaction = &handler;
-    if (sigaction(SIGSEGV, &action, NULL) == -1)
+    struct sigaction action{};
+    action.sa_flags = SA_SIGINFO;
+    action.sa_sigaction = crash_handler;
+
+    if (::sigaction(SIGSEGV, &action, nullptr) == -1)
     {
-        perror("sigaction");
-        std::exit(EXIT_FAILURE);
+        return std::unexpected(std::error_code(errno, std::system_category()));
     }
+
+    return {};
 }
 } // namespace Pbox
