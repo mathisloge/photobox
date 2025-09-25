@@ -52,9 +52,6 @@ qt_add_qml_module(
         Countdown.cpp
         SvgFontCache.hpp
         SvgFontCache.cpp
-    RESOURCES
-        Fonts/GreatVibes/GreatVibes-Regular.ttf
-        Fonts/Roboto/Roboto-Regular.ttf
 )
 
 add_library(Photobox::Core ALIAS PhotoboxCore)
