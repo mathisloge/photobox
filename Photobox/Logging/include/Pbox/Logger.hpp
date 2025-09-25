@@ -27,5 +27,9 @@ PHOTOBOXLOGGING_EXPORT quill::Logger *createLogger(const std::string &logger_nam
 #define DEFINE_ROOT_LOGGER(name)                                                                                       \
     namespace                                                                                                          \
     {                                                                                                                  \
-    static quill::Logger *(name) = ::Pbox::createLogger(::Pbox::kRootLogger);                                          \
+    quill::Logger *logger_##name()                                                                                     \
+    {                                                                                                                  \
+        static auto *name_logger = ::Pbox::createLogger(::Pbox::kRootLogger);                                          \
+        return name_logger;                                                                                            \
+    }                                                                                                                  \
     }

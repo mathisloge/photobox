@@ -17,8 +17,6 @@ qt_add_qml_module(
         ImageProvider.cpp
         ApplicationState.hpp
         CollageSettings.hpp
-        CollageFontCache.hpp
-        CollageFontCache.cpp
         CaptureSessionFactory.hpp
         CaptureSessionFactory.cpp
         RemoteTrigger.cpp
