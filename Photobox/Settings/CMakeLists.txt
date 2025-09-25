@@ -28,7 +28,11 @@ target_sources(
 
 target_link_libraries(
     PhotoboxSettings
-    PUBLIC nlohmann_json::nlohmann_json Photobox::Core Photobox::Peripheral
+    PUBLIC
+        nlohmann_json::nlohmann_json
+        Photobox::Core
+        Photobox::Peripheral
+        Photobox::CollageSession
 )
 
 if(BUILD_TESTING)

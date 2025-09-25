@@ -2,20 +2,19 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "CollageCaptureSessionFactory.hpp"
+#include "Pbox/Sessions/CollageCaptureSessionFactory.hpp"
 #include "CollageCaptureSession.hpp"
 #include "Pbox/CleanupAsyncScope.hpp"
+#include "Pbox/Sessions/CollageRenderer.hpp"
 
 namespace Pbox
 {
 CollageCaptureSessionFactory::CollageCaptureSessionFactory(std::string name,
                                                            Instance<Scheduler> scheduler,
-                                                           Instance<CollagePrinter> printer,
                                                            Instance<ImageStorage> image_storage,
                                                            CollageSettings collage_settings)
     : name_{std::move(name)}
     , scheduler_{std::move(scheduler)}
-    , printer_{std::move(printer)}
     , image_storage_{std::move(image_storage)}
     , collage_settings_{std::move(collage_settings)}
     , renderer_{std::make_shared<CollageRenderer>()}

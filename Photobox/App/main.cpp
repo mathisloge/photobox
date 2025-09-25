@@ -8,7 +8,6 @@
 #include <QQuickStyle>
 #include <QWindow>
 #include <ApplicationState.hpp>
-#include <CollagePrinter.hpp>
 #include <CrashCollection.hpp>
 #include <EspHomeCameraLed.hpp>
 #include <EspHomeClient.hpp>
@@ -24,9 +23,6 @@
 #include <TriggerManager.hpp>
 #include <fmt/core.h>
 #include "CaptureManager.hpp"
-#include "CollageCaptureSession.hpp"
-#include "CollageContext.hpp"
-#include "SingleCaptureSession.hpp"
 #include "SystemStatusManager.hpp"
 
 Q_IMPORT_QML_PLUGIN(Photobox_CorePlugin)
@@ -110,10 +106,6 @@ int main(int argc, char *argv[])
         Instance<CaptureSessionManager> capture_session_manager = std::make_shared<CaptureSessionManager>();
         Project project{trigger_manager, capture_session_manager, image_storage, scheduler};
         project.initFromConfig("/home/mlogemann/dev/photobox/Photobox/Settings/Tests/Assets/ProjectSettings.json");
-
-        // CollageContext collage_context{
-        //     scheduler, image_storage, collage_directory.toStdString(), printer_settings.toStdString()};
-        //   system_status_manager.registerClient(std::addressof(collage_context.systemStatusClient()));
 
         std::unique_ptr<RemoteTrigger> remote_trigger =
             std::make_unique<EspHomeRemoteTrigger>("", std::make_unique<EspHomeClient>(trigger_button_host));

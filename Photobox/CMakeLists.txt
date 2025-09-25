@@ -5,6 +5,7 @@
 add_subdirectory(Logging)
 add_subdirectory(Utils)
 add_subdirectory(Core)
+add_subdirectory(CollageSession)
 add_subdirectory(Peripheral)
 add_subdirectory(Ui)
 #add_subdirectory(Lumix)

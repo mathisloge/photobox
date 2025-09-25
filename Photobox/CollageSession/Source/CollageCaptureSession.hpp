@@ -7,11 +7,11 @@
 #include <QObject>
 #include <Pbox/DisableCopyMove.hpp>
 #include <exec/async_scope.hpp>
-#include "CollageRenderer.hpp"
 #include "CollageSettings.hpp"
 #include "ICaptureSession.hpp"
 #include "ImageStorage.hpp"
 #include "Pbox/Instance.hpp"
+#include "Pbox/Sessions/CollageRenderer.hpp"
 #include "Scheduler.hpp"
 
 namespace Pbox

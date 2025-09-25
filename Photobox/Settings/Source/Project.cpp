@@ -5,11 +5,9 @@
 #include "Pbox/Settings/Project.hpp"
 #include <fstream>
 #include <Pbox/Logger.hpp>
+#include <Pbox/Sessions/CollageCaptureSessionFactory.hpp>
 #include <Pbox/Settings/Detail/TypesSerialization.hpp>
 #include "CameraLed.hpp"
-#include "CollageCaptureSession.hpp"
-#include "CollageCaptureSessionFactory.hpp"
-#include "CollageContext.hpp"
 #include "EspHomeClient.hpp"
 #include "EspHomeRemoteTrigger.hpp"
 #include "ICaptureSession.hpp"
@@ -87,7 +85,7 @@ void Project::initFromConfig(const std::filesystem::path &config_file)
             capture_session_manager_->registerCaptureSession(
                 session.name,
                 std::make_unique<CollageCaptureSessionFactory>(
-                    session.name, scheduler_, nullptr, image_storage_, session.collage.value_or(CollageSettings{})));
+                    session.name, scheduler_, image_storage_, session.collage.value_or(CollageSettings{})));
             break;
         case SessionType::Unknown:
             LOG_WARNING(logger_project(), "Got unknown session type for session '{}'", session.name);

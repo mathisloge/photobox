@@ -20,8 +20,7 @@
             "type": "SingleCapture",
             "print": false,
             "triggers": [
-                "SingleTrigger",
-                "Display"
+                "SingleTrigger"
             ],
             "collage": null
         },
@@ -30,7 +29,8 @@
             "type": "CollageCapture",
             "print": false,
             "triggers": [
-                "CollageTrigger"
+                "CollageTrigger",
+                "Display"
             ],
             "collage": {
                 "automatic_capture": true,
@@ -38,8 +38,8 @@
                     "image-1",
                     "image-2"
                 ],
-                "time_between_capture": 5,
-                "svg_template": "collage.svg"
+                "time_between_capture": 2,
+                "svg_template": "/home/mlogemann/dev/photobox/Tests/assets/collage.svg"
             }
         }
     ],
