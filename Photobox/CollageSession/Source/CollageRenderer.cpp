@@ -6,10 +6,8 @@
 #include <QImage>
 #include <QPainter>
 #include <fstream>
-#include <mutex>
 #include <Pbox/Logger.hpp>
 #include <nlohmann/json.hpp>
-#include "CollageFontCache.hpp"
 
 DEFINE_LOGGER(collage_renderer);
 namespace Pbox
@@ -135,23 +133,4 @@ const std::filesystem::path &CollageRenderer::getDocumentPath() const
 {
     return base_image_file_path_;
 }
-
-void init_lunasvg(Pbox::CollageFontCache &font_cache)
-{
-    static thread_local std::once_flag has_init;
-    std::call_once(has_init, [&font_cache]() {
-        for (auto &&font : font_cache.getFonts())
-        {
-            lunasvg_add_font_face_from_data(
-                font.name.c_str(),
-                font.bold,
-                font.italic,
-                font.font_data.data(),
-                font.font_data.size(),
-                [](void * /*closure*/) {},
-                nullptr);
-        }
-    });
-}
-
 } // namespace Pbox

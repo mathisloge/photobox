@@ -50,6 +50,8 @@ qt_add_qml_module(
         TriggerManager.cpp
         Countdown.hpp
         Countdown.cpp
+        SvgFontCache.hpp
+        SvgFontCache.cpp
     RESOURCES
         Fonts/GreatVibes/GreatVibes-Regular.ttf
         Fonts/Roboto/Roboto-Regular.ttf

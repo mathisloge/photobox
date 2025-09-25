@@ -23,3 +23,7 @@ target_sources(
         Source/CollageCaptureSessionFactory.cpp
         Source/CollageRenderer.cpp
 )
+
+if(BUILD_TESTING)
+    add_subdirectory(Tests)
+endif()
