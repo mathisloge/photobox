@@ -10,7 +10,7 @@
 
   <text fill="red" font-family="Roboto" font-size="10" x="0" y="100">10.10.2024</text>
 
-  <image id="image-1" x="0" y="35" width="50" height="45" href="/home/mlogemann/dev/photobox/Photobox/CollageSession/Tests/Assets/capture_1.png" />
-  <image id="image-2" x="100" y="35" width="50" height="45"  href="/home/mlogemann/dev/photobox/Photobox/CollageSession/Tests/Assets/capture_5.png" />
+  <image id="image-1" x="0" y="35" width="50" height="45" href="" />
+  <image id="image-2" x="100" y="35" width="50" height="45"  href="" />
 
 </svg>
