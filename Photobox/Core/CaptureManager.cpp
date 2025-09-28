@@ -68,6 +68,7 @@ void CaptureManager::triggerButtonPressed(const QString &trigger_id)
     if (session_->getStatus() == ICaptureSession::Status::Idle)
     {
         const auto trigger = trigger_id.toStdString();
+        triggered_by_ = trigger;
         LOG_DEBUG(logger_capture_manager(), "Got trigger {}", trigger);
         switchToSession(capture_session_manager_->createFromTrigger(trigger));
         session_->triggerCapture();
@@ -132,10 +133,10 @@ void CaptureManager::handleSessionStatusChange()
     switch (status)
     {
     case ICaptureSession::Status::Idle:
-        // remote_trigger_.playEffect(RemoteTrigger::Effect::Idle);
+        trigger_manager_->updateTriggerEffect(triggered_by_, RemoteTrigger::Effect::Idle);
         break;
     case ICaptureSession::Status::Capturing:
-        // remote_trigger_.playEffect(RemoteTrigger::Effect::Countdown);
+        trigger_manager_->updateTriggerEffect(triggered_by_, RemoteTrigger::Effect::Countdown);
         break;
     case ICaptureSession::Status::Busy:
         break;
