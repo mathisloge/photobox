@@ -67,6 +67,7 @@ void Project::initFromConfig(const std::filesystem::path &config_file)
     }
 
     name_ = settings.name;
+    image_storage_->setStorageDir(settings.capture_dir);
 
     for (auto &&trigger : std::as_const(settings.remote_triggers))
     {

@@ -45,6 +45,15 @@ ImageStorage::ImageStorage(std::filesystem::path storage_dir)
     }
 }
 
+void ImageStorage::setStorageDir(std::filesystem::path storage_dir)
+{
+    if (storage_dir != storage_dir_)
+    {
+        storage_dir_ = std::move(storage_dir);
+        LOG_INFO(logger_image_store(), "Updated image store dir to '{}'", storage_dir.string());
+    }
+}
+
 std::filesystem::path ImageStorage::saveImage(const QImage &image)
 {
     const auto file_path = storage_dir_ / generateNewImageFilePath();

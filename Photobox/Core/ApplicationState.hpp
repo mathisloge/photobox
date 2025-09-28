@@ -21,7 +21,6 @@ class ApplicationState : public QObject
     QML_SINGLETON
 
     Q_PROPERTY(Pbox::ICamera *camera READ getCamera CONSTANT);
-    Q_PROPERTY(Pbox::RemoteTrigger *remoteTrigger READ getRemoteTrigger CONSTANT);
     Q_PROPERTY(Pbox::CameraLed *cameraLed READ getCameraLed CONSTANT);
     Q_PROPERTY(Pbox::SystemStatusManager *systemStatusManager READ getSystemStatusManager CONSTANT);
     Q_PROPERTY(Pbox::CaptureManager *captureManager READ getCaptureManager CONSTANT);
@@ -30,11 +29,6 @@ class ApplicationState : public QObject
     ICamera *getCamera()
     {
         return camera.get();
-    }
-
-    RemoteTrigger *getRemoteTrigger() const
-    {
-        return remote_trigger;
     }
 
     CameraLed *getCameraLed() const
@@ -49,14 +43,13 @@ class ApplicationState : public QObject
 
     CaptureManager *getCaptureManager() const
     {
-        return capture_manager;
+        return capture_manager.get();
     }
 
   public:
     std::shared_ptr<ICamera> camera;
-    RemoteTrigger *remote_trigger{};
     CameraLed *camera_led{};
     Instance<SystemStatusManager> system_status_manager;
-    CaptureManager *capture_manager{};
+    Instance<CaptureManager> capture_manager;
 };
 } // namespace Pbox
