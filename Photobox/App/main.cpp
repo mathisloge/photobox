@@ -57,13 +57,6 @@ int main(int argc, char *argv[])
         QCommandLineParser parser;
         parser.addHelpOption();
         parser.addVersionOption();
-        QCommandLineOption capture_directory_option(
-            QStringList() << "storage-dir", "the captured image storage dir", "path to dir", "captures");
-        parser.addOption(capture_directory_option);
-
-        QCommandLineOption collage_directory_option(
-            QStringList() << "collage-dir", "The dir with the collage settings", "path to dir", "collage");
-        parser.addOption(collage_directory_option);
 
         QCommandLineOption printer_settings_option(QStringList() << "printer-settings",
                                                    "The printer_settings.json file",
@@ -73,10 +66,6 @@ int main(int argc, char *argv[])
 
         QCommandLineOption developer_option(QStringList{"dev"}, "Use developer mode");
         parser.addOption(developer_option);
-
-        QCommandLineOption trigger_button_host_option(
-            QStringList() << "trigger-btn", "The hostname of the trigger button", "url", "http://192.168.178.30");
-        parser.addOption(trigger_button_host_option);
 
         QCommandLineOption camera_led_host_option(
             QStringList() << "camera-led", "The hostname of the camera led controller", "url", "http://192.168.178.31");
@@ -88,33 +77,24 @@ int main(int argc, char *argv[])
 
         parser.process(app);
 
-        const QString capture_directory = parser.value(capture_directory_option);
-        const QString collage_directory = parser.value(collage_directory_option);
         const QString printer_settings = parser.value(printer_settings_option);
         const bool developer_mode = parser.isSet(developer_option);
-        const QString trigger_button_host = parser.value(trigger_button_host_option);
         const QString camera_led_host = parser.value(camera_led_host_option);
         const QWindow::Visibility window_mode =
             parser.isSet(fullscreen_option) ? QWindow::Visibility::FullScreen : QWindow::Visibility::Windowed;
 
-        LOG_NOTICE(logger_root(), "capture_directory={}", capture_directory.toStdString());
-        LOG_NOTICE(logger_root(), "collage_directory={}", collage_directory.toStdString());
         LOG_NOTICE(logger_root(), "printer_settings={}", printer_settings.toStdString());
         LOG_NOTICE(logger_root(), "developer_mode={}", developer_mode);
-        LOG_NOTICE(logger_root(), "trigger_button_host={}", trigger_button_host.toStdString());
         LOG_NOTICE(logger_root(), "camera_led_host={}", camera_led_host.toStdString());
         LOG_NOTICE(logger_root(), "window_mode={}", static_cast<int>(window_mode));
-        LOG_NOTICE(logger_root(), "capture_directory={}", capture_directory.toStdString());
 
-        Instance<ImageStorage> image_storage = std::make_shared<ImageStorage>(capture_directory.toStdString());
+        Instance<ImageStorage> image_storage = std::make_shared<ImageStorage>("photobox-capture");
         Instance<SystemStatusManager> system_status_manager = std::make_shared<SystemStatusManager>();
         Instance<TriggerManager> trigger_manager = std::make_shared<TriggerManager>(system_status_manager);
         Instance<CaptureSessionManager> capture_session_manager = std::make_shared<CaptureSessionManager>();
         Project project{trigger_manager, capture_session_manager, image_storage, scheduler};
-        project.initFromConfig("/home/mlogemann/dev/photobox/Photobox/Settings/Tests/Assets/ProjaaectSettings.json");
+        project.initFromConfig("/home/mlogemann/dev/photobox/Photobox/Settings/Tests/Assets/ProjectSettings.json");
 
-        std::unique_ptr<RemoteTrigger> remote_trigger =
-            std::make_unique<EspHomeRemoteTrigger>("", std::make_unique<EspHomeClient>(trigger_button_host));
         Instance<CameraLed> camera_led =
             std::make_shared<EspHomeCameraLed>(std::make_unique<EspHomeClient>(camera_led_host));
         std::shared_ptr<ICamera> camera;
@@ -128,8 +108,8 @@ int main(int argc, char *argv[])
             camera = std::make_shared<MockCamera>();
         }
 
-        CaptureManager capture_manager{
-            *scheduler, *image_storage, *camera, trigger_manager, camera_led, capture_session_manager};
+        Instance<CaptureManager> capture_manager = std::make_shared<CaptureManager>(
+            *scheduler, *image_storage, *camera, trigger_manager, camera_led, capture_session_manager);
         system_status_manager->registerClient(camera->systemStatusClient());
 
         QQmlApplicationEngine engine;
@@ -142,12 +122,11 @@ int main(int argc, char *argv[])
 
         app_state->system_status_manager = system_status_manager;
         app_state->camera = camera;
-        app_state->remote_trigger = remote_trigger.get();
         app_state->camera_led = camera_led.get();
-        app_state->capture_manager = std::addressof(capture_manager);
+        app_state->capture_manager = capture_manager;
 
         engine.loadFromModule("Photobox.App", "Main");
-        engine.addImageProvider(QLatin1String("preview-image"), capture_manager.createImageProvider());
+        engine.addImageProvider(QLatin1String("preview-image"), capture_manager->createImageProvider());
 
         app_return_code = app.exec();
     }
