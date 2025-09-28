@@ -42,6 +42,7 @@ struct ProjectConfig
 {
     std::string name;
     std::filesystem::path capture_dir;
+    std::chrono::seconds initial_countdown;
     std::optional<CameraLedConfig> camera_led;
     std::vector<EspHomeRemoteTriggerConfig> remote_triggers;
     std::vector<SessionConfig> sessions;

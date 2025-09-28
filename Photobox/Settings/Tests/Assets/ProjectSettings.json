@@ -1,6 +1,7 @@
 {
     "name": "hochzeit-xyz",
     "capture_dir": "./output",
+    "initial_countdown": 1,
     "remote_triggers": [
         {
             "name": "CollageTrigger",

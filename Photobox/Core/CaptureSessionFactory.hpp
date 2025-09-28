@@ -21,7 +21,7 @@ class ICaptureSessionFactory
     PBOX_DISABLE_COPY_MOVE(ICaptureSessionFactory);
     ICaptureSessionFactory() = default;
     virtual ~ICaptureSessionFactory() = default;
-    virtual CaptureSessionPtr create() const = 0;
+    virtual CaptureSessionPtr create(std::chrono::seconds initial_countdown) const = 0;
 };
 
 using CaptureSessionId = std::string;
@@ -31,11 +31,13 @@ class CaptureSessionManager
   public:
     void registerCaptureSession(CaptureSessionId session_id, std::unique_ptr<ICaptureSessionFactory> session_factory);
     void addTriggerRelation(CaptureSessionId session_id, TriggerId trigger_id);
+    void setInitialCountdown(std::chrono::seconds initial_countdown);
     CaptureSessionPtr createIdleSession() const;
     CaptureSessionPtr createFromTrigger(const TriggerId &trigger_id) const;
 
   private:
     std::unordered_map<CaptureSessionId, std::unique_ptr<ICaptureSessionFactory>> session_factories_;
     std::unordered_map<TriggerId, CaptureSessionId> trigger_session_relation_;
+    std::chrono::seconds initial_countdown_{};
 };
 } // namespace Pbox

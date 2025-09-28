@@ -44,6 +44,16 @@ void CaptureSessionManager::addTriggerRelation(CaptureSessionId session_id, Trig
     }
 }
 
+void CaptureSessionManager::setInitialCountdown(std::chrono::seconds initial_countdown)
+{
+    if (initial_countdown_ != initial_countdown)
+    {
+        initial_countdown_ = initial_countdown;
+        LOG_INFO(
+            logger_capture_session_abstract_factory(), "Initial countdown set to '{}s'", initial_countdown.count());
+    }
+}
+
 CaptureSessionPtr CaptureSessionManager::createIdleSession() const
 {
     return make_unique_object_ptr_as<ICaptureSession, IdleCaptureSession>();
@@ -62,7 +72,7 @@ CaptureSessionPtr CaptureSessionManager::createFromTrigger(const TriggerId &trig
         return nullptr;
     }
 
-    return sid->second->create();
+    return sid->second->create(initial_countdown_);
 }
 
 } // namespace Pbox

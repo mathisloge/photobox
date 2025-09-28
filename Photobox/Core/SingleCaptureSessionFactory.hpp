@@ -15,9 +15,9 @@ class SingleCaptureSessionFactory : public ICaptureSessionFactory
         : name_{std::move(name)}
     {}
 
-    CaptureSessionPtr create() const override
+    CaptureSessionPtr create(std::chrono::seconds initial_countdown) const override
     {
-        return make_unique_object_ptr_as<ICaptureSession, SingleCaptureSession>(name_);
+        return make_unique_object_ptr_as<ICaptureSession, SingleCaptureSession>(name_, initial_countdown);
     }
 
   private:

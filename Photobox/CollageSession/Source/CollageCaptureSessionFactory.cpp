@@ -41,9 +41,9 @@ void CollageCaptureSessionFactory::loadCollage()
     async_scope_.spawn(std::move(init_collage));
 }
 
-CaptureSessionPtr CollageCaptureSessionFactory::create() const
+CaptureSessionPtr CollageCaptureSessionFactory::create(std::chrono::seconds initial_countdown) const
 {
     return make_unique_object_ptr_as<ICaptureSession, CollageCaptureSession>(
-        name_, image_storage_, renderer_, scheduler_, collage_settings_);
+        name_, initial_countdown, image_storage_, renderer_, scheduler_, collage_settings_);
 }
 } // namespace Pbox
