@@ -22,7 +22,7 @@ class CollageCaptureSessionFactory : public ICaptureSessionFactory
                                  Instance<ImageStorage> image_storage,
                                  CollageSettings collage_settings);
     ~CollageCaptureSessionFactory() override;
-    CaptureSessionPtr create() const override;
+    CaptureSessionPtr create(std::chrono::seconds initial_countdown) const override;
 
   private:
     void loadCollage();

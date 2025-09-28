@@ -23,6 +23,7 @@ class CollageCaptureSession : public ICaptureSession
   public:
     PBOX_DISABLE_COPY_MOVE(CollageCaptureSession);
     explicit CollageCaptureSession(std::string name,
+                                   std::chrono::seconds initial_countdown,
                                    Instance<ImageStorage> image_storage,
                                    Instance<CollageRenderer> renderer,
                                    Instance<Scheduler> scheduler,

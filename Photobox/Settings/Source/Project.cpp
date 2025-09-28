@@ -67,7 +67,8 @@ void Project::initFromConfig(const std::filesystem::path &config_file)
     }
 
     name_ = settings.name;
-    image_storage_->setStorageDir(settings.capture_dir);
+    image_storage_->updateStorageDir(settings.capture_dir);
+    capture_session_manager_->setInitialCountdown(settings.initial_countdown);
 
     for (auto &&trigger : std::as_const(settings.remote_triggers))
     {

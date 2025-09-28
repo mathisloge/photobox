@@ -16,6 +16,18 @@ namespace Pbox
 ImageStorage::ImageStorage(std::filesystem::path storage_dir)
     : storage_dir_{std::move(storage_dir)}
 {
+    updateStorageDir(std::move(storage_dir));
+}
+
+void ImageStorage::updateStorageDir(std::filesystem::path storage_dir)
+{
+    if (storage_dir == storage_dir_)
+    {
+        return;
+    }
+
+    storage_dir_ = std::move(storage_dir);
+    LOG_INFO(logger_image_store(), "Updated image store dir to '{}'", storage_dir_.string());
     if (std::filesystem::exists(storage_dir_))
     {
         auto current_file_count = 0;
@@ -27,6 +39,7 @@ ImageStorage::ImageStorage(std::filesystem::path storage_dir)
             }
         }
         image_counter_ = current_file_count + 1;
+        LOG_DEBUG(logger_image_store(), "Updated image counter to '{}'", image_counter_.load());
     }
     else
     {
@@ -45,22 +58,13 @@ ImageStorage::ImageStorage(std::filesystem::path storage_dir)
     }
 }
 
-void ImageStorage::setStorageDir(std::filesystem::path storage_dir)
-{
-    if (storage_dir != storage_dir_)
-    {
-        storage_dir_ = std::move(storage_dir);
-        LOG_INFO(logger_image_store(), "Updated image store dir to '{}'", storage_dir.string());
-    }
-}
-
 std::filesystem::path ImageStorage::saveImage(const QImage &image)
 {
     const auto file_path = storage_dir_ / generateNewImageFilePath();
     const bool image_saved = image.save(QString::fromStdString(file_path));
     if (not image_saved)
     {
-        throw std::runtime_error{"Image could not be saved."};
+        throw std::runtime_error{fmt::format("Image could not be saved to '{}'", file_path.string())};
     }
     return file_path;
 }

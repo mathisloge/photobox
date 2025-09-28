@@ -11,7 +11,6 @@
 #include "IdleCaptureSession.hpp"
 #include "ImageProvider.hpp"
 #include "ImageStorage.hpp"
-#include "RemoteTrigger.hpp"
 
 DEFINE_LOGGER(capture_manager);
 

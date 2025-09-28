@@ -13,6 +13,7 @@ namespace Pbox
 {
 
 CollageCaptureSession::CollageCaptureSession(std::string name,
+                                             std::chrono::seconds initial_countdown,
                                              Instance<ImageStorage> image_storage,
                                              Instance<CollageRenderer> renderer,
                                              Instance<Scheduler> scheduler,
@@ -23,7 +24,7 @@ CollageCaptureSession::CollageCaptureSession(std::string name,
     , scheduler_{std::move(scheduler)}
     , settings_{std::move(settings)}
 {
-    getCountdown()->setSeconds(settings_.time_between_capture);
+    getCountdown()->setSeconds(initial_countdown);
     connect(getCountdown(), &Countdown::finished, this, [this] {
         LOG_DEBUG(logger_collage_capture_session(), "requesting capture...");
         Q_EMIT requestedImageCapture();

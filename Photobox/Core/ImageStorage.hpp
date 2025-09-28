@@ -16,7 +16,7 @@ class ImageStorage
     std::filesystem::path saveImage(const QImage &image);
     const std::filesystem::path &storageDir() const;
     std::string generateNewImageFilePath();
-    void setStorageDir(std::filesystem::path storage_dir);
+    void updateStorageDir(std::filesystem::path storage_dir);
 
   private:
     std::filesystem::path storage_dir_;
