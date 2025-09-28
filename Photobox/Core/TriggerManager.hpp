@@ -21,6 +21,7 @@ class TriggerManager : public QObject
     explicit TriggerManager(Instance<SystemStatusManager> system_status_manager);
     ~TriggerManager() override = default;
     void registerTrigger(TriggerId triggerId, std::unique_ptr<RemoteTrigger> trigger);
+    void updateTriggerEffect(TriggerId triggerId, RemoteTrigger::Effect effect);
 
   Q_SIGNALS:
     void triggerFired(TriggerId triggerId);

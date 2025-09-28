@@ -97,6 +97,7 @@ void CollageCaptureSession::startCountdownOrFinish()
         LOG_DEBUG(logger_collage_capture_session(), "Starting countdown");
         setStatus(ICaptureSession::Status::Capturing);
         setLiveViewVisible(true);
+        getCountdown()->setSeconds(settings_.time_between_capture);
         getCountdown()->start();
     }
     else if (not finished_ and saved_collage_path_.has_value())

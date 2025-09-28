@@ -70,5 +70,6 @@ class CaptureManager : public QObject
     unique_object_ptr<ICaptureSession> session_{nullptr};
     exec::async_scope async_scope_;
     std::atomic_uint32_t image_ids_;
+    TriggerId triggered_by_;
 };
 } // namespace Pbox

@@ -24,7 +24,25 @@ void TriggerManager::registerTrigger(TriggerId triggerId, std::unique_ptr<Remote
     }
     else
     {
+        entry->second->playEffect(RemoteTrigger::Effect::Idle);
         system_status_manager_->registerClient(entry->second->systemStatusClient());
     }
 }
+
+void TriggerManager::updateTriggerEffect(TriggerId triggerId, RemoteTrigger::Effect effect)
+{
+    const QMetaEnum effect_meta_enum = QMetaEnum::fromType<RemoteTrigger::Effect>();
+    auto &&effect_str = effect_meta_enum.valueToKey(static_cast<int>(effect));
+
+    auto it = remote_triggers_.find(triggerId);
+    if (it == remote_triggers_.end())
+    {
+        LOG_ERROR(
+            logger_trigger_manager(), "Could not find trigger '{}' to update effect to '{}'", triggerId, effect_str);
+        return;
+    }
+    LOG_DEBUG(logger_trigger_manager(), "Update effect of trigger '{}' to effect '{}'", triggerId, effect_str);
+    it->second->playEffect(effect);
+}
+
 } // namespace Pbox
