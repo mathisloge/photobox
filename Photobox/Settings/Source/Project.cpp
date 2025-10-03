@@ -37,11 +37,13 @@ Project::Project(Instance<TriggerManager> trigger_manager,
                  Instance<CaptureSessionManager> capture_session_manager,
                  Instance<ImageStorage> image_storage,
                  Instance<Scheduler> scheduler,
+                 Instance<SvgFontCache> font_cache,
                  std::unique_ptr<IRemoteTriggerFactory> remote_trigger_factory)
     : trigger_manager_{std::move(trigger_manager)}
     , capture_session_manager_{std::move(capture_session_manager)}
     , image_storage_{std::move(image_storage)}
     , scheduler_{std::move(scheduler)}
+    , font_cache_{std::move(font_cache)}
     , remote_trigger_factory_{std::move(remote_trigger_factory)}
 {}
 
@@ -67,6 +69,11 @@ void Project::initFromConfig(const std::filesystem::path &config_file)
     name_ = settings.name;
     image_storage_->updateStorageDir(settings.capture_dir);
     capture_session_manager_->setInitialCountdown(settings.initial_countdown);
+
+    for (auto &&font : settings.fonts)
+    {
+        font_cache_->registerFont(font.family, font.bold, font.italic, font.path);
+    }
 
     for (auto &&trigger : std::as_const(settings.remote_triggers))
     {

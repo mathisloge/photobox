@@ -2,6 +2,14 @@
     "name": "hochzeit-xyz",
     "capture_dir": "./output",
     "initial_countdown": 1,
+    "fonts": [
+        {
+            "family": "Great Vibes",
+            "path": "/home/mlogemann/dev/photobox/Photobox/CollageSession/Tests/Assets/GreatVibes/GreatVibes-Regular.ttf",
+            "bold": false,
+            "italic": false
+        }
+    ],
     "remote_triggers": [
         {
             "name": "CollageTrigger",

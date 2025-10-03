@@ -53,6 +53,7 @@ struct adl_serializer<std::chrono::duration<Rep, Period>>
 
 namespace Pbox
 {
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(FontConfig, family, path, bold, italic);
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(EspHomeRemoteTriggerConfig, name, uri);
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(CameraLedConfig, uri);
 NLOHMANN_JSON_SERIALIZE_ENUM(SessionType,
@@ -65,6 +66,6 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
     CollageSettings, automatic_capture, svg_template, image_elements, time_between_capture)
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(SessionConfig, name, type, print, triggers, collage);
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
-    ProjectConfig, name, capture_dir, initial_countdown, camera_led, remote_triggers, sessions);
+    ProjectConfig, name, capture_dir, initial_countdown, camera_led, remote_triggers, sessions, fonts);
 
 } // namespace Pbox

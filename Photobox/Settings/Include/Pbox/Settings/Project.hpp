@@ -8,6 +8,7 @@
 #include "CaptureSessionFactory.hpp"
 #include "ImageStorage.hpp"
 #include "Scheduler.hpp"
+#include "SvgFontCache.hpp"
 #include "TriggerManager.hpp"
 #include "Types.hpp"
 
@@ -47,6 +48,7 @@ class Project
         Instance<CaptureSessionManager> capture_session_manager,
         Instance<ImageStorage> image_storage,
         Instance<Scheduler> scheduler,
+        Instance<SvgFontCache> font_cache,
         std::unique_ptr<IRemoteTriggerFactory> remote_trigger_factory = createDefaultRemoteTriggerFactory());
     ~Project();
 
@@ -60,6 +62,7 @@ class Project
     Instance<CaptureSessionManager> capture_session_manager_;
     Instance<ImageStorage> image_storage_;
     Instance<Scheduler> scheduler_;
+    Instance<SvgFontCache> font_cache_;
     std::unique_ptr<IRemoteTriggerFactory> remote_trigger_factory_;
     std::string name_;
     std::filesystem::path output_directory_;
