@@ -23,6 +23,7 @@
 #include <TriggerManager.hpp>
 #include <fmt/core.h>
 #include "CaptureManager.hpp"
+#include "SvgFontCache.hpp"
 #include "SystemStatusManager.hpp"
 
 Q_IMPORT_QML_PLUGIN(Photobox_CorePlugin)
@@ -92,7 +93,8 @@ int main(int argc, char *argv[])
         Instance<SystemStatusManager> system_status_manager = std::make_shared<SystemStatusManager>();
         Instance<TriggerManager> trigger_manager = std::make_shared<TriggerManager>(system_status_manager);
         Instance<CaptureSessionManager> capture_session_manager = std::make_shared<CaptureSessionManager>();
-        Project project{trigger_manager, capture_session_manager, image_storage, scheduler};
+        Instance<SvgFontCache> svg_font_cache = std::make_shared<SvgFontCache>();
+        Project project{trigger_manager, capture_session_manager, image_storage, scheduler, svg_font_cache};
         project.initFromConfig("/home/mlogemann/dev/photobox/Photobox/Settings/Tests/Assets/ProjectSettings.json");
 
         Instance<CameraLed> camera_led =

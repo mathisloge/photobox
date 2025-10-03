@@ -38,6 +38,14 @@ struct SessionConfig
     std::optional<CollageSettings> collage;
 };
 
+struct FontConfig
+{
+    std::string family;
+    std::filesystem::path path;
+    bool bold;
+    bool italic;
+};
+
 struct ProjectConfig
 {
     std::string name;
@@ -46,6 +54,7 @@ struct ProjectConfig
     std::optional<CameraLedConfig> camera_led;
     std::vector<EspHomeRemoteTriggerConfig> remote_triggers;
     std::vector<SessionConfig> sessions;
+    std::vector<FontConfig> fonts;
 };
 
 } // namespace Pbox
