@@ -33,6 +33,7 @@ target_link_libraries(
         Photobox::Core
         Photobox::Peripheral
         Photobox::CollageSession
+        Photobox::SingleSession
 )
 
 if(BUILD_TESTING)

@@ -6,14 +6,12 @@
 #include <fstream>
 #include <Pbox/Logger.hpp>
 #include <Pbox/Sessions/CollageCaptureSessionFactory.hpp>
+#include <Pbox/Sessions/SingleCaptureSessionFactory.hpp>
 #include <Pbox/Settings/Detail/TypesSerialization.hpp>
 #include "CameraLed.hpp"
 #include "EspHomeClient.hpp"
 #include "EspHomeRemoteTrigger.hpp"
-#include "ICaptureSession.hpp"
 #include "RemoteTrigger.hpp"
-#include "SingleCaptureSession.hpp"
-#include "SingleCaptureSessionFactory.hpp"
 
 DEFINE_LOGGER(project);
 
