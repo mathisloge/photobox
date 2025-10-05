@@ -17,6 +17,7 @@ struct RegisteredFont
     std::string family;
     bool bold{};
     bool italic{};
+    std::filesystem::path path;
 
     auto operator<=>(const RegisteredFont &rhs) const = default;
 };

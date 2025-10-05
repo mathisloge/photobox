@@ -3,9 +3,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "Pbox/Sessions/CollageCaptureSessionFactory.hpp"
+#include <Pbox/CleanupAsyncScope.hpp>
+#include <Pbox/Logger.hpp>
 #include "CollageCaptureSession.hpp"
-#include "Pbox/CleanupAsyncScope.hpp"
 #include "Pbox/Sessions/CollageRenderer.hpp"
+
+DEFINE_LOGGER(collage_capture_session);
 
 namespace Pbox
 {
@@ -19,6 +22,9 @@ CollageCaptureSessionFactory::CollageCaptureSessionFactory(std::string name,
     , collage_settings_{std::move(collage_settings)}
     , renderer_{std::make_shared<CollageRenderer>()}
 {
+    LOG_DEBUG(logger_collage_capture_session(),
+              "Create CollageCaptureSessionFactory with svg template: {}",
+              collage_settings_.svg_template.string());
     loadCollage();
 }
 
