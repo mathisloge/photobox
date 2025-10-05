@@ -19,7 +19,7 @@ repos:
       - id: check-added-large-files
 
   - repo: https://github.com/BlankSpruce/gersemi
-    rev: 0.22.2
+    rev: 0.22.3
     hooks:
       - id: gersemi
         name: CMake linting
@@ -35,7 +35,7 @@ repos:
         types_or: [c++, c, proto]
   # Check linting and style issues
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.13.2"
+    rev: "v0.13.3"
     hooks:
       # Run the linter.
       - id: ruff-check

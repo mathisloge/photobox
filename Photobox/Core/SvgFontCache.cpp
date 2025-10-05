@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 Mathis Logemann <mathis.opensource@tuta.io>
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "SvgFontCache.hpp"
 #include <Pbox/Logger.hpp>
 #include <lunasvg.h>
