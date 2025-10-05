@@ -18,6 +18,18 @@ DEFINE_LOGGER(project);
 namespace Pbox
 {
 
+namespace
+{
+std::filesystem::path absolute_from_settings_root(const std::filesystem::path &root, const std::filesystem::path &path)
+{
+    if (path.is_absolute())
+    {
+        return path;
+    }
+    return root / path;
+}
+} // namespace
+
 class DefaultRemoteTriggerFactory final : public IRemoteTriggerFactory
 {
   public:
@@ -53,6 +65,9 @@ void Project::initFromConfig(const std::filesystem::path &config_file)
     nlohmann::json json;
     settings_file >> json;
 
+    const std::filesystem::path root_path{config_file.parent_path()};
+    LOG_DEBUG(logger_project(), "using root dir: {}", root_path.string());
+
     ProjectConfig settings;
     try
     {
@@ -67,12 +82,13 @@ void Project::initFromConfig(const std::filesystem::path &config_file)
     }
 
     name_ = settings.name;
-    image_storage_->updateStorageDir(settings.capture_dir);
+    image_storage_->updateStorageDir(absolute_from_settings_root(root_path, settings.capture_dir));
     capture_session_manager_->setInitialCountdown(settings.initial_countdown);
 
     for (auto &&font : settings.fonts)
     {
-        font_cache_->registerFont(font.family, font.bold, font.italic, font.path);
+        font_cache_->registerFont(
+            font.family, font.bold, font.italic, absolute_from_settings_root(root_path, font.path));
     }
 
     for (auto &&trigger : std::as_const(settings.remote_triggers))
@@ -81,8 +97,12 @@ void Project::initFromConfig(const std::filesystem::path &config_file)
                                           remote_trigger_factory_->createEsphomeTrigger(trigger.name, trigger.uri));
     }
 
-    for (auto &&session : std::as_const(settings.sessions))
+    for (auto &&session : settings.sessions)
     {
+        if (session.collage.has_value())
+        {
+            session.collage->svg_template = absolute_from_settings_root(root_path, session.collage->svg_template);
+        }
         switch (session.type)
         {
         case SessionType::SingleCapture:
