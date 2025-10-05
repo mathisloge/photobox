@@ -21,12 +21,12 @@ qt_add_qml_module(
         CaptureSessionFactory.cpp
         RemoteTrigger.cpp
         RemoteTrigger.hpp
+        RemoteTriggerId.hpp
+        IRemoteTriggerFactory.hpp
         CameraLed.cpp
         CameraLed.hpp
         CrashCollection.cpp
         CrashCollection.hpp
-        GPhoto2Camera.hpp
-        GPhoto2Camera.cpp
         Scheduler.cpp
         Scheduler.hpp
         ICaptureSession.cpp
@@ -62,7 +62,7 @@ target_link_libraries(
         Qt6::Multimedia
         Boost::headers
         Photobox::Utils
-        Photobox::GPhoto2
+        Photobox::Logging
         cpptrace::cpptrace
         lunasvg::lunasvg
         nlohmann_json::nlohmann_json

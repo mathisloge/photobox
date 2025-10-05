@@ -13,7 +13,9 @@ target_link_libraries(
         Qt6::Quick
         Qt6::QuickControls2
         Qt6::PrintSupport
+        Photobox::Logging
         Photobox::Core
+        Photobox::GPhoto2
         Photobox::CorePlugin
         Photobox::Settings
         Photobox::SettingsPlugin

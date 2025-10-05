@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "GPhoto2Context.hpp"
-#include "GPhoto2Exeption.hpp"
+#include "Pbox/GPhoto2Exeption.hpp"
 namespace Pbox::GPhoto2
 {
 Context::Context()

@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <Pbox/DisableCopyMove.hpp>
 #include "CaptureSessionFactory.hpp"
+#include "IRemoteTriggerFactory.hpp"
 #include "ImageStorage.hpp"
 #include "Scheduler.hpp"
 #include "SvgFontCache.hpp"
@@ -16,26 +17,6 @@ namespace Pbox
 {
 class CameraLed;
 class RemoteTrigger;
-/**
- * @brief Interface for creating RemoteTrigger instances.
- *
- * This abstract factory interface defines a method for constructing
- * RemoteTrigger objects using a given configuration. It allows
- * for decoupling the instantiation logic of RemoteTrigger objects
- * from their usage, supporting dependency injection and testing.
- */
-class IRemoteTriggerFactory
-{
-  public:
-    /**
-     * @brief Creates a new RemoteTrigger instance for a esphome based trigger.
-     *
-     * @param config The configuration used to initialize the RemoteTrigger.
-     * @return std::unique_ptr<RemoteTrigger> A unique pointer to the created RemoteTrigger.
-     */
-    [[nodiscard]] virtual std::unique_ptr<RemoteTrigger> create(const EspHomeRemoteTriggerConfig &config) = 0;
-    virtual ~IRemoteTriggerFactory() = default;
-};
 
 std::unique_ptr<IRemoteTriggerFactory> createDefaultRemoteTriggerFactory();
 

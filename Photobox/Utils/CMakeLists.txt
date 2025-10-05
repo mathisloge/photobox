@@ -12,9 +12,12 @@ target_sources(
             TYPE HEADERS
             BASE_DIRS include
             FILES
-                include/Pbox/Conditional.hpp
-                include/Pbox/QStdexec.hpp
-                include/Pbox/DisableCopyMove.hpp
                 include/Pbox/CleanupAsyncScope.hpp
+                include/Pbox/Conditional.hpp
+                include/Pbox/DisableCopyMove.hpp
                 include/Pbox/Instance.hpp
+                include/Pbox/ObjectDeleter.hpp
+                include/Pbox/ObjectUniquePtr.hpp
+                include/Pbox/PrintLicenseInfo.hpp
+                include/Pbox/QStdexec.hpp
 )

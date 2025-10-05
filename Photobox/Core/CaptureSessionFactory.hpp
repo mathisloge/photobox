@@ -4,7 +4,7 @@
 
 #pragma once
 #include <functional>
-#include "ObjectUniquePtr.hpp"
+#include <Pbox/ObjectUniquePtr.hpp>
 #include "Pbox/DisableCopyMove.hpp"
 #include "TriggerId.hpp"
 
