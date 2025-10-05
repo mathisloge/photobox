@@ -43,7 +43,7 @@ cpmaddpackage(URI "gh:odygrd/quill@10.1.0" OPTIONS "QUILL_DISABLE_NON_PREFIXED_M
 
 if(BUILD_TESTING)
     cpmaddpackage(URI "gh:mathisloge/quite@1.4.0-dev.4" OPTIONS "QUITE_BUILD_TEST_API ON" "QUITE_INSTALL OFF" "QUITE_BUILD_PROBE_QT OFF" "BUILD_TESTING OFF" "QUITE_BUILD_PYTHON_TEST_API OFF" "QUITE_BUILD_REMOTE_MANAGER OFF")
-    cpmaddpackage(URI "gh:catchorg/Catch2@3.10.0" FIND_PACKAGE_ARGUMENTS "CONFIG")
+    cpmaddpackage(URI "gh:catchorg/Catch2@3.11.0" FIND_PACKAGE_ARGUMENTS "CONFIG")
     list(APPEND CMAKE_MODULE_PATH "${Catch2_SOURCE_DIR}/extras") # local builds
     list(APPEND CMAKE_MODULE_PATH "${Catch2_DIR}") # flatpak builds
     include(Catch)
