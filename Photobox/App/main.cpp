@@ -12,10 +12,10 @@
 #include <EspHomeCameraLed.hpp>
 #include <EspHomeClient.hpp>
 #include <EspHomeRemoteTrigger.hpp>
-#include <GPhoto2Camera.hpp>
 #include <ICamera.hpp>
 #include <ImageStorage.hpp>
 #include <MockCamera.hpp>
+#include <Pbox/GPhoto2Camera.hpp>
 #include <Pbox/Logger.hpp>
 #include <Pbox/Settings/Project.hpp>
 #include <Pbox/SetupLogging.hpp>
@@ -59,12 +59,6 @@ int main(int argc, char *argv[])
         parser.addHelpOption();
         parser.addVersionOption();
 
-        QCommandLineOption printer_settings_option(QStringList() << "printer-settings",
-                                                   "The printer_settings.json file",
-                                                   "path to file",
-                                                   "printer_settings.json");
-        parser.addOption(printer_settings_option);
-
         QCommandLineOption developer_option(QStringList{"dev"}, "Use developer mode");
         parser.addOption(developer_option);
 
@@ -78,13 +72,11 @@ int main(int argc, char *argv[])
 
         parser.process(app);
 
-        const QString printer_settings = parser.value(printer_settings_option);
         const bool developer_mode = parser.isSet(developer_option);
         const QString camera_led_host = parser.value(camera_led_host_option);
         const QWindow::Visibility window_mode =
             parser.isSet(fullscreen_option) ? QWindow::Visibility::FullScreen : QWindow::Visibility::Windowed;
 
-        LOG_NOTICE(logger_root(), "printer_settings={}", printer_settings.toStdString());
         LOG_NOTICE(logger_root(), "developer_mode={}", developer_mode);
         LOG_NOTICE(logger_root(), "camera_led_host={}", camera_led_host.toStdString());
         LOG_NOTICE(logger_root(), "window_mode={}", static_cast<int>(window_mode));
@@ -103,7 +95,7 @@ int main(int argc, char *argv[])
 
         if (not developer_mode)
         {
-            camera = std::make_shared<GPhoto2Camera>(*scheduler);
+            camera = std::make_shared<GPhoto2Camera>(scheduler);
         }
         else
         {
@@ -111,7 +103,7 @@ int main(int argc, char *argv[])
         }
 
         Instance<CaptureManager> capture_manager = std::make_shared<CaptureManager>(
-            *scheduler, *image_storage, *camera, trigger_manager, camera_led, capture_session_manager);
+            scheduler, image_storage, camera, trigger_manager, camera_led, capture_session_manager);
         system_status_manager->registerClient(camera->systemStatusClient());
 
         QQmlApplicationEngine engine;
@@ -123,8 +115,6 @@ int main(int argc, char *argv[])
         Q_ASSERT(app_state != nullptr);
 
         app_state->system_status_manager = system_status_manager;
-        app_state->camera = camera;
-        app_state->camera_led = camera_led.get();
         app_state->capture_manager = capture_manager;
 
         engine.loadFromModule("Photobox.App", "Main");

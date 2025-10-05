@@ -16,30 +16,30 @@ DEFINE_LOGGER(capture_manager);
 
 namespace Pbox
 {
-CaptureManager::CaptureManager(Scheduler &scheduler,
-                               ImageStorage &image_storage,
-                               ICamera &camera,
+CaptureManager::CaptureManager(Instance<Scheduler> scheduler,
+                               Instance<ImageStorage> image_storage,
+                               Instance<ICamera> camera,
                                Instance<TriggerManager> trigger_manager,
                                Instance<CameraLed> camera_led,
                                Instance<CaptureSessionManager> capture_session_manager)
-    : scheduler_{scheduler}
-    , image_storage_{image_storage}
-    , camera_{camera}
-    , trigger_manager_{trigger_manager}
+    : scheduler_{std::move(scheduler)}
+    , image_storage_{std::move(image_storage)}
+    , camera_{std::move(camera)}
+    , trigger_manager_{std::move(trigger_manager)}
     , camera_led_{std::move(camera_led)}
     , session_{make_unique_object_ptr_as<ICaptureSession, IdleCaptureSession>()}
     , capture_session_manager_{std::move(capture_session_manager)}
 {
-    connect(&camera_, &ICamera::imageCaptured, this, [this](auto &&image) {
+    connect(camera_.get(), &ICamera::imageCaptured, this, [this](auto &&image) {
         //! important: first emit the signal so that all image providers have it saved, and only then set the image to
         //! the session. otherwise qml will not reevaluate the image and the providers don't have a signal to schedule a
         //! cache invalidation
         const auto image_id = image_ids_++;
         Q_EMIT imageCaptured(image, image_id);
         session_->imageCaptured(image, image_id);
-        async_scope_.spawn(stdexec::schedule(scheduler_.getWorkScheduler()) |
-                           stdexec::then([this, image = image]() { return image_storage_.saveImage(image); }) |
-                           stdexec::continues_on(scheduler_.getQtEventLoopScheduler()) |
+        async_scope_.spawn(stdexec::schedule(scheduler_->getWorkScheduler()) |
+                           stdexec::then([this, image = image]() { return image_storage_->saveImage(image); }) |
+                           stdexec::continues_on(scheduler_->getQtEventLoopScheduler()) |
                            stdexec::then([this](auto &&saved_image_path) { session_->imageSaved(saved_image_path); }) |
                            stdexec::upon_error([](auto &&ex_ptr) {
                                try
@@ -75,7 +75,7 @@ void CaptureManager::triggerButtonPressed(const QString &trigger_id)
     }
 }
 
-ImageProvider *CaptureManager::createImageProvider()
+ImageProvider *CaptureManager::createImageProvider() const
 {
     auto *image_provider = new ImageProvider(); // NOLINT(cppcoreguidelines-owning-memory)
     connect(this, &CaptureManager::imageCaptured, image_provider, &ImageProvider::addImage);
@@ -90,7 +90,7 @@ Pbox::ICaptureSession *CaptureManager::getSession()
 
 ICamera *CaptureManager::getCamera()
 {
-    return std::addressof(camera_);
+    return camera_.get();
 }
 
 void CaptureManager::sessionFinished()
@@ -109,7 +109,7 @@ void CaptureManager::switchToSession(CaptureSessionPtr new_session)
     session_ = std::move(new_session);
     if (session_ != nullptr)
     {
-        connect(session_.get(), &ICaptureSession::requestedImageCapture, &camera_, &ICamera::requestCapturePhoto);
+        connect(session_.get(), &ICaptureSession::requestedImageCapture, camera_.get(), &ICamera::requestCapturePhoto);
         connect(session_.get(), &ICaptureSession::finished, this, &CaptureManager::sessionFinished);
         connect(session_.get(), &ICaptureSession::statusChanged, this, &CaptureManager::handleSessionStatusChange);
         connect(session_.get(),

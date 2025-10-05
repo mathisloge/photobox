@@ -5,11 +5,12 @@
 #pragma once
 #include <QObject>
 #include <QtQmlIntegration>
+#include <Pbox/ObjectUniquePtr.hpp>
 #include <exec/async_scope.hpp>
 #include "CaptureSessionFactory.hpp"
+#include "ICamera.hpp"
 #include "ICaptureSession.hpp"
 #include "ImageProvider.hpp"
-#include "ObjectUniquePtr.hpp"
 #include "Pbox/Instance.hpp"
 #include "TriggerManager.hpp"
 namespace Pbox
@@ -19,7 +20,6 @@ class ImageStorage;
 class CollageContext;
 class RemoteTrigger;
 class CameraLed;
-class ICamera;
 class CaptureManager : public QObject
 {
     Q_OBJECT
@@ -31,16 +31,16 @@ class CaptureManager : public QObject
 
   public:
     PBOX_DISABLE_COPY_MOVE(CaptureManager);
-    explicit CaptureManager(Scheduler &scheduler,
-                            ImageStorage &image_storage,
-                            ICamera &camera,
+    explicit CaptureManager(Instance<Scheduler> scheduler,
+                            Instance<ImageStorage> image_storage,
+                            Instance<ICamera> camera,
                             Instance<TriggerManager> trigger_manager,
                             Instance<CameraLed> camera_led,
                             Instance<CaptureSessionManager> capture_session_manager);
     ~CaptureManager() override;
     Q_INVOKABLE void triggerButtonPressed(const QString &trigger_id);
 
-    ImageProvider *createImageProvider();
+    ImageProvider *createImageProvider() const;
 
     /// vvv property methods
     Pbox::ICaptureSession *getSession();
@@ -61,9 +61,9 @@ class CaptureManager : public QObject
     void handleSessionCaptureStatusChange();
 
   private:
-    Scheduler &scheduler_;
-    ImageStorage &image_storage_;
-    ICamera &camera_;
+    Instance<Scheduler> scheduler_;
+    Instance<ImageStorage> image_storage_;
+    Instance<ICamera> camera_;
     Instance<TriggerManager> trigger_manager_;
     Instance<CameraLed> camera_led_;
     Instance<CaptureSessionManager> capture_session_manager_;

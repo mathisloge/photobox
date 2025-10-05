@@ -7,10 +7,10 @@
 #include <string>
 #include <vector>
 #include <CollageSettings.hpp>
+#include "RemoteTriggerId.hpp"
 
 namespace Pbox
 {
-using RemoteTriggerId = std::string;
 struct EspHomeRemoteTriggerConfig
 {
     RemoteTriggerId name;

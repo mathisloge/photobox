@@ -21,11 +21,11 @@ namespace Pbox
 class DefaultRemoteTriggerFactory final : public IRemoteTriggerFactory
 {
   public:
-    std::unique_ptr<RemoteTrigger> create(const EspHomeRemoteTriggerConfig &config) override
+    std::unique_ptr<RemoteTrigger> createEsphomeTrigger(RemoteTriggerId name, std::string uri) override
     {
         return std::make_unique<EspHomeRemoteTrigger>(
-            QString::fromStdString(config.name),
-            std::make_unique<EspHomeClient>(QUrl{QString::fromStdString(config.uri)}));
+            QString::fromStdString(std::move(name)),
+            std::make_unique<EspHomeClient>(QUrl{QString::fromStdString(uri)}));
     }
 };
 std::unique_ptr<IRemoteTriggerFactory> createDefaultRemoteTriggerFactory()
@@ -77,7 +77,8 @@ void Project::initFromConfig(const std::filesystem::path &config_file)
 
     for (auto &&trigger : std::as_const(settings.remote_triggers))
     {
-        trigger_manager_->registerTrigger(trigger.name, remote_trigger_factory_->create(trigger));
+        trigger_manager_->registerTrigger(trigger.name,
+                                          remote_trigger_factory_->createEsphomeTrigger(trigger.name, trigger.uri));
     }
 
     for (auto &&session : std::as_const(settings.sessions))

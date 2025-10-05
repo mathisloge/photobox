@@ -7,7 +7,6 @@
 #include <QtQmlIntegration>
 #include <ICamera.hpp>
 #include <RemoteTrigger.hpp>
-#include "CameraLed.hpp"
 #include "CaptureManager.hpp"
 #include "Pbox/Instance.hpp"
 #include "SystemStatusManager.hpp"
@@ -20,22 +19,10 @@ class ApplicationState : public QObject
     QML_ELEMENT
     QML_SINGLETON
 
-    Q_PROPERTY(Pbox::ICamera *camera READ getCamera CONSTANT);
-    Q_PROPERTY(Pbox::CameraLed *cameraLed READ getCameraLed CONSTANT);
     Q_PROPERTY(Pbox::SystemStatusManager *systemStatusManager READ getSystemStatusManager CONSTANT);
     Q_PROPERTY(Pbox::CaptureManager *captureManager READ getCaptureManager CONSTANT);
 
   public:
-    ICamera *getCamera()
-    {
-        return camera.get();
-    }
-
-    CameraLed *getCameraLed() const
-    {
-        return camera_led;
-    }
-
     SystemStatusManager *getSystemStatusManager() const
     {
         return system_status_manager.get();
@@ -47,8 +34,6 @@ class ApplicationState : public QObject
     }
 
   public:
-    std::shared_ptr<ICamera> camera;
-    CameraLed *camera_led{};
     Instance<SystemStatusManager> system_status_manager;
     Instance<CaptureManager> capture_manager;
 };
