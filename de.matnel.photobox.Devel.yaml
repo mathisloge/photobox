@@ -24,6 +24,7 @@ modules:
   - Flatpak/stdexec.yaml
   - Flatpak/quill.yaml
   - Flatpak/catch2.yaml
+  - Flatpak/quite.yaml
 
   - name: PhotoboxApp
     buildsystem: cmake-ninja

@@ -1,4 +1,4 @@
-name: fmt
+name: catch2
 buildsystem: cmake-ninja
 builddir: true
 config-opts:

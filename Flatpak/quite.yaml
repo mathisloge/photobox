@@ -1,0 +1,31 @@
+name: quite
+buildsystem: cmake-ninja
+builddir: true
+config-opts:
+  - -DCMAKE_BUILD_TYPE=Release
+  - -DQUITE_BUILD_TEST_API=ON
+  - -DQUITE_BUILD_PROBE_QT=OFF
+  - -DBUILD_TESTING=OFF
+  - -DQUITE_BUILD_PYTHON_TEST_API=OFF
+  - -DQUITE_BUILD_REMOTE_MANAGER=OFF
+  - -DCPM_LOCAL_PACKAGES_ONLY=ON
+  - -DFETCHCONTENT_SOURCE_DIR_ENTT=../deps/entt
+  - -DFETCHCONTENT_SOURCE_DIR_ASIO-GRPC=../deps/asio_grpc
+  - -DFETCHCONTENT_SOURCE_DIR_STB=../deps/stb
+sources:
+  - type: git
+    url: https://github.com/Tradias/asio-grpc.git
+    tag: v3.5.1
+    dest: deps/asio_grpc
+  - type: git
+    url: https://github.com/skypjack/entt.git
+    tag: v3.16.0
+    dest: deps/entt
+  - type: git
+    url: https://github.com/nothings/stb.git
+    commit: f1c79c02822848a9bed4315b12c8c8f3761e1296
+    branch: master
+    dest: deps/stb
+  - type: git
+    url: https://github.com/mathisloge/quite.git
+    tag: v1.4.1-dev.2
