@@ -9,4 +9,4 @@ config-opts:
 sources:
   - type: git
     url: https://github.com/fmtlib/fmt.git
-    tag: 11.2.0
+    tag: 12.1.0

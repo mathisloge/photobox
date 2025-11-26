@@ -24,11 +24,11 @@ sources:
     tag: v24.10.00
     dest: deps/rapids-cmake
   - type: file
-    url: https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.40.2/CPM.cmake
+    url: https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.42.0/CPM.cmake
     sha256: c8cdc32c03816538ce22781ed72964dc864b2a34a310d3b7104812a5ca2d835d
     dest: deps/cpm
     dest-filename: CPM.cmake
   - type: git
     url: https://github.com/NVIDIA/stdexec.git
-    commit: f6767557f3ddee8cd5d27df3072984438d83c8a4
+    commit: 05edd1a11ffc9704a73757d2206332e1d12727c8
     branch: main
