@@ -1,0 +1,5 @@
+site_name: Photobox
+site_url: https://mathisloge.github.io/photobox/
+docs_dir: Documentation
+theme:
+  name: material
