@@ -5,7 +5,11 @@
 #include "EspHomeClient.hpp"
 #include <QNetworkReply>
 #include <QTimer>
+#include <Pbox/Logger.hpp>
 #include <nlohmann/json.hpp>
+
+DEFINE_LOGGER(esphome_client)
+
 namespace Pbox
 {
 
@@ -37,7 +41,9 @@ void EspHomeClient::post(std::string_view url_request)
     req.setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader, QStringLiteral("text/plain;charset=UTF-8"));
     auto &&reply = net_manager_.post(req, QByteArray{});
     connect(reply, &QNetworkReply::errorOccurred, this, [](QNetworkReply::NetworkError err) {
-        qDebug() << "error during request:" << err;
+        LOG_ERROR(logger_esphome_client(),
+                  "Error during request: {}",
+                  QMetaEnum::fromType<QNetworkReply::NetworkError>().valueToKey(err));
     });
     connect(reply, &QNetworkReply::sslErrors, this, []() { qDebug() << "ssl error"; });
 }
@@ -49,7 +55,11 @@ void EspHomeClient::subscribeEvents()
 
     connect(reply, &QNetworkReply::readyRead, this, [this, reply]() { readEventReply(*reply); });
     connect(reply, &QNetworkReply::errorOccurred, this, [this](QNetworkReply::NetworkError error_code) {
-        qDebug() << "error for event stream: " << error_code << ". Try to reestablishing connection in 500ms";
+        constexpr std::chrono::milliseconds kRetryTime{500};
+        LOG_ERROR(logger_esphome_client(),
+                  "Network reply error: {}, Try to reestablishing connection in {}ms",
+                  QMetaEnum::fromType<QNetworkReply::NetworkError>().valueToKey(error_code),
+                  kRetryTime.count());
         QTimer::singleShot(std::chrono::milliseconds{500}, this, &EspHomeClient::subscribeEvents);
     });
 }

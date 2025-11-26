@@ -59,6 +59,9 @@ int main(int argc, char *argv[])
         parser.addHelpOption();
         parser.addVersionOption();
 
+        QCommandLineOption config_option(QStringList{"config"}, "Configuration json path", "path", "./photobox.json");
+        parser.addOption(config_option);
+
         QCommandLineOption developer_option(QStringList{"dev"}, "Use developer mode");
         parser.addOption(developer_option);
 
@@ -87,7 +90,19 @@ int main(int argc, char *argv[])
         Instance<CaptureSessionManager> capture_session_manager = std::make_shared<CaptureSessionManager>();
         Instance<SvgFontCache> svg_font_cache = std::make_shared<SvgFontCache>();
         Project project{trigger_manager, capture_session_manager, image_storage, scheduler, svg_font_cache};
-        project.initFromConfig("/home/mlogemann/dev/photobox/Photobox/Settings/Tests/Assets/ProjectSettings.json");
+
+        try
+        {
+            project.initFromConfig(parser.value(config_option).toStdString());
+        }
+        catch (const std::exception &ex)
+        {
+            LOG_CRITICAL(logger_root(),
+                         "Could not load configuration file from path {}. Error: {}",
+                         parser.value(config_option).toStdString(),
+                         ex.what());
+            return EXIT_FAILURE;
+        }
 
         Instance<CameraLed> camera_led =
             std::make_shared<EspHomeCameraLed>(std::make_unique<EspHomeClient>(camera_led_host));

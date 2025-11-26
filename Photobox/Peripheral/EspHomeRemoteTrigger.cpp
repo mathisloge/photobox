@@ -4,9 +4,12 @@
 
 #include "EspHomeRemoteTrigger.hpp"
 #include <QNetworkRequest>
+#include <Pbox/Logger.hpp>
 #include <fmt/core.h>
 #include <nlohmann/json.hpp>
 #include "IEspHomeClient.hpp"
+
+DEFINE_LOGGER(esphome_trigger)
 
 namespace
 {
@@ -54,6 +57,7 @@ void EspHomeRemoteTrigger::playEffect(RemoteTrigger::Effect effect)
     {
         return;
     }
+    LOG_DEBUG(logger_esphome_trigger(), "Requesting effect {}", it->second);
     const auto request_url = fmt::format("light/statuslight/turn_on?effect={}", it->second);
     client_->post(request_url);
 }
@@ -62,6 +66,7 @@ void EspHomeRemoteTrigger::updatePressedState(bool is_pressed)
 {
     if (pressed_ != is_pressed)
     {
+        LOG_DEBUG(logger_esphome_trigger(), "Pressed state changed to {}", is_pressed);
         pressed_ = is_pressed;
         if (not pressed_)
         {
