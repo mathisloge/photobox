@@ -37,12 +37,14 @@ EspHomeClient::~EspHomeClient() = default;
 
 void EspHomeClient::post(std::string_view url_request)
 {
-    QNetworkRequest req{base_url_.resolved(QString::fromLocal8Bit(url_request))};
+    const auto url = base_url_.resolved(QString::fromLocal8Bit(url_request));
+    QNetworkRequest req{url};
     req.setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader, QStringLiteral("text/plain;charset=UTF-8"));
     auto &&reply = net_manager_.post(req, QByteArray{});
-    connect(reply, &QNetworkReply::errorOccurred, this, [](QNetworkReply::NetworkError err) {
+    connect(reply, &QNetworkReply::errorOccurred, this, [this](QNetworkReply::NetworkError err) {
         LOG_ERROR(logger_esphome_client(),
-                  "Error during request: {}",
+                  "Error during request to {}: {}",
+                  base_url_.toString().toStdString(),
                   QMetaEnum::fromType<QNetworkReply::NetworkError>().valueToKey(err));
     });
     connect(reply, &QNetworkReply::sslErrors, this, []() { qDebug() << "ssl error"; });
@@ -50,17 +52,28 @@ void EspHomeClient::post(std::string_view url_request)
 
 void EspHomeClient::subscribeEvents()
 {
-    QNetworkRequest request = prepareRequest(base_url_.resolved(QStringLiteral("events")));
+    const auto request_url = base_url_.resolved(QStringLiteral("events"));
+    QNetworkRequest request = prepareRequest(request_url);
     auto *reply = net_manager_.get(request);
 
-    connect(reply, &QNetworkReply::readyRead, this, [this, reply]() { readEventReply(*reply); });
-    connect(reply, &QNetworkReply::errorOccurred, this, [this](QNetworkReply::NetworkError error_code) {
-        constexpr std::chrono::milliseconds kRetryTime{500};
-        LOG_ERROR(logger_esphome_client(),
-                  "Network reply error: {}, Try to reestablishing connection in {}ms",
-                  QMetaEnum::fromType<QNetworkReply::NetworkError>().valueToKey(error_code),
-                  kRetryTime.count());
-        QTimer::singleShot(std::chrono::milliseconds{500}, this, &EspHomeClient::subscribeEvents);
+    connect(reply, &QNetworkReply::readyRead, this, [this, reply]() {
+        Q_EMIT connected();
+        readEventReply(*reply);
+    });
+    connect(reply, &QNetworkReply::finished, this, [this, reply, request_url]() {
+        LOG_DEBUG(logger_esphome_client(), "Network reply finished to {}", request_url.toString().toStdString());
+        if (reply->error() != QNetworkReply::NoError)
+        {
+            constexpr std::chrono::milliseconds kRetryTime{500};
+            LOG_ERROR(logger_esphome_client(),
+                      "Network reply finished with error from {}: {}, retrying in {}ms",
+                      request_url.toString().toStdString(),
+                      QMetaEnum::fromType<QNetworkReply::NetworkError>().valueToKey(reply->error()),
+                      kRetryTime.count());
+            Q_EMIT connecting();
+            QTimer::singleShot(kRetryTime, this, &EspHomeClient::subscribeEvents);
+            return;
+        }
     });
 }
 

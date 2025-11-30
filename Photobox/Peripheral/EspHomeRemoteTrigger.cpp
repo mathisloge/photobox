@@ -38,6 +38,12 @@ EspHomeRemoteTrigger::EspHomeRemoteTrigger(QString name, std::unique_ptr<IEspHom
     : RemoteTrigger{std::move(name)}
     , client_{std::move(client)}
 {
+    connect(client_.get(), &IEspHomeClient::connecting, this, [this]() {
+        system_status_client_.setSystemStatus(SystemStatusCode::Code::Connecting);
+    });
+    connect(client_.get(), &IEspHomeClient::connected, this, [this]() {
+        system_status_client_.setSystemStatus(SystemStatusCode::Code::Ok);
+    });
     connect(client_.get(), &IEspHomeClient::eventReceived, this, [this](const nlohmann::json &json) {
         const auto pressed = parseTriggerButton(json);
         updatePressedState(pressed);

@@ -15,6 +15,8 @@ class IEspHomeClient : public QObject
     virtual void post(std::string_view url_request) = 0;
 
   Q_SIGNALS:
+    void connecting();
+    void connected();
     void eventReceived(const nlohmann::json &event);
 };
 } // namespace Pbox

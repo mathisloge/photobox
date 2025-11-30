@@ -17,13 +17,17 @@ TriggerManager::TriggerManager(Instance<SystemStatusManager> system_status_manag
 void TriggerManager::registerTrigger(TriggerId triggerId, std::unique_ptr<RemoteTrigger> trigger)
 {
     LOG_DEBUG(logger_trigger_manager(), "Register remote trigger '{}'", triggerId);
-    const auto [entry, emplaced] = remote_triggers_.emplace(std::move(triggerId), std::move(trigger));
+    const auto [entry, emplaced] = remote_triggers_.emplace(triggerId, std::move(trigger));
     if (not emplaced)
     {
         LOG_ERROR(logger_trigger_manager(), "Could not register trigger '{}', it already exists.", entry->first);
     }
     else
     {
+        connect(entry->second.get(), &RemoteTrigger::triggered, this, [this, triggerId]() {
+            LOG_INFO(logger_trigger_manager(), "Trigger '{}' fired.", triggerId);
+            Q_EMIT triggerFired(triggerId);
+        });
         entry->second->playEffect(RemoteTrigger::Effect::Idle);
         system_status_manager_->registerClient(entry->second->systemStatusClient());
     }

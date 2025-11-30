@@ -35,6 +35,7 @@ class DefaultRemoteTriggerFactory final : public IRemoteTriggerFactory
   public:
     std::unique_ptr<RemoteTrigger> createEsphomeTrigger(RemoteTriggerId name, std::string uri) override
     {
+        LOG_INFO(logger_project(), "Create esphome trigger '{}' with uri '{}'", name, uri);
         return std::make_unique<EspHomeRemoteTrigger>(
             QString::fromStdString(std::move(name)),
             std::make_unique<EspHomeClient>(QUrl{QString::fromStdString(uri)}));
