@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathisloge.opensource@pm.me>
+// SPDX-FileCopyrightText: 2024 - 2025 Mathis Logemann <mathis.opensource@tuta.io>
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -17,8 +17,5 @@ class IdleCaptureSession : public ICaptureSession
     void triggerCapture() override;
     void imageCaptured(const QImage &captured_image, std::uint32_t image_id) override;
     void imageSaved(const std::filesystem::path &captured_image_path) override;
-
-    bool isCountdownVisible() const override;
-    const QString &getCountdownText() const override;
 };
 } // namespace Pbox

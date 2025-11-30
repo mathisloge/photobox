@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathisloge.opensource@pm.me>
+// SPDX-FileCopyrightText: 2024 - 2025 Mathis Logemann <mathis.opensource@tuta.io>
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -16,6 +16,7 @@ class ImageStorage
     std::filesystem::path saveImage(const QImage &image);
     const std::filesystem::path &storageDir() const;
     std::string generateNewImageFilePath();
+    void updateStorageDir(std::filesystem::path storage_dir);
 
   private:
     std::filesystem::path storage_dir_;

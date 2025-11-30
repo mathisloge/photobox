@@ -1,11 +1,11 @@
-// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathisloge.opensource@pm.me>
+// SPDX-FileCopyrightText: 2024 - 2025 Mathis Logemann <mathis.opensource@tuta.io>
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "SystemStatusModel.hpp"
 #include <Pbox/Logger.hpp>
 
-DEFINE_LOGGER(systemStatusModel);
+DEFINE_LOGGER(system_status_model);
 
 namespace Pbox
 {
@@ -23,7 +23,7 @@ QVariant SystemStatusModel::data(const QModelIndex &index, int role) const
     const auto &client = clients_.at(index.row());
     if (client.isNull())
     {
-        LOG_WARNING(systemStatusModel, "Got dangling system client.");
+        LOG_WARNING(logger_system_status_model(), "Got dangling system client.");
         return {};
     }
     switch (Role{role})
@@ -45,14 +45,28 @@ QHash<int, QByteArray> SystemStatusModel::roleNames() const
     return kRoles;
 }
 
-void SystemStatusModel::addClient(const SystemStatusClient *client)
+void SystemStatusModel::addClient(const SystemStatusClient &client)
 {
     const int new_index = static_cast<int>(clients_.size());
     beginInsertRows(QModelIndex{}, new_index, new_index);
-    clients_.emplace_back(client);
-    connect(client, &SystemStatusClient::systemStatusChanged, this, [this, row = new_index]() {
+    clients_.emplace_back(&client);
+    connect(&client, &SystemStatusClient::systemStatusChanged, this, [this, row = new_index]() {
         Q_EMIT dataChanged(index(row), index(row), {std::to_underlying(Role::Status)});
     });
     endInsertRows();
+}
+
+void SystemStatusModel::removeClient(const SystemStatusClient &client)
+{
+    const auto it = std::ranges::find(clients_, QPointer{&client});
+    if (it == clients_.end())
+    {
+        return;
+    }
+    const auto pos = static_cast<int>(std::distance(clients_.begin(), it));
+    beginRemoveRows(QModelIndex{}, pos, pos);
+    disconnect(&client, nullptr, this, nullptr);
+    clients_.erase(it);
+    endRemoveRows();
 }
 } // namespace Pbox

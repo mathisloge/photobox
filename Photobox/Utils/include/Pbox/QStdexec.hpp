@@ -1,15 +1,12 @@
-// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathisloge.opensource@pm.me>
+// SPDX-FileCopyrightText: 2025 Mathis Logemann <mathis@quite.rocks>
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#ifndef QTHREADSENDER_H
-#define QTHREADSENDER_H
-
+#pragma once
 #include <QAbstractEventDispatcher>
 #include <QMetaObject>
 #include <QObject>
 #include <QThread>
-#include <exception>
 #include <tuple>
 #include <type_traits>
 #include <stdexec/concepts.hpp>
@@ -24,75 +21,80 @@ class QThreadOperationState;
 class QThreadScheduler
 {
   public:
+    using scheduler_concept = stdexec::scheduler_t;
+
     explicit QThreadScheduler(QThread *thread)
-        : m_thread(thread)
+        : thread_(thread)
     {}
+
     QThread *thread()
     {
-        return m_thread;
+        return thread_;
     }
-    struct default_env
+
+    struct DefaultEnv
     {
         QThread *thread;
         template <typename CPO>
-        friend QThreadScheduler tag_invoke(stdexec::get_completion_scheduler_t<CPO>, default_env env) noexcept
+        auto query(stdexec::get_completion_scheduler_t<CPO>) const noexcept -> QThreadScheduler
         {
-            return QThreadScheduler(env.thread);
+            return QThreadScheduler{thread};
         }
     };
+
+    DefaultEnv query(stdexec::get_env_t) noexcept
+    {
+        return {thread_};
+    }
+
+    auto schedule() const noexcept
+    {
+        return QThreadSender{thread_};
+    }
+
     class QThreadSender
     {
       public:
-        using is_sender = void;
+        using sender_concept = stdexec::sender_t;
         using completion_signatures =
             stdexec::completion_signatures<stdexec::set_value_t(), stdexec::set_error_t(std::exception_ptr)>;
 
         explicit QThreadSender(QThread *thread)
-            : m_thread(thread)
+            : thread_(thread)
         {}
+
         QThread *thread()
         {
-            return m_thread;
+            return thread_;
         }
 
-        friend default_env tag_invoke(stdexec::get_env_t, const QThreadSender &snd) noexcept
+        auto get_env() const noexcept -> DefaultEnv
         {
-            return {snd.m_thread};
+            return {thread_};
         }
 
-        template <class Recv>
-        friend inline QThreadOperationState<Recv> tag_invoke(stdexec::connect_t, QThreadSender sender, Recv &&receiver)
+        template <class Receiver>
+        QThreadOperationState<Receiver> connect(Receiver receiver)
         {
-            return QThreadOperationState<Recv>(std::move(receiver), sender.thread());
+            return QThreadOperationState<Receiver>(std::move(receiver), thread());
         }
 
       private:
-        QThread *m_thread;
+        QThread *thread_;
     };
 
-    friend QThreadSender tag_invoke(stdexec::schedule_t, QThreadScheduler sched)
-    {
-        return QThreadSender(sched.thread());
-    }
-    friend bool operator==(const QThreadScheduler &a, const QThreadScheduler &b) noexcept
-    {
-        return a.m_thread == b.m_thread;
-    }
-    friend bool operator!=(const QThreadScheduler &a, const QThreadScheduler &b) noexcept
-    {
-        return a.m_thread != b.m_thread;
-    }
+    bool operator==(const QThreadScheduler &b) const noexcept = default;
 
   private:
-    QThread *m_thread = nullptr;
+    QThread *thread_ = nullptr;
 };
 
-inline QThreadScheduler qThreadAsScheduler(QThread *thread)
+inline QThreadScheduler qthread_as_scheduler(QThread *thread)
 {
     return QThreadScheduler(thread);
 }
 
-inline QThreadScheduler qThreadAsScheduler(QThread &thread)
+inline QThreadScheduler qthread_as_scheduler(QThread &thread)
 {
     return QThreadScheduler(&thread);
 }
@@ -101,24 +103,24 @@ template <class Recv>
 class QThreadOperationState
 {
   public:
+    using operation_state_concept = stdexec::operation_state_t;
+    Q_DISABLE_COPY_MOVE(QThreadOperationState);
     QThreadOperationState(Recv &&receiver, QThread *thread)
-        : m_receiver(std::move(receiver))
-        , m_thread(thread)
+        : receiver_{std::move(receiver)}
+        , thread_{thread}
     {}
+
+    ~QThreadOperationState() = default;
+
     void start() noexcept
     {
         QMetaObject::invokeMethod(
-            m_thread->eventDispatcher(), [this]() { stdexec::set_value(std::move(m_receiver)); }, Qt::QueuedConnection);
-    }
-    friend void tag_invoke(stdexec::tag_t<stdexec::start>, QThreadOperationState &oper_state) noexcept
-    {
-        oper_state.start();
+            thread_->eventDispatcher(), [this]() { stdexec::set_value(std::move(receiver_)); }, Qt::QueuedConnection);
     }
 
   private:
-    Q_DISABLE_COPY_MOVE(QThreadOperationState)
-    Recv m_receiver;
-    QThread *m_thread;
+    Recv receiver_;
+    QThread *thread_;
 };
 
 template <class Recv, class QObj, class Ret, class... Args>
@@ -127,92 +129,132 @@ class QObjectOperationState;
 template <class QObj, class Ret, class... Args>
 class QObjectSender
 {
-    struct default_env
+    struct DefaultEnv
     {
         QThread *thread;
         template <typename CPO>
-        friend QThreadScheduler tag_invoke(stdexec::get_completion_scheduler_t<CPO>, default_env env) noexcept
+        auto query(stdexec::get_completion_scheduler_t<CPO> /*cpo*/) const noexcept
         {
-            return QThreadScheduler(env.thread);
+            return QThreadScheduler{thread};
         }
     };
-    friend default_env tag_invoke(stdexec::get_env_t, const QObjectSender &snd) noexcept
+
+    auto get_env() const noexcept -> DefaultEnv
     {
-        return {snd.m_obj->thread()};
+        return {obj_->thread()};
     }
 
   public:
-    using is_sender = void;
-    using completion_signatures =
-        stdexec::completion_signatures<stdexec::set_value_t(Args...), stdexec::set_error_t(std::exception_ptr)>;
+    using sender_concept = stdexec::sender_t;
+    using completion_signatures = stdexec::completion_signatures<stdexec::set_value_t(Args...),
+                                                                 stdexec::set_error_t(std::exception_ptr),
+                                                                 stdexec::set_stopped_t()>;
 
-    using m_ptr_type = Ret (QObj::*)(Args...);
-    QObjectSender(QObj *obj, m_ptr_type ptr)
-        : m_obj(obj)
-        , m_ptr(ptr)
+    using MemberPointer = Ret (QObj::*)(Args...);
+    QObjectSender(QObj *obj, MemberPointer ptr)
+        : obj_(obj)
+        , ptr_(ptr)
     {}
+
     QObj *object()
     {
-        return m_obj;
+        return obj_;
     }
-    m_ptr_type member_ptr()
+
+    MemberPointer member_ptr()
     {
-        return m_ptr;
+        return ptr_;
     }
+
     template <class Recv>
-    friend inline QObjectOperationState<Recv, QObj, Ret, Args...> tag_invoke(stdexec::tag_t<stdexec::connect>,
-                                                                             QObjectSender sender,
-                                                                             Recv &&receiver)
+    QObjectOperationState<Recv, QObj, Ret, Args...> connect(Recv &&receiver)
     {
-        return QObjectOperationState<Recv, QObj, Ret, Args...>(std::move(receiver), sender.m_obj, sender.m_ptr);
+        return QObjectOperationState<Recv, QObj, Ret, Args...>(std::forward<Recv>(receiver), obj_, ptr_);
     }
 
   private:
-    QObj *m_obj;
-    m_ptr_type m_ptr;
+    QObj *obj_;
+    MemberPointer ptr_;
 };
 
 template <class Recv, class QObj, class Ret, class... Args>
 class QObjectOperationState
 {
   public:
+    using operation_state_concept = stdexec::operation_state_t;
     using m_ptr_type = Ret (QObj::*)(Args...);
+
     QObjectOperationState(Recv &&receiver, QObj *obj, m_ptr_type ptr)
-        : m_receiver(std::move(receiver))
-        , m_obj(obj)
-        , m_ptr(ptr)
+        : receiver_(std::move(receiver))
+        , obj_(obj)
+        , ptr_(ptr)
     {}
-    friend void tag_invoke(stdexec::tag_t<stdexec::start>, QObjectOperationState &oper_state) noexcept
+
+  private:
+    struct StopCallback
     {
-        oper_state.connection = QObject::connect(oper_state.m_obj, oper_state.m_ptr, [&oper_state](Args... args) {
-            stdexec::set_value(std::move(oper_state.m_receiver), std::forward<Args>(args)...);
-        });
-    }
-    ~QObjectOperationState()
+        QObjectOperationState *self;
+
+        void operator()() const noexcept
+        {
+            self->stop_callback_.reset();
+            QObject::disconnect(self->connection_);
+            if (not self->completed_.test_and_set(std::memory_order_acq_rel))
+            {
+                QMetaObject::invokeMethod(
+                    self->obj_->thread()->eventDispatcher(),
+                    [this]() { stdexec::set_stopped(std::move(self->receiver_)); },
+                    Qt::QueuedConnection);
+            }
+        }
+    };
+
+  private:
+    using stop_token_type = stdexec::stop_token_of_t<stdexec::env_of_t<Recv>>;
+    using stop_callback_type = typename stop_token_type::template callback_type<StopCallback>;
+
+  public:
+    void start() noexcept
     {
-        QObject::disconnect(connection);
+        stop_callback_.emplace(stdexec::get_stop_token(stdexec::get_env(receiver_)), StopCallback{this});
+        connection_ = QObject::connect(
+            obj_,
+            ptr_,
+            obj_,
+            [this](Args... args) {
+                QObject::disconnect(connection_);
+                stop_callback_.reset();
+                if (!completed_.test_and_set(std::memory_order_acq_rel))
+                {
+                    QMetaObject::invokeMethod(
+                        obj_,
+                        [this, &args...] { stdexec::set_value(std::move(receiver_), std::forward<Args>(args)...); },
+                        Qt::QueuedConnection);
+                }
+            },
+            Qt::SingleShotConnection);
     }
 
   private:
-    Recv m_receiver;
-    QObj *m_obj;
-    m_ptr_type m_ptr;
-    QMetaObject::Connection connection;
+    Recv receiver_;
+    QObj *obj_;
+    m_ptr_type ptr_;
+    QMetaObject::Connection connection_;
+    std::atomic_flag completed_{false};
+    std::optional<stop_callback_type> stop_callback_;
 };
 
 template <class QObj, class Ret, class... Args>
-inline QObjectSender<QObj, Ret, Args...> qObjectAsSender(QObj *obj, Ret (QObj::*ptr)(Args...))
+inline QObjectSender<QObj, Ret, Args...> qobject_as_sender(QObj *obj, Ret (QObj::*ptr)(Args...))
 {
     return QObjectSender<QObj, Ret, Args...>(obj, ptr);
 }
 
 template <class QObj, class Ret, class... Args>
-inline auto qObjectAsTupleSender(QObj *obj, Ret (QObj::*ptr)(Args...))
+inline auto qobject_as_tuple_sender(QObj *obj, Ret (QObj::*ptr)(Args...))
 {
     return QObjectSender<QObj, Ret, Args...>(obj, ptr) |
-           stdexec::then([](Args... args) { return std::tuple<std::remove_reference_t<Args>...>(std::move(args)...); });
+           stdexec::then([](Args... args) { return std::tuple<std::remove_cvref_t<Args>...>(std::move(args)...); });
 }
 
 } // namespace Pbox
-
-#endif // QTHREADSENDER_H

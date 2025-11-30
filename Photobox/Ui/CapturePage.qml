@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathisloge.opensource@pm.me>
+// SPDX-FileCopyrightText: 2024 - 2025 Mathis Logemann <mathis.opensource@tuta.io>
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -33,8 +33,8 @@ Page {
         id: countdown
 
         anchors.centerIn: parent
-        opacity: root.session.countdownVisible ? 1 : 0
-        text: root.session.countdownText
+        opacity: root.session.countdown.visible ? 1 : 0
+        text: root.session.countdown.text
     }
 
     BuzzerAnimation {
@@ -47,7 +47,7 @@ Page {
         id: manualCaptureArea
         anchors.fill: parent
         onClicked: {
-            ApplicationState.captureManager.triggerButtonPressed();
+            ApplicationState.captureManager.triggerButtonPressed("Display");
         }
     }
 }

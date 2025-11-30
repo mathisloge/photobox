@@ -2,7 +2,7 @@ esphome:
   name: photobox-trigger
 
 esp32:
-  board: esp32-c6-devkitm-1
+  board: esp32-c6-devkitc-1
   variant: esp32c6
   framework:
     type: esp-idf
@@ -11,16 +11,17 @@ esp32:
 
 # Enable logging
 logger:
-
-# Enable Home Assistant API
-ota:
-  - platform: esphome
-    password: ""
+  level: DEBUG
 
 wifi:
-  ssid: "photobox"
-  password: "photobox-matnel"
+  ssid: "Fotobox"
+  password: ""
   fast_connect: true
+  ap:
+    ssid: "Photobox trigger fallback"
+    password: ""
+
+captive_portal:
 
 
 web_server:
@@ -30,7 +31,7 @@ web_server:
 binary_sensor:
   - platform: gpio
     pin:
-      number: GPIO3
+      number: GPIO23
       inverted: true
       mode:
         input: true
@@ -43,8 +44,8 @@ binary_sensor:
 light:
   - platform: esp32_rmt_led_strip
     rgb_order: GRB
-    pin: GPIO10
-    num_leds: 24
+    pin: GPIO2
+    num_leds: 12
     rmt_channel: 0
     chipset: ws2812
     name: "StatusLight"

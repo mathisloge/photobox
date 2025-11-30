@@ -9,4 +9,4 @@ config-opts:
 sources:
   - type: git
     url: https://github.com/jeremy-rifkin/libdwarf-lite.git
-    tag: v0.11.0
+    tag: v2.1.0

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathisloge.opensource@pm.me>
+// SPDX-FileCopyrightText: 2024 - 2025 Mathis Logemann <mathis.opensource@tuta.io>
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -31,8 +31,9 @@ bool parseTriggerButton(const nlohmann::json &json)
 
 namespace Pbox
 {
-EspHomeRemoteTrigger::EspHomeRemoteTrigger(std::unique_ptr<IEspHomeClient> client)
-    : client_{std::move(client)}
+EspHomeRemoteTrigger::EspHomeRemoteTrigger(QString name, std::unique_ptr<IEspHomeClient> client)
+    : RemoteTrigger{std::move(name)}
+    , client_{std::move(client)}
 {
     connect(client_.get(), &IEspHomeClient::eventReceived, this, [this](const nlohmann::json &json) {
         const auto pressed = parseTriggerButton(json);

@@ -1,9 +1,10 @@
-// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathisloge.opensource@pm.me>
+// SPDX-FileCopyrightText: 2024 - 2025 Mathis Logemann <mathis.opensource@tuta.io>
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #pragma once
 #include <QObject>
+#include <unordered_set>
 #include "SystemStatusModel.hpp"
 
 namespace Pbox
@@ -27,7 +28,7 @@ class SystemStatusManager : public QObject
     Q_ENUM(Status);
 
   public:
-    void registerClient(const Pbox::SystemStatusClient *client);
+    void registerClient(const Pbox::SystemStatusClient &client);
 
     /// vvv property methods
     SystemStatusModel *getModel();
@@ -42,7 +43,7 @@ class SystemStatusManager : public QObject
     void evaluateSystemStatus();
 
   private:
-    std::vector<QPointer<const SystemStatusClient>> clients_;
+    std::unordered_set<const SystemStatusClient *> clients_;
     SystemStatusModel model_;
     Status status_{Status::AllClientsInitializied};
 };

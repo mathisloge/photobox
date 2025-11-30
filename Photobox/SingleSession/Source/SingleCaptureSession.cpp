@@ -1,0 +1,56 @@
+// SPDX-FileCopyrightText: 2024 - 2025 Mathis Logemann <mathis.opensource@tuta.io>
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+#include "SingleCaptureSession.hpp"
+#include <Pbox/Logger.hpp>
+#include <fmt/core.h>
+
+DEFINE_LOGGER(single_capture_session)
+
+namespace Pbox
+{
+SingleCaptureSession::SingleCaptureSession(std::string name, std::chrono::seconds initial_countdown)
+    : ICaptureSession{std::move(name)}
+{
+    getCountdown()->setSeconds(initial_countdown);
+    connect(getCountdown(), &Countdown::finished, this, &SingleCaptureSession::requestedImageCapture);
+    connect(getCountdown(), &Countdown::currentCountChanged, this, &SingleCaptureSession::handleCountdown);
+}
+
+void SingleCaptureSession::triggerCapture()
+{
+    if (getStatus() == ICaptureSession::Status::Idle)
+    {
+        setLiveViewVisible(true);
+        startCapturing();
+    }
+}
+
+void SingleCaptureSession::imageCaptured(const QImage & /*captured_image*/, std::uint32_t image_id)
+{
+    setCaptureStatus(ICaptureSession::CaptureStatus::Idle);
+    setPreviewImage(QString::fromStdString(fmt::format("image://preview-image/{}", image_id)));
+    QTimer::singleShot(std::chrono::seconds{6}, this, &SingleCaptureSession::finished);
+}
+
+void SingleCaptureSession::imageSaved(const std::filesystem::path &captured_image_path)
+{}
+
+void SingleCaptureSession::startCapturing()
+{
+    setLiveViewVisible(true);
+    setStatus(ICaptureSession::Status::Capturing);
+    getCountdown()->start();
+}
+
+void SingleCaptureSession::handleCountdown(std::chrono::seconds count)
+{
+    LOG_DEBUG(logger_single_capture_session(), "Countdown {}", count.count());
+    if (count == std::chrono::seconds{1})
+    {
+        setLiveViewVisible(false);
+        setCaptureStatus(ICaptureSession::CaptureStatus::BeforeCapture);
+    }
+}
+} // namespace Pbox

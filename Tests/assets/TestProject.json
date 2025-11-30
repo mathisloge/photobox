@@ -1,0 +1,70 @@
+{
+    "name": "hochzeit-xyz",
+    "capture_dir": "./output",
+    "remote_triggers": [
+        {
+            "name": "CollageTrigger",
+            "uri": "http://192.168.178.30"
+        },
+        {
+            "name": "SingleTrigger",
+            "uri": "http://192.168.178.31"
+        }
+    ],
+    "camera_led": {
+        "uri": "http://192.168.178.33"
+    },
+    "sessions": [
+        {
+            "name": "SingleCaptureSession",
+            "type": "single-capture",
+            "trigger_conditions": [
+                {
+                    "type": "remote-trigger",
+                    "id": "SingleTrigger"
+                },
+                {
+                    "id": "display",
+                    "type": "display-touch"
+                }
+            ]
+        },
+        {
+            "name": "CollageCaptureSession",
+            "type": "collage-capture",
+            "trigger_conditions": [
+                {
+                    "type": "remote-trigger",
+                    "id": "CollageTrigger"
+                }
+            ],
+            "collage": {
+                "automatic_capture": true,
+                "image_elements": [
+                    "image-1",
+                    "image-2"
+                ],
+                "seconds_between_capture": 5,
+                "svg": "/home/mlogemann/dev/photobox/Tests/assets/collage.svg"
+            }
+        }
+    ],
+    "printer": {
+        "fullPage": false,
+        "name": "",
+        "pageLayout": {
+            "margins": {
+                "bottom": 3.53,
+                "left": 3.53,
+                "right": 3.53,
+                "top": 3.53
+            },
+            "orientation": 0,
+            "pageSize": {
+                "pageSizeId": 7
+            },
+            "units": 0
+        },
+        "resolution": 96
+    }
+}

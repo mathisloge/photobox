@@ -1,0 +1,39 @@
+// SPDX-FileCopyrightText: 2025 Mathis Logemann <mathis.opensource@tuta.io>
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+#include "SvgFontCache.hpp"
+#include <Pbox/Logger.hpp>
+#include <lunasvg.h>
+
+DEFINE_LOGGER(svg_font_cache)
+namespace Pbox
+{
+
+void SvgFontCache::registerFont(std::string family, bool bold, bool italic, std::filesystem::path path)
+{
+    auto &&[font, emplaced] = registered_fonts_.emplace(
+        Detail::RegisteredFont{.family = std::move(family), .bold = bold, .italic = italic, .path = std::move(path)});
+
+    LOG_DEBUG(logger_svg_font_cache(),
+              "Register font '{}', bold={}, italic={} from '{}'",
+              font->family,
+              font->bold,
+              font->italic,
+              font->path.string());
+    if (emplaced)
+    {
+        lunasvg_add_font_face_from_file(font->family.c_str(), font->bold, font->italic, font->path.c_str());
+    }
+    else
+    {
+        LOG_WARNING(logger_svg_font_cache(),
+                    "Font '{}' from '{}', bold={}, italic={} was already registered.",
+                    font->path.string(),
+                    font->family,
+                    font->bold,
+                    font->italic);
+    }
+}
+
+} // namespace Pbox

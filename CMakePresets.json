@@ -23,6 +23,7 @@
             "description": "The developer configuration",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
+                "QT_QML_GENERATE_QMLLS_INI": true,
                 "BUILD_TESTING": true,
                 "QT_QML_DEBUG": true
             }

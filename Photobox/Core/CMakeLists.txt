@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 Mathis Logemann <mathis.opensource@tuta.io>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 qt_add_qml_module(
     PhotoboxCore
     URI "Photobox.Core"
@@ -12,30 +16,21 @@ qt_add_qml_module(
         ImageProvider.hpp
         ImageProvider.cpp
         ApplicationState.hpp
-        CollageRenderer.hpp
-        CollageRenderer.cpp
         CollageSettings.hpp
-        CollagePrinter.hpp
-        CollagePrinter.cpp
-        CollageContext.hpp
-        CollageContext.cpp
-        CollageFontCache.hpp
-        CollageFontCache.cpp
-        CollageCaptureSession.hpp
-        CollageCaptureSession.cpp
+        CaptureSessionFactory.hpp
+        CaptureSessionFactory.cpp
         RemoteTrigger.cpp
         RemoteTrigger.hpp
+        RemoteTriggerId.hpp
+        IRemoteTriggerFactory.hpp
         CameraLed.cpp
         CameraLed.hpp
         CrashCollection.cpp
         CrashCollection.hpp
-        GPhoto2Camera.hpp
-        GPhoto2Camera.cpp
         Scheduler.cpp
         Scheduler.hpp
         ICaptureSession.cpp
         ICaptureSession.hpp
-        CaptureSessionFactory.hpp
         IdleCaptureSession.hpp
         IdleCaptureSession.cpp
         CaptureManager.hpp
@@ -47,20 +42,29 @@ qt_add_qml_module(
         SystemStatusModel.hpp
         SystemStatusClient.hpp
         SystemStatusClient.cpp
-    RESOURCES
-        Fonts/GreatVibes/GreatVibes-Regular.ttf
-        Fonts/Roboto/Roboto-Regular.ttf
+        TriggerManager.hpp
+        TriggerManager.cpp
+        Countdown.hpp
+        Countdown.cpp
+        SvgFontCache.hpp
+        SvgFontCache.cpp
 )
 
+add_library(Photobox::Core ALIAS PhotoboxCore)
+add_library(Photobox::CorePlugin ALIAS PhotoboxCoreplugin)
+
 target_include_directories(PhotoboxCore PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
-target_link_libraries(PhotoboxCore PUBLIC
-    Qt6::Quick
-    Qt6::PrintSupport
-    Qt6::Multimedia
-    Photobox::Utils
-    Photobox::GPhoto2
-    cpptrace::cpptrace
-    lunasvg::lunasvg
-    nlohmann_json::nlohmann_json
-    fmt::fmt
+target_link_libraries(
+    PhotoboxCore
+    PUBLIC
+        Qt6::Quick
+        Qt6::PrintSupport
+        Qt6::Multimedia
+        Boost::headers
+        Photobox::Utils
+        Photobox::Logging
+        cpptrace::cpptrace
+        lunasvg::lunasvg
+        nlohmann_json::nlohmann_json
+        fmt::fmt
 )

@@ -1,17 +1,18 @@
-// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathisloge.opensource@pm.me>
+// SPDX-FileCopyrightText: 2024 - 2025 Mathis Logemann <mathis.opensource@tuta.io>
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #pragma once
-#include <nlohmann/json.hpp>
+#include <filesystem>
+#include <string>
+#include <vector>
 namespace Pbox
 {
 struct CollageSettings
 {
-    bool automatic_capture{true};
-    int seconds_between_capture{5};
+    std::filesystem::path svg_template;
+    bool automatic_capture{};
+    std::chrono::seconds time_between_capture;
     std::vector<std::string> image_elements;
-
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(CollageSettings, automatic_capture, seconds_between_capture, image_elements);
 };
 } // namespace Pbox

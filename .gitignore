@@ -1,6 +1,7 @@
 build
 .cache
 venv
+.venv
 .esphome
 outdir
 dist
@@ -8,3 +9,4 @@ flatpak-build
 .flatpak-builder
 flatpak-repo/
 compile_commands.json
+.qmlls.ini

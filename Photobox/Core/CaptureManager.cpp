@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathisloge.opensource@pm.me>
+// SPDX-FileCopyrightText: 2024 - 2025 Mathis Logemann <mathis.opensource@tuta.io>
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -11,42 +11,51 @@
 #include "IdleCaptureSession.hpp"
 #include "ImageProvider.hpp"
 #include "ImageStorage.hpp"
-#include "RemoteTrigger.hpp"
 
 DEFINE_LOGGER(capture_manager);
 
 namespace Pbox
 {
-CaptureManager::CaptureManager(Scheduler &scheduler,
-                               ImageStorage &image_storage,
-                               ICamera &camera,
-                               RemoteTrigger &remote_trigger,
-                               CameraLed &camera_led,
-                               CaptureSessionFactoryFnc collage_session_factory)
-    : scheduler_{scheduler}
-    , image_storage_{image_storage}
-    , camera_{camera}
-    , remote_trigger_{remote_trigger}
-    , camera_led_{camera_led}
-    , session_{std::make_unique<IdleCaptureSession>()}
-    , collage_session_factory_{std::move(collage_session_factory)}
+CaptureManager::CaptureManager(Instance<Scheduler> scheduler,
+                               Instance<ImageStorage> image_storage,
+                               Instance<ICamera> camera,
+                               Instance<TriggerManager> trigger_manager,
+                               Instance<CameraLed> camera_led,
+                               Instance<CaptureSessionManager> capture_session_manager)
+    : scheduler_{std::move(scheduler)}
+    , image_storage_{std::move(image_storage)}
+    , camera_{std::move(camera)}
+    , trigger_manager_{std::move(trigger_manager)}
+    , camera_led_{std::move(camera_led)}
+    , session_{make_unique_object_ptr_as<ICaptureSession, IdleCaptureSession>()}
+    , capture_session_manager_{std::move(capture_session_manager)}
 {
-    connect(&camera_, &ICamera::imageCaptured, this, [this](auto &&image) {
+    connect(camera_.get(), &ICamera::imageCaptured, this, [this](auto &&image) {
         //! important: first emit the signal so that all image providers have it saved, and only then set the image to
-        //! the session. otherwise qml will not reevalute the image and the providers don't have a signal to schedule a
+        //! the session. otherwise qml will not reevaluate the image and the providers don't have a signal to schedule a
         //! cache invalidation
         const auto image_id = image_ids_++;
         Q_EMIT imageCaptured(image, image_id);
         session_->imageCaptured(image, image_id);
-        async_scope_.spawn(
-            stdexec::schedule(scheduler_.getWorkScheduler()) |
-            stdexec::then([this, image = image]() { return image_storage_.saveImage(image); }) |
-            stdexec::continues_on(scheduler_.getQtEventLoopScheduler()) |
-            stdexec::then([this](auto &&saved_image_path) { session_->imageSaved(saved_image_path); }) |
-            stdexec::upon_error([](auto &&ex_ptr) { LOG_ERROR(capture_manager, "Error while saving image"); }));
+        async_scope_.spawn(stdexec::schedule(scheduler_->getWorkScheduler()) |
+                           stdexec::then([this, image = image]() { return image_storage_->saveImage(image); }) |
+                           stdexec::continues_on(scheduler_->getQtEventLoopScheduler()) |
+                           stdexec::then([this](auto &&saved_image_path) { session_->imageSaved(saved_image_path); }) |
+                           stdexec::upon_error([](auto &&ex_ptr) {
+                               try
+                               {
+                                   std::rethrow_exception(ex_ptr);
+                               }
+                               catch (const std::exception &ex)
+                               {
+                                   LOG_ERROR(logger_capture_manager(), "Error while saving image. {}", ex.what());
+                               }
+                           }));
     });
-    connect(&remote_trigger_, &RemoteTrigger::triggered, this, &CaptureManager::triggerButtonPressed);
-    switchToSession(std::make_unique<IdleCaptureSession>());
+    connect(trigger_manager_.get(), &TriggerManager::triggerFired, this, [this](const TriggerId &trigger_id) {
+        triggerButtonPressed(QString::fromStdString(trigger_id));
+    });
+    switchToSession(make_unique_object_ptr_as<ICaptureSession, IdleCaptureSession>());
 }
 
 CaptureManager::~CaptureManager()
@@ -54,17 +63,21 @@ CaptureManager::~CaptureManager()
     cleanup_async_scope(async_scope_);
 }
 
-void CaptureManager::triggerButtonPressed()
+void CaptureManager::triggerButtonPressed(const QString &trigger_id)
 {
     if (session_->getStatus() == ICaptureSession::Status::Idle)
     {
+        const auto trigger = trigger_id.toStdString();
+        triggered_by_ = trigger;
+        LOG_DEBUG(logger_capture_manager(), "Got trigger {}", trigger);
+        switchToSession(capture_session_manager_->createFromTrigger(trigger));
         session_->triggerCapture();
     }
 }
 
-ImageProvider *CaptureManager::createImageProvider()
+ImageProvider *CaptureManager::createImageProvider() const
 {
-    auto *image_provider = new ImageProvider();
+    auto *image_provider = new ImageProvider(); // NOLINT(cppcoreguidelines-owning-memory)
     connect(this, &CaptureManager::imageCaptured, image_provider, &ImageProvider::addImage);
     connect(this, &CaptureManager::resetImages, image_provider, &ImageProvider::resetCache);
     return image_provider;
@@ -77,33 +90,40 @@ Pbox::ICaptureSession *CaptureManager::getSession()
 
 ICamera *CaptureManager::getCamera()
 {
-    return std::addressof(camera_);
+    return camera_.get();
 }
 
 void CaptureManager::sessionFinished()
 {
-    LOG_DEBUG(capture_manager, "Session '{}' finished", session_->name());
+    LOG_DEBUG(logger_capture_manager(), "Session '{}' finished", session_->name());
     Q_EMIT resetImages();
-    if (session_->name() == IdleCaptureSession::kName)
+    if (session_->name() != IdleCaptureSession::kName)
     {
-        switchToSession(collage_session_factory_());
-        session_->triggerCapture();
-    }
-    else
-    {
-        switchToSession(std::make_unique<IdleCaptureSession>());
+        switchToSession(capture_session_manager_->createIdleSession());
     }
 }
 
-void CaptureManager::switchToSession(CaptureSessionPtr &&new_session)
+void CaptureManager::switchToSession(CaptureSessionPtr new_session)
 {
     const auto old_session_name = session_ != nullptr ? session_->name() : "unknown";
     session_ = std::move(new_session);
-    connect(session_.get(), &ICaptureSession::requestedImageCapture, &camera_, &ICamera::requestCapturePhoto);
-    connect(session_.get(), &ICaptureSession::finished, this, &CaptureManager::sessionFinished);
-    connect(session_.get(), &ICaptureSession::statusChanged, this, &CaptureManager::handleSessionStatusChange);
+    if (session_ != nullptr)
+    {
+        connect(session_.get(), &ICaptureSession::requestedImageCapture, camera_.get(), &ICamera::requestCapturePhoto);
+        connect(session_.get(), &ICaptureSession::finished, this, &CaptureManager::sessionFinished);
+        connect(session_.get(), &ICaptureSession::statusChanged, this, &CaptureManager::handleSessionStatusChange);
+        connect(session_.get(),
+                &ICaptureSession::captureStatusChanged,
+                this,
+                &CaptureManager::handleSessionCaptureStatusChange);
+        handleSessionStatusChange();
+        handleSessionCaptureStatusChange();
+    }
     Q_EMIT sessionChanged();
-    LOG_INFO(capture_manager, "Switched session from '{}' to '{}'", old_session_name, session_->name());
+    LOG_INFO(logger_capture_manager(),
+             "Switched session from '{}' to '{}'",
+             old_session_name,
+             session_ != nullptr ? session_->name() : "none");
 }
 
 void CaptureManager::handleSessionStatusChange()
@@ -113,10 +133,10 @@ void CaptureManager::handleSessionStatusChange()
     switch (status)
     {
     case ICaptureSession::Status::Idle:
-        remote_trigger_.playEffect(RemoteTrigger::Effect::Idle);
+        trigger_manager_->updateTriggerEffect(triggered_by_, RemoteTrigger::Effect::Idle);
         break;
     case ICaptureSession::Status::Capturing:
-        remote_trigger_.playEffect(RemoteTrigger::Effect::Countdown);
+        trigger_manager_->updateTriggerEffect(triggered_by_, RemoteTrigger::Effect::Countdown);
         break;
     case ICaptureSession::Status::Busy:
         break;
@@ -129,13 +149,16 @@ void CaptureManager::handleSessionCaptureStatusChange()
     switch (status)
     {
     case ICaptureSession::CaptureStatus::Idle:
-        camera_led_.turnOff();
+        LOG_DEBUG(logger_capture_manager(), "Camera LED => off");
+        camera_led_->turnOff();
         break;
     case ICaptureSession::CaptureStatus::BeforeCapture:
-        camera_led_.playEffect(CameraLed::Effect::Pulsate);
+        LOG_DEBUG(logger_capture_manager(), "Camera LED => Pulsate");
+        camera_led_->playEffect(CameraLed::Effect::Pulsate);
         break;
     case ICaptureSession::CaptureStatus::WaitForCapture:
-        camera_led_.playEffect(CameraLed::Effect::Capture);
+        LOG_DEBUG(logger_capture_manager(), "Camera LED => Capture");
+        camera_led_->playEffect(CameraLed::Effect::Capture);
         break;
     }
 }

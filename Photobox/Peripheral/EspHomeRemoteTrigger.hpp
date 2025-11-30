@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 Mathis Logemann <mathisloge.opensource@pm.me>
+// SPDX-FileCopyrightText: 2024 - 2025 Mathis Logemann <mathis.opensource@tuta.io>
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -12,7 +12,7 @@ class EspHomeRemoteTrigger : public RemoteTrigger
 {
   public:
     Q_DISABLE_COPY_MOVE(EspHomeRemoteTrigger);
-    explicit EspHomeRemoteTrigger(std::unique_ptr<IEspHomeClient> client);
+    explicit EspHomeRemoteTrigger(QString name, std::unique_ptr<IEspHomeClient> client);
     ~EspHomeRemoteTrigger() override;
 
     void playEffect(RemoteTrigger::Effect effect) override;
