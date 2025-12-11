@@ -28,8 +28,8 @@ target_link_libraries(
     PUBLIC
         Photobox::Logging
         Boost::headers
-        Boost::asio
-        Boost::system
+        $<$<TARGET_EXISTS:Boost::asio>:Boost::asio>
+        $<$<TARGET_EXISTS:Boost::system>:Boost::system>
         STDEXEC::stdexec
         Photobox::Core
         PkgConfig::gphoto2
