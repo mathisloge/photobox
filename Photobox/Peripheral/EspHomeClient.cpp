@@ -29,8 +29,13 @@ QNetworkRequest prepareRequest(const QUrl &url)
 EspHomeClient::EspHomeClient(QUrl base_url)
     : base_url_{std::move(base_url)}
 {
+    event_timeout_.setSingleShot(false);
+    event_timeout_.setInterval(std::chrono::seconds{10});
+    event_timeout_.setTimerType(Qt::TimerType::PreciseTimer);
     net_manager_.setAutoDeleteReplies(true);
     subscribeEvents();
+    connect(&event_timeout_, &QTimer::timeout, this, &EspHomeClient::subscribeEvents);
+    connect(this, &EspHomeClient::connecting, &event_timeout_, &QTimer::stop);
 }
 
 EspHomeClient::~EspHomeClient() = default;
@@ -52,23 +57,30 @@ void EspHomeClient::post(std::string_view url_request)
 
 void EspHomeClient::subscribeEvents()
 {
+    if (sse_reply_ != nullptr)
+    {
+        sse_reply_->abort();
+        LOG_DEBUG(logger_esphome_client(), "Network reply was still active. Stopping it.");
+    }
     const auto request_url = base_url_.resolved(QStringLiteral("events"));
     QNetworkRequest request = prepareRequest(request_url);
-    auto *reply = net_manager_.get(request);
+    sse_reply_ = net_manager_.get(request);
 
-    connect(reply, &QNetworkReply::readyRead, this, [this, reply]() {
+    connect(sse_reply_, &QNetworkReply::readyRead, this, [this]() {
+        Q_ASSERT(sse_reply_ != nullptr);
         Q_EMIT connected();
-        readEventReply(*reply);
+        readEventReply(*sse_reply_);
     });
-    connect(reply, &QNetworkReply::finished, this, [this, reply, request_url]() {
+    connect(sse_reply_, &QNetworkReply::finished, this, [this, request_url]() {
         LOG_DEBUG(logger_esphome_client(), "Network reply finished to {}", request_url.toString().toStdString());
-        if (reply->error() != QNetworkReply::NoError)
+        Q_ASSERT(sse_reply_ != nullptr);
+        if (sse_reply_->error() != QNetworkReply::NoError)
         {
             constexpr std::chrono::milliseconds kRetryTime{500};
             LOG_ERROR(logger_esphome_client(),
                       "Network reply finished with error from {}: {}, retrying in {}ms",
                       request_url.toString().toStdString(),
-                      QMetaEnum::fromType<QNetworkReply::NetworkError>().valueToKey(reply->error()),
+                      QMetaEnum::fromType<QNetworkReply::NetworkError>().valueToKey(sse_reply_->error()),
                       kRetryTime.count());
             Q_EMIT connecting();
             QTimer::singleShot(kRetryTime, this, &EspHomeClient::subscribeEvents);
@@ -79,6 +91,7 @@ void EspHomeClient::subscribeEvents()
 
 void EspHomeClient::readEventReply(QNetworkReply &reply)
 {
+    event_timeout_.start();
     bool next_is_state{false};
     while (reply.canReadLine())
     {

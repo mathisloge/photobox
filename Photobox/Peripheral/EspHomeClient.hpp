@@ -4,6 +4,8 @@
 
 #pragma once
 #include <QNetworkAccessManager>
+#include <QPointer>
+#include <QTimer>
 #include "IEspHomeClient.hpp"
 
 namespace Pbox
@@ -22,7 +24,9 @@ class EspHomeClient : public IEspHomeClient
     void readEventReply(QNetworkReply &reply);
 
   private:
+    QTimer event_timeout_;
     QUrl base_url_;
     QNetworkAccessManager net_manager_;
+    QPointer<QNetworkReply> sse_reply_{nullptr};
 };
 } // namespace Pbox
