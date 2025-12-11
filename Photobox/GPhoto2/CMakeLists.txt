@@ -25,5 +25,12 @@ target_sources(
 )
 target_link_libraries(
     PhotoboxGPhoto2
-    PUBLIC Photobox::Logging Photobox::Core PkgConfig::gphoto2
+    PUBLIC
+        Photobox::Logging
+        Boost::headers
+        Boost::asio
+        Boost::system
+        STDEXEC::stdexec
+        Photobox::Core
+        PkgConfig::gphoto2
 )

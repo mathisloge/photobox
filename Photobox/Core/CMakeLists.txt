@@ -61,10 +61,11 @@ target_link_libraries(
         Qt6::PrintSupport
         Qt6::Multimedia
         Boost::headers
-        Photobox::Utils
-        Photobox::Logging
+        STDEXEC::stdexec
         cpptrace::cpptrace
         lunasvg::lunasvg
         nlohmann_json::nlohmann_json
         fmt::fmt
+        Photobox::Utils
+        Photobox::Logging
 )

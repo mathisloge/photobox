@@ -4,7 +4,10 @@
 
 add_library(PhotoboxUtils INTERFACE)
 add_library(Photobox::Utils ALIAS PhotoboxUtils)
-target_link_libraries(PhotoboxUtils INTERFACE STDEXEC::stdexec Qt6::Core)
+target_link_libraries(
+    PhotoboxUtils
+    INTERFACE Boost::headers STDEXEC::stdexec Qt6::Core
+)
 target_sources(
     PhotoboxUtils
     INTERFACE
