@@ -109,17 +109,49 @@ std::optional<QImage> captureImage(Context &context)
         gp_camera_capture(context.camera.get(), GP_CAPTURE_IMAGE, &camera_file_path, context.context.get());
     if (ret_val < GP_OK)
     {
-        LOG_ERROR(logger_gphoto2(), "could invoke gphoto2 capture");
+        LOG_ERROR(logger_gphoto2(), "could not invoke gphoto2 capture: {}", ret_val);
         return std::nullopt;
     }
-    gp_camera_file_get(context.camera.get(),
-                       camera_file_path.folder,
-                       camera_file_path.name,
-                       GP_FILE_TYPE_NORMAL,
-                       file.get(),
-                       context.context.get());
+    LOG_INFO(logger_gphoto2(), "captured image to {}", camera_file_path.name);
 
-    return readImageFromFile(file.get());
+    const auto file_get_ret_val = gp_camera_file_get(context.camera.get(),
+                                                     camera_file_path.folder,
+                                                     camera_file_path.name,
+                                                     GP_FILE_TYPE_NORMAL,
+                                                     file.get(),
+                                                     context.context.get());
+    if (file_get_ret_val < GP_OK)
+    {
+        LOG_ERROR(logger_gphoto2(), "could not get file: {}", file_get_ret_val);
+    }
+
+    auto image = readImageFromFile(file.get());
+
+    return image;
+}
+bool readUntilTimeout(Context &context)
+{
+    while (true)
+    {
+        CameraEventType evtype;
+        void *data = nullptr;
+
+        const int ret = gp_camera_wait_for_event(context.camera.get(), 100, &evtype, &data, context.context.get());
+
+        if (ret < GP_OK)
+        {
+            LOG_ERROR(logger_gphoto2(), "could not wait for event: {}", ret);
+            break;
+        }
+
+        if (evtype == GP_EVENT_TIMEOUT)
+        {
+            LOG_DEBUG(logger_gphoto2(), "got timeout event");
+            return true;
+        }
+    }
+
+    return false;
 }
 
 namespace
