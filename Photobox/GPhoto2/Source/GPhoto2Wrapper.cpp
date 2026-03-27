@@ -4,7 +4,7 @@
 
 #include "GPhoto2Wrapper.hpp"
 #include <Pbox/Logger.hpp>
-#include "Pbox/GPhoto2Exeption.hpp"
+#include "Pbox/GPhoto2Exception.hpp"
 #include <gphoto2-port-result.h>
 
 DEFINE_LOGGER(gphoto2);

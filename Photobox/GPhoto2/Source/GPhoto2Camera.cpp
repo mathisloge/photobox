@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 - 2025 Mathis Logemann <mathis.opensource@tuta.io>
+// SPDX-FileCopyrightText: 2024 - 2026 Mathis Logemann <mathis.opensource@tuta.io>
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -6,21 +6,20 @@
 #include <QPointer>
 #include <QVideoFrame>
 #include <Pbox/CleanupAsyncScope.hpp>
-#include <Pbox/Conditional.hpp>
 #include <Pbox/Logger.hpp>
 #include <Pbox/QStdexec.hpp>
 #include "GPhoto2Context.hpp"
 #include "GPhoto2Integration.hpp"
-#include "Pbox/GPhoto2Exeption.hpp"
+#include "Pbox/GPhoto2Exception.hpp"
 
 #undef emit // stupid qt...
 #include <asioexec/use_sender.hpp>
 #include <boost/asio/steady_timer.hpp>
 #include <exec/env.hpp>
-#include <exec/repeat_effect_until.hpp>
 #include <exec/static_thread_pool.hpp>
 
 DEFINE_LOGGER(gphoto2_camera);
+
 namespace Pbox
 {
 namespace
@@ -57,51 +56,70 @@ exec::task<void> GPhoto2Camera::asyncCaptureLoop()
     auto token = co_await stdexec::get_stop_token();
     while (not token.stop_requested())
     {
-        auto context = co_await stdexec::stopped_as_optional(asyncAutoconnect());
-        if (not context.has_value())
+        auto context_opt = co_await stdexec::stopped_as_optional(asyncAutoconnect());
+        if (not context_opt.has_value())
         {
             continue;
         }
         LOG_DEBUG(logger_gphoto2_camera(), "Got a camera...");
 
-        auto capture = stdexec::schedule(scheduler_->getWorkScheduler()) //
-                       | stdexec::then([this, &context]() {
-                             LOG_DEBUG(logger_gphoto2_camera(), "capture image...");
-                             capture_photo_ = false;
-                             return GPhoto2::captureImage(*context);
-                         })                                                           //
-                       | stdexec::continues_on(scheduler_->getQtEventLoopScheduler()) //
-                       | stdexec::then([this](auto &&image) {
-                             if (image.has_value())
-                             {
-                                 Q_EMIT imageCaptured(image.value());
-                             }
-                             return image.has_value();
-                         })                           //
-                       | exec::repeat_effect_until(); // todo: this now retries forever to capture a image.
-                                                      // maybe retry_n times and emit an error?
-        auto preview = stdexec::schedule(scheduler_->getWorkScheduler()) //
-                       | flowCapturePreview(*context)                    //
-                       | stdexec::then([this](auto &&image) { processPreviewImage(image); });
+        GPhoto2::Context &context = *context_opt;
 
         while (status_client_.systemStatus() == SystemStatusCode::Code::Ok and not token.stop_requested())
         {
-            co_await stdexec::starts_on(
-                stdexec::inline_scheduler{},
-                conditional(capture_photo_, capture, preview) | stdexec::upon_error([this](auto &&error) {
-                    status_client_.setSystemStatus(SystemStatusCode::Code::Error);
-                    try
+            try
+            {
+                if (capture_photo_.exchange(false, std::memory_order_relaxed))
+                {
+                    LOG_DEBUG(logger_gphoto2_camera(), "Triggering capture...");
+                    co_await (stdexec::schedule(scheduler_->getWorkScheduler()) |
+                              stdexec::then([&context]() { GPhoto2::triggerCapture(context); }));
+                }
+
+                const auto events =
+                    co_await (stdexec::schedule(scheduler_->getWorkScheduler()) |
+                              stdexec::then([&context]() { return GPhoto2::pollCameraEvents(context); }));
+
+                for (const auto &event : events)
+                {
+                    if (event.type == GP_EVENT_FILE_ADDED)
                     {
-                        if (error)
+                        LOG_DEBUG(logger_gphoto2_camera(),
+                                  "File added: {}/{}",
+                                  event.camera_file_path.folder,
+                                  event.camera_file_path.name);
+
+                        auto image = co_await (stdexec::schedule(scheduler_->getWorkScheduler()) |
+                                               stdexec::then([&context, &event]() {
+                                                   return GPhoto2::downloadImage(context, event.camera_file_path);
+                                               }));
+
+                        if (image)
                         {
-                            std::rethrow_exception(error);
+                            co_await (stdexec::schedule(scheduler_->getQtEventLoopScheduler()) |
+                                      stdexec::then(
+                                          [this, image = std::move(image)]() { Q_EMIT imageCaptured(image.value()); }));
                         }
                     }
-                    catch (const std::exception &e)
+                    else if (event.type == GP_EVENT_CAPTURE_COMPLETE)
                     {
-                        LOG_ERROR(logger_gphoto2_camera(), "GPhoto2 Exception: {}", e.what());
+                        LOG_DEBUG(logger_gphoto2_camera(), "Camera finished the capture. Waiting for a file added event...");
                     }
-                }));
+                }
+                auto preview_image =
+                    co_await (stdexec::schedule(scheduler_->getWorkScheduler()) | flowCapturePreview(context));
+
+                co_await (stdexec::schedule(scheduler_->getQtEventLoopScheduler()) |
+                          stdexec::then([this, preview_image = std::move(preview_image)]() {
+                              processPreviewImage(preview_image);
+                          }));
+            }
+            catch (const std::exception &e)
+            {
+                LOG_ERROR(logger_gphoto2_camera(), "GPhoto2 Exception: {}", e.what());
+                status_client_.setSystemStatus(SystemStatusCode::Code::Error);
+                break;
+            }
         }
     }
 }
@@ -132,7 +150,7 @@ GPhoto2Camera::~GPhoto2Camera()
 void GPhoto2Camera::requestCapturePhoto()
 {
     LOG_DEBUG(logger_gphoto2_camera(), "image requested...");
-    capture_photo_ = true;
+    capture_photo_.store(true, std::memory_order_relaxed);
 }
 
 const SystemStatusClient &GPhoto2Camera::systemStatusClient() const

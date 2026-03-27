@@ -13,7 +13,7 @@ target_sources(
             BASE_DIRS Include
             FILES
                 Include/Pbox/GPhoto2Camera.hpp
-                Include/Pbox/GPhoto2Exeption.hpp
+                Include/Pbox/GPhoto2Exception.hpp
     PRIVATE
         Source/GPhoto2Camera.cpp
         Source/GPhoto2Context.cpp
