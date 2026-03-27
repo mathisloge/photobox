@@ -103,7 +103,8 @@ exec::task<void> GPhoto2Camera::asyncCaptureLoop()
                     }
                     else if (event.type == GP_EVENT_CAPTURE_COMPLETE)
                     {
-                        LOG_DEBUG(logger_gphoto2_camera(), "Camera finished the capture. Waiting for a file added event...");
+                        LOG_DEBUG(logger_gphoto2_camera(),
+                                  "Camera finished the capture. Waiting for a file added event...");
                     }
                 }
                 auto preview_image =

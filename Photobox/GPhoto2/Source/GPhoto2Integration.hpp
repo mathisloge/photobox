@@ -20,7 +20,8 @@ namespace Pbox::GPhoto2
  * events so they can be processed without directly depending on raw
  * gphoto2 event handling.
  */
-struct CameraEvent {
+struct CameraEvent
+{
 
     /**
      * @brief Type of the camera event.
@@ -36,7 +37,6 @@ struct CameraEvent {
      */
     CameraFilePath camera_file_path{};
 };
-
 
 struct Context;
 
@@ -94,10 +94,9 @@ void triggerCapture(Context &context);
  *
  * @throws GPhoto2Exception if deletion was requested but failed
  */
-std::optional<QImage> downloadImage(
-    Context &context,
-    CameraFilePath camera_file_path,
-    bool delete_from_camera = kDeletePhotoFromCamera);
+std::optional<QImage> downloadImage(Context &context,
+                                    CameraFilePath camera_file_path,
+                                    bool delete_from_camera = kDeletePhotoFromCamera);
 
 /**
  * @brief Polls and retrieves all pending camera events.
@@ -114,7 +113,7 @@ std::optional<QImage> downloadImage(
  *
  * @throws GPhoto2Exception if event polling fails
  */
-std::vector<CameraEvent> pollCameraEvents(Context& context);
+std::vector<CameraEvent> pollCameraEvents(Context &context);
 
 /**
  * @brief Captures a low-resolution preview image from the camera.
