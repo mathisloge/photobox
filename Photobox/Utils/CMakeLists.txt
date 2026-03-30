@@ -16,7 +16,6 @@ target_sources(
             BASE_DIRS include
             FILES
                 include/Pbox/CleanupAsyncScope.hpp
-                include/Pbox/Conditional.hpp
                 include/Pbox/DisableCopyMove.hpp
                 include/Pbox/Instance.hpp
                 include/Pbox/ObjectDeleter.hpp
