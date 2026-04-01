@@ -7,6 +7,7 @@ qt_add_qml_module(
     URI "Photobox.Core"
     STATIC
     SOURCES
+        Theme.hpp
         ICamera.hpp
         ICamera.cpp
         MockCamera.hpp

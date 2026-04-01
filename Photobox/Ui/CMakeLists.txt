@@ -15,9 +15,11 @@ qt_add_qml_module(
         CaptureMainPage.qml
         CapturePage.qml
         PreviewPage.qml
-        BuzzerAnimation.qml
+        GlowEffect.qml
+        VideoBox.qml
+        PageBackground.qml
+        Buzzer.qml
     RESOURCES
-        Buzzer.svg
         Pointer.svg
         ImageBorder.svg
         Logo.svg

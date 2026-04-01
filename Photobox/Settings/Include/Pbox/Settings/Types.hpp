@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <string>
 #include <vector>
+#include <optional>
 #include <CollageSettings.hpp>
 #include "RemoteTriggerId.hpp"
 

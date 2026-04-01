@@ -1,28 +1,23 @@
 // SPDX-FileCopyrightText: 2024 - 2025 Mathis Logemann <mathis.opensource@tuta.io>
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
-
+pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls
-import QtMultimedia
+import QtQuick.Layouts
 import Photobox.Core
 
 Page {
     id: root
     readonly property ICaptureSession session: ApplicationState.captureManager.session
-
-    VideoOutput {
+    background: PageBackground {}
+    VideoBox {
         id: videoOutput
 
         anchors.fill: parent
+        anchors.margins: 20
 
         opacity: root.session.liveViewVisible ? 1 : 0
-
-        Behavior on opacity {
-            NumberAnimation {
-                duration: 500
-            }
-        }
 
         Component.onCompleted: {
             ApplicationState.captureManager.camera.videoSink = videoOutput.videoSink;
@@ -37,17 +32,37 @@ Page {
         text: root.session.countdown.text
     }
 
-    BuzzerAnimation {
+    ListView {
+        id: list
+        model: ListModel {
+            ListElement {
+                name: "Einzelfoto"
+                buzzColor: "#FF00FF"
+            }
+            ListElement {
+                name: "Mehrfachfoto"
+                buzzColor: "#FFD700"
+            }
+            ListElement {
+                name: "Collage"
+                buzzColor: "#6200EA"
+            }
+        }
         anchors.bottom: parent.bottom
-        anchors.horizontalCenter: parent.horizontalCenter
-        opacity: root.session.status === ICaptureSession.Idle ? 1 : 0
-    }
+        anchors.bottomMargin: 30
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 240
+        orientation: ListView.Horizontal
 
-    MouseArea {
-        id: manualCaptureArea
-        anchors.fill: parent
-        onClicked: {
-            ApplicationState.captureManager.triggerButtonPressed("Display");
+        delegate: Buzzer {
+            required property string name
+            required property color buzzColor
+            color: buzzColor
+            text: name
+            onClicked: {
+                ApplicationState.captureManager.triggerButtonPressed("Display");
+            }
         }
     }
 }
