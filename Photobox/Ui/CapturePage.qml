@@ -32,36 +32,23 @@ Page {
         text: root.session.countdown.text
     }
 
-    ListView {
-        id: list
-        model: ListModel {
-            ListElement {
-                name: "Einzelfoto"
-                buzzColor: "#FF00FF"
-            }
-            ListElement {
-                name: "Mehrfachfoto"
-                buzzColor: "#FFD700"
-            }
-            ListElement {
-                name: "Collage"
-                buzzColor: "#6200EA"
-            }
-        }
+    RowLayout {
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: 30
-        anchors.left: parent.left
-        anchors.right: parent.right
-        height: 240
-        orientation: ListView.Horizontal
+        anchors.horizontalCenter: parent.horizontalCenter
+        Repeater {
+            id: list
+            model: CaptureSessionList {
+                sessionManager: ApplicationState.captureSessionManager
+            }
 
-        delegate: Buzzer {
-            required property string name
-            required property color buzzColor
-            color: buzzColor
-            text: name
-            onClicked: {
-                ApplicationState.captureManager.triggerButtonPressed("Display");
+            delegate: Buzzer {
+                required property string sessionId
+                required property string name
+                text: name
+                opacity: (!root.session.liveViewVisible || root.session.countdown.visible) ? 0 : 1
+                onClicked: {
+                    ApplicationState.captureManager.sessionButtonPressed(sessionId);
+                }
             }
         }
     }

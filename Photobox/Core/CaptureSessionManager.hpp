@@ -15,6 +15,13 @@ class CaptureSessionManager : public QObject
     void setInitialCountdown(std::chrono::seconds initial_countdown);
     CaptureSessionPtr createIdleSession() const;
     CaptureSessionPtr createFromTrigger(const TriggerId &trigger_id) const;
+    CaptureSessionPtr createFromSessionId(const CaptureSessionId &session_id) const;
+
+    auto getSessionFactories() const
+    {
+        return session_factories_ | std::views::values |
+               std::views::transform([](const auto &ptr) -> const ICaptureSessionFactory & { return *ptr; });
+    }
 
   private:
     std::unordered_map<CaptureSessionId, std::unique_ptr<ICaptureSessionFactory>> session_factories_;

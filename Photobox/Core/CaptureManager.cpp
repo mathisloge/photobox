@@ -75,6 +75,17 @@ void CaptureManager::triggerButtonPressed(const QString &trigger_id)
     }
 }
 
+void CaptureManager::sessionButtonPressed(const QString &session_id)
+{
+    if (session_->getStatus() == ICaptureSession::Status::Idle)
+    {
+        triggered_by_ = "";
+        LOG_DEBUG(logger_capture_manager(), "Got session display trigger {}", session_id.toStdString());
+        switchToSession(capture_session_manager_->createFromSessionId(session_id.toStdString()));
+        session_->triggerCapture();
+    }
+}
+
 ImageProvider *CaptureManager::createImageProvider() const
 {
     auto *image_provider = new ImageProvider(); // NOLINT(cppcoreguidelines-owning-memory)
@@ -129,17 +140,19 @@ void CaptureManager::switchToSession(CaptureSessionPtr new_session)
 void CaptureManager::handleSessionStatusChange()
 {
     const auto status = session_->getStatus();
-
-    switch (status)
+    if (not triggered_by_.empty())
     {
-    case ICaptureSession::Status::Idle:
-        trigger_manager_->updateTriggerEffect(triggered_by_, RemoteTrigger::Effect::Idle);
-        break;
-    case ICaptureSession::Status::Capturing:
-        trigger_manager_->updateTriggerEffect(triggered_by_, RemoteTrigger::Effect::Countdown);
-        break;
-    case ICaptureSession::Status::Busy:
-        break;
+        switch (status)
+        {
+        case ICaptureSession::Status::Idle:
+            trigger_manager_->updateTriggerEffect(triggered_by_, RemoteTrigger::Effect::Idle);
+            break;
+        case ICaptureSession::Status::Capturing:
+            trigger_manager_->updateTriggerEffect(triggered_by_, RemoteTrigger::Effect::Countdown);
+            break;
+        case ICaptureSession::Status::Busy:
+            break;
+        }
     }
 }
 

@@ -11,6 +11,7 @@ Item {
     required property color color
 
     signal clicked
+    signal buzz
 
     // Outer bezel
     Rectangle {
@@ -77,7 +78,7 @@ Item {
 
             Connections {
                 target: root
-                function onClicked() {
+                function onBuzz() {
                     anim.restart();
                 }
             }
@@ -145,6 +146,9 @@ Item {
                 verticalCenter: parent.verticalCenter
                 verticalCenterOffset: -8
             }
+            width: parent.width
+            wrapMode: Text.Wrap
+            horizontalAlignment: Text.AlignHCenter
             text: root.text
             font {
                 pixelSize: 18
@@ -179,7 +183,14 @@ Item {
         id: mouseArea
         anchors.fill: parent
         onClicked: {
+            root.buzz();
             root.clicked();
+        }
+    }
+
+    Behavior on opacity {
+        NumberAnimation {
+            duration: 500
         }
     }
 }

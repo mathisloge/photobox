@@ -4,8 +4,8 @@
 
 #pragma once
 #include <QObject>
-#include <QtQmlIntegration>
 #include <Pbox/ObjectUniquePtr.hpp>
+#include <QtQmlIntegration/qqmlintegration.h>
 #include <exec/async_scope.hpp>
 #include "CaptureSessionManager.hpp"
 #include "ICamera.hpp"
@@ -40,6 +40,7 @@ class CaptureManager : public QObject
                             Instance<CaptureSessionManager> capture_session_manager);
     ~CaptureManager() override;
     Q_INVOKABLE void triggerButtonPressed(const QString &trigger_id);
+    Q_INVOKABLE void sessionButtonPressed(const QString &session_id);
 
     ImageProvider *createImageProvider() const;
 

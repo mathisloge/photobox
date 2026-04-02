@@ -24,6 +24,10 @@ class CollageCaptureSessionFactory : public ICaptureSessionFactory
     ~CollageCaptureSessionFactory() override;
     CaptureSessionPtr create(std::chrono::seconds initial_countdown) const override;
 
+    const CaptureSessionId &sessionId() const override;
+    const std::string &name() const override;
+    QColor color() const override;
+
   private:
     void loadCollage();
 

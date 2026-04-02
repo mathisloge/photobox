@@ -14,4 +14,19 @@ CaptureSessionPtr SingleCaptureSessionFactory::create(std::chrono::seconds initi
 {
     return make_unique_object_ptr_as<ICaptureSession, SingleCaptureSession>(name_, initial_countdown);
 }
+
+const CaptureSessionId &SingleCaptureSessionFactory::sessionId() const
+{
+    return name_;
+}
+
+const std::string &SingleCaptureSessionFactory::name() const
+{
+    return name_;
+}
+
+QColor SingleCaptureSessionFactory::color() const
+{
+    return QColor{};
+}
 } // namespace Pbox

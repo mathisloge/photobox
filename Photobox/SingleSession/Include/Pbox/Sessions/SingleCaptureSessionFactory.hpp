@@ -13,6 +13,9 @@ class SingleCaptureSessionFactory : public ICaptureSessionFactory
     explicit SingleCaptureSessionFactory(std::string name);
 
     CaptureSessionPtr create(std::chrono::seconds initial_countdown) const override;
+    const CaptureSessionId &sessionId() const override;
+    const std::string &name() const override;
+    QColor color() const override;
 
   private:
     std::string name_;

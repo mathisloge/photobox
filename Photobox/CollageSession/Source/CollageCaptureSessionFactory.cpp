@@ -52,4 +52,19 @@ CaptureSessionPtr CollageCaptureSessionFactory::create(std::chrono::seconds init
     return make_unique_object_ptr_as<ICaptureSession, CollageCaptureSession>(
         name_, initial_countdown, image_storage_, renderer_, scheduler_, collage_settings_);
 }
+
+const CaptureSessionId &CollageCaptureSessionFactory::sessionId() const
+{
+    return name_;
+}
+
+const std::string &CollageCaptureSessionFactory::name() const
+{
+    return name_;
+}
+
+QColor CollageCaptureSessionFactory::color() const
+{
+    return QColor{};
+}
 } // namespace Pbox

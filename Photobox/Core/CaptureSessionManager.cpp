@@ -66,7 +66,12 @@ CaptureSessionPtr CaptureSessionManager::createFromTrigger(const TriggerId &trig
     {
         return nullptr;
     }
-    const auto sid = session_factories_.find(tid->second);
+    return createFromSessionId(tid->second);
+}
+
+CaptureSessionPtr CaptureSessionManager::createFromSessionId(const CaptureSessionId &session_id) const
+{
+    const auto sid = session_factories_.find(session_id);
     if (sid == session_factories_.end())
     {
         return nullptr;

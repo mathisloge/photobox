@@ -4,9 +4,9 @@
 
 #pragma once
 #include <filesystem>
+#include <optional>
 #include <string>
 #include <vector>
-#include <optional>
 #include <CollageSettings.hpp>
 #include "RemoteTriggerId.hpp"
 
