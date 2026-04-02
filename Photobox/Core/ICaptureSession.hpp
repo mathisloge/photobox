@@ -44,11 +44,11 @@ class ICaptureSession : public QObject
 
   public:
     PBOX_DISABLE_COPY_MOVE(ICaptureSession);
-    ICaptureSession(std::string name);
+    ICaptureSession(std::string session_id_);
     ~ICaptureSession() override;
 
     //! @brief The name of the session.
-    const std::string &name() const;
+    const std::string &sessionId() const;
 
     virtual void triggerCapture() = 0;
 
@@ -86,7 +86,7 @@ class ICaptureSession : public QObject
 
   private:
     Countdown countdown_;
-    std::string name_;
+    std::string session_id_;
     Status status_{Status::Idle};
     CaptureStatus capture_status_{CaptureStatus::Idle};
     bool live_view_visible_{false};

@@ -6,15 +6,15 @@
 
 namespace Pbox
 {
-ICaptureSession::ICaptureSession(std::string name)
-    : name_{std::move(name)}
+ICaptureSession::ICaptureSession(std::string session_id)
+    : session_id_{std::move(session_id)}
 {}
 
 ICaptureSession::~ICaptureSession() = default;
 
-const std::string &ICaptureSession::name() const
+const std::string &ICaptureSession::sessionId() const
 {
-    return name_;
+    return session_id_;
 }
 
 ICaptureSession::Status ICaptureSession::getStatus() const

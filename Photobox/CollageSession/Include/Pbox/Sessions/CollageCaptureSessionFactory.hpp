@@ -17,7 +17,9 @@ class CollageCaptureSessionFactory : public ICaptureSessionFactory
 {
   public:
     PBOX_DISABLE_COPY_MOVE(CollageCaptureSessionFactory)
-    CollageCaptureSessionFactory(std::string name,
+    CollageCaptureSessionFactory(CaptureSessionId session_id,
+                                 std::string name,
+                                 QColor color,
                                  Instance<Scheduler> scheduler,
                                  Instance<ImageStorage> image_storage,
                                  CollageSettings collage_settings);
@@ -32,7 +34,9 @@ class CollageCaptureSessionFactory : public ICaptureSessionFactory
     void loadCollage();
 
   private:
+    CaptureSessionId session_id_;
     std::string name_;
+    QColor color_;
     Instance<CollageRenderer> renderer_;
     Instance<Scheduler> scheduler_;
     Instance<ImageStorage> image_storage_;

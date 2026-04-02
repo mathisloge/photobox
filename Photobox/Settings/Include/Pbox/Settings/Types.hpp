@@ -32,11 +32,13 @@ enum class SessionType
 
 struct SessionConfig
 {
+    std::string id;
     std::string name;
     SessionType type{};
     bool print{};
     std::vector<std::string> triggers;
     std::optional<CollageSettings> collage;
+    std::string color_hex;
 };
 
 struct FontConfig

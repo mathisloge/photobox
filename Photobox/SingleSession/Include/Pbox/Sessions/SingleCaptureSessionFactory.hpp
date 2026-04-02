@@ -10,7 +10,7 @@ namespace Pbox
 class SingleCaptureSessionFactory : public ICaptureSessionFactory
 {
   public:
-    explicit SingleCaptureSessionFactory(std::string name);
+    explicit SingleCaptureSessionFactory(CaptureSessionId session_id, std::string name, QColor color);
 
     CaptureSessionPtr create(std::chrono::seconds initial_countdown) const override;
     const CaptureSessionId &sessionId() const override;
@@ -18,6 +18,8 @@ class SingleCaptureSessionFactory : public ICaptureSessionFactory
     QColor color() const override;
 
   private:
+    CaptureSessionId session_id_;
     std::string name_;
+    QColor color_;
 };
 } // namespace Pbox

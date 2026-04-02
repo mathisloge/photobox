@@ -4,20 +4,23 @@
 
 #include "Pbox/Sessions/SingleCaptureSessionFactory.hpp"
 #include "SingleCaptureSession.hpp"
+
 namespace Pbox
 {
-SingleCaptureSessionFactory::SingleCaptureSessionFactory(std::string name)
-    : name_{std::move(name)}
+SingleCaptureSessionFactory::SingleCaptureSessionFactory(CaptureSessionId session_id, std::string name, QColor color)
+    : session_id_{std::move(session_id)}
+    , name_{std::move(name)}
+    , color_{std::move(color)}
 {}
 
 CaptureSessionPtr SingleCaptureSessionFactory::create(std::chrono::seconds initial_countdown) const
 {
-    return make_unique_object_ptr_as<ICaptureSession, SingleCaptureSession>(name_, initial_countdown);
+    return make_unique_object_ptr_as<ICaptureSession, SingleCaptureSession>(session_id_, initial_countdown);
 }
 
 const CaptureSessionId &SingleCaptureSessionFactory::sessionId() const
 {
-    return name_;
+    return session_id_;
 }
 
 const std::string &SingleCaptureSessionFactory::name() const
@@ -27,6 +30,6 @@ const std::string &SingleCaptureSessionFactory::name() const
 
 QColor SingleCaptureSessionFactory::color() const
 {
-    return QColor{};
+    return color_;
 }
 } // namespace Pbox

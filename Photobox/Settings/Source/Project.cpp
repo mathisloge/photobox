@@ -108,22 +108,28 @@ void Project::initFromConfig(const std::filesystem::path &config_file)
         {
         case SessionType::SingleCapture:
             capture_session_manager_->registerCaptureSession(
-                session.name, std::make_unique<SingleCaptureSessionFactory>(session.name));
+                session.id,
+                std::make_unique<SingleCaptureSessionFactory>(
+                    session.id, session.name, QColor{QString::fromStdString(session.color_hex)}));
             break;
         case SessionType::CollageCapture:
             capture_session_manager_->registerCaptureSession(
-                session.name,
-                std::make_unique<CollageCaptureSessionFactory>(
-                    session.name, scheduler_, image_storage_, session.collage.value_or(CollageSettings{})));
+                session.id,
+                std::make_unique<CollageCaptureSessionFactory>(session.id,
+                                                               session.name,
+                                                               QColor{QString::fromStdString(session.color_hex)},
+                                                               scheduler_,
+                                                               image_storage_,
+                                                               session.collage.value_or(CollageSettings{})));
             break;
         case SessionType::Unknown:
-            LOG_WARNING(logger_project(), "Got unknown session type for session '{}'", session.name);
+            LOG_WARNING(logger_project(), "Got unknown session type for session '{}'", session.id);
             break;
         }
 
         for (auto &&trigger : session.triggers)
         {
-            capture_session_manager_->addTriggerRelation(session.name, trigger);
+            capture_session_manager_->addTriggerRelation(session.id, trigger);
         }
     }
 }
