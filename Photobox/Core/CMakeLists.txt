@@ -20,6 +20,8 @@ qt_add_qml_module(
         CollageSettings.hpp
         CaptureSessionFactory.hpp
         CaptureSessionFactory.cpp
+        CaptureSessionManager.hpp
+        CaptureSessionManager.cpp
         RemoteTrigger.cpp
         RemoteTrigger.hpp
         RemoteTriggerId.hpp

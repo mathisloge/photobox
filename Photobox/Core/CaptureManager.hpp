@@ -7,12 +7,13 @@
 #include <QtQmlIntegration>
 #include <Pbox/ObjectUniquePtr.hpp>
 #include <exec/async_scope.hpp>
-#include "CaptureSessionFactory.hpp"
+#include "CaptureSessionManager.hpp"
 #include "ICamera.hpp"
 #include "ICaptureSession.hpp"
 #include "ImageProvider.hpp"
 #include "Pbox/Instance.hpp"
 #include "TriggerManager.hpp"
+
 namespace Pbox
 {
 class Scheduler;

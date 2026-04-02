@@ -5,7 +5,7 @@
 #pragma once
 #include <filesystem>
 #include <Pbox/DisableCopyMove.hpp>
-#include "CaptureSessionFactory.hpp"
+#include "CaptureSessionManager.hpp"
 #include "IRemoteTriggerFactory.hpp"
 #include "ImageStorage.hpp"
 #include "Scheduler.hpp"
