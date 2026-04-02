@@ -8,6 +8,7 @@
 #include <ICamera.hpp>
 #include <RemoteTrigger.hpp>
 #include "CaptureManager.hpp"
+#include "CaptureSessionManager.hpp"
 #include "Pbox/Instance.hpp"
 #include "SystemStatusManager.hpp"
 
@@ -21,6 +22,7 @@ class ApplicationState : public QObject
 
     Q_PROPERTY(Pbox::SystemStatusManager *systemStatusManager READ getSystemStatusManager CONSTANT);
     Q_PROPERTY(Pbox::CaptureManager *captureManager READ getCaptureManager CONSTANT);
+    Q_PROPERTY(Pbox::CaptureSessionManager *captureSessionManager READ getCaptureSessionManager CONSTANT);
 
   public:
     SystemStatusManager *getSystemStatusManager() const
@@ -33,8 +35,14 @@ class ApplicationState : public QObject
         return capture_manager.get();
     }
 
+    CaptureSessionManager *getCaptureSessionManager() const
+    {
+        return capture_session_manager.get();
+    }
+
   public:
     Instance<SystemStatusManager> system_status_manager;
     Instance<CaptureManager> capture_manager;
+    Instance<CaptureSessionManager> capture_session_manager;
 };
 } // namespace Pbox

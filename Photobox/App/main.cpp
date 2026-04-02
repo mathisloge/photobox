@@ -131,6 +131,7 @@ int main(int argc, char *argv[])
 
         app_state->system_status_manager = system_status_manager;
         app_state->capture_manager = capture_manager;
+        app_state->capture_session_manager = capture_session_manager;
 
         engine.loadFromModule("Photobox.App", "Main");
         engine.addImageProvider(QLatin1String("preview-image"), capture_manager->createImageProvider());

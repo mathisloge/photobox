@@ -1,10 +1,14 @@
 #pragma once
+#include <QtQmlIntegration/qqmlintegration.h>
 #include "CaptureSessionFactory.hpp"
 #include "TriggerId.hpp"
 namespace Pbox
 {
-class CaptureSessionManager
+class CaptureSessionManager : public QObject
 {
+    Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Provided by ApplicationState")
   public:
     void registerCaptureSession(CaptureSessionId session_id, std::unique_ptr<ICaptureSessionFactory> session_factory);
     void addTriggerRelation(CaptureSessionId session_id, TriggerId trigger_id);
