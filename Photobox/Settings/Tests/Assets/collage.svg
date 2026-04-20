@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="150mm" height="100mm" viewBox="0 0 150 100">
+  <rect width="150" height="100" fill="white" />
+
+  <text y="30" fill="gold" font-family="Great Vibes" text-anchor="middle" font-size="28">
+    <tspan x="75">Test</tspan>
+    <tspan x="75" dy="30">&amp;</tspan>
+    <tspan x="75" dy="30">User</tspan>
+  </text>
+
+  <text fill="red" font-family="Roboto" font-size="10" x="0" y="100">10.10.2024</text>
+
+  <image id="image-1" x="0" y="35" width="50" height="45" href="" />
+  <image id="image-2" x="100" y="35" width="50" height="45"  href="" />
+
+</svg>

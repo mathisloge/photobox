@@ -51,7 +51,7 @@
                     "image-2"
                 ],
                 "time_between_capture": 2,
-                "svg_template": "/home/mlogemann/dev/photobox/Tests/assets/collage.svg"
+                "svg_template": "./collage.svg"
             }
         }
     ],
