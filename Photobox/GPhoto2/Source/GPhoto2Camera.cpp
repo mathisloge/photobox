@@ -14,11 +14,10 @@
 #include "Pbox/GPhoto2Exeption.hpp"
 
 #undef emit // stupid qt...
-#include <asioexec/use_sender.hpp>
 #include <boost/asio/steady_timer.hpp>
+#include <exec/asio/use_sender.hpp>
 #include <exec/env.hpp>
-#include <exec/repeat_effect_until.hpp>
-#include <exec/static_thread_pool.hpp>
+#include <exec/repeat_until.hpp>
 
 DEFINE_LOGGER(gphoto2_camera);
 namespace Pbox
@@ -77,9 +76,9 @@ exec::task<void> GPhoto2Camera::asyncCaptureLoop()
                                  Q_EMIT imageCaptured(image.value());
                              }
                              return image.has_value();
-                         })                           //
-                       | exec::repeat_effect_until(); // todo: this now retries forever to capture a image.
-                                                      // maybe retry_n times and emit an error?
+                         })                    //
+                       | exec::repeat_until(); // todo: this now retries forever to capture a image.
+                                               // maybe retry_n times and emit an error?
         auto preview = stdexec::schedule(scheduler_->getWorkScheduler()) //
                        | flowCapturePreview(*context)                    //
                        | stdexec::then([this](auto &&image) { processPreviewImage(image); });
@@ -114,7 +113,7 @@ exec::task<GPhoto2::Context> GPhoto2Camera::asyncAutoconnect()
     while (not autodetectAndConnectCamera(context))
     {
         co_await boost::asio::steady_timer{scheduler_->getWorkExecutor(), std::chrono::milliseconds{100}}.async_wait(
-            asioexec::use_sender);
+            exec::asio::use_sender);
     }
     status_client_.setSystemStatus(SystemStatusCode::Code::Ok);
     co_return context;

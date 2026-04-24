@@ -75,6 +75,17 @@ void CaptureManager::triggerButtonPressed(const QString &trigger_id)
     }
 }
 
+void CaptureManager::sessionButtonPressed(const QString &session_id)
+{
+    if (session_->getStatus() == ICaptureSession::Status::Idle)
+    {
+        triggered_by_ = "";
+        LOG_DEBUG(logger_capture_manager(), "Got session display trigger {}", session_id.toStdString());
+        switchToSession(capture_session_manager_->createFromSessionId(session_id.toStdString()));
+        session_->triggerCapture();
+    }
+}
+
 ImageProvider *CaptureManager::createImageProvider() const
 {
     auto *image_provider = new ImageProvider(); // NOLINT(cppcoreguidelines-owning-memory)
@@ -95,9 +106,9 @@ ICamera *CaptureManager::getCamera()
 
 void CaptureManager::sessionFinished()
 {
-    LOG_DEBUG(logger_capture_manager(), "Session '{}' finished", session_->name());
+    LOG_DEBUG(logger_capture_manager(), "Session '{}' finished", session_->sessionId());
     Q_EMIT resetImages();
-    if (session_->name() != IdleCaptureSession::kName)
+    if (session_->sessionId() != IdleCaptureSession::kName)
     {
         switchToSession(capture_session_manager_->createIdleSession());
     }
@@ -105,7 +116,7 @@ void CaptureManager::sessionFinished()
 
 void CaptureManager::switchToSession(CaptureSessionPtr new_session)
 {
-    const auto old_session_name = session_ != nullptr ? session_->name() : "unknown";
+    const auto old_session_id = session_ != nullptr ? session_->sessionId() : "unknown";
     session_ = std::move(new_session);
     if (session_ != nullptr)
     {
@@ -122,24 +133,26 @@ void CaptureManager::switchToSession(CaptureSessionPtr new_session)
     Q_EMIT sessionChanged();
     LOG_INFO(logger_capture_manager(),
              "Switched session from '{}' to '{}'",
-             old_session_name,
-             session_ != nullptr ? session_->name() : "none");
+             old_session_id,
+             session_ != nullptr ? session_->sessionId() : "none");
 }
 
 void CaptureManager::handleSessionStatusChange()
 {
     const auto status = session_->getStatus();
-
-    switch (status)
+    if (not triggered_by_.empty())
     {
-    case ICaptureSession::Status::Idle:
-        trigger_manager_->updateTriggerEffect(triggered_by_, RemoteTrigger::Effect::Idle);
-        break;
-    case ICaptureSession::Status::Capturing:
-        trigger_manager_->updateTriggerEffect(triggered_by_, RemoteTrigger::Effect::Countdown);
-        break;
-    case ICaptureSession::Status::Busy:
-        break;
+        switch (status)
+        {
+        case ICaptureSession::Status::Idle:
+            trigger_manager_->updateTriggerEffect(triggered_by_, RemoteTrigger::Effect::Idle);
+            break;
+        case ICaptureSession::Status::Capturing:
+            trigger_manager_->updateTriggerEffect(triggered_by_, RemoteTrigger::Effect::Countdown);
+            break;
+        case ICaptureSession::Status::Busy:
+            break;
+        }
     }
 }
 

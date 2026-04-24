@@ -17,18 +17,26 @@ class CollageCaptureSessionFactory : public ICaptureSessionFactory
 {
   public:
     PBOX_DISABLE_COPY_MOVE(CollageCaptureSessionFactory)
-    CollageCaptureSessionFactory(std::string name,
+    CollageCaptureSessionFactory(CaptureSessionId session_id,
+                                 std::string name,
+                                 QColor color,
                                  Instance<Scheduler> scheduler,
                                  Instance<ImageStorage> image_storage,
                                  CollageSettings collage_settings);
     ~CollageCaptureSessionFactory() override;
     CaptureSessionPtr create(std::chrono::seconds initial_countdown) const override;
 
+    const CaptureSessionId &sessionId() const override;
+    const std::string &name() const override;
+    QColor color() const override;
+
   private:
     void loadCollage();
 
   private:
+    CaptureSessionId session_id_;
     std::string name_;
+    QColor color_;
     Instance<CollageRenderer> renderer_;
     Instance<Scheduler> scheduler_;
     Instance<ImageStorage> image_storage_;

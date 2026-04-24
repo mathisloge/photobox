@@ -6,5 +6,11 @@
 #include <string>
 namespace Pbox
 {
+/**
+ * @brief Type alias for remote trigger identifiers.
+ *
+ * This using declaration provides type safety for distinguishing
+ * trigger IDs from regular strings.
+ */
 using RemoteTriggerId = std::string;
-}
+} // namespace Pbox

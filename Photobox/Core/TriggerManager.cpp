@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "TriggerManager.hpp"
+#include <QMetaEnum>
 #include <Pbox/Logger.hpp>
 #include "SystemStatusManager.hpp"
 

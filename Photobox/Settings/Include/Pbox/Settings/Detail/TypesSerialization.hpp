@@ -8,6 +8,9 @@
 
 namespace nlohmann
 {
+/**
+ * @brief JSON serializer for optional types.
+ */
 template <typename T>
 struct adl_serializer<std::optional<T>>
 {
@@ -26,7 +29,7 @@ struct adl_serializer<std::optional<T>>
     {
         if (t.has_value())
         {
-            json = json = t.value();
+            json = t.value();
         }
         else
         {
@@ -35,6 +38,9 @@ struct adl_serializer<std::optional<T>>
     }
 };
 
+/**
+ * @brief JSON serializer for chrono durations.
+ */
 template <typename Rep, typename Period>
 struct adl_serializer<std::chrono::duration<Rep, Period>>
 {
@@ -53,6 +59,9 @@ struct adl_serializer<std::chrono::duration<Rep, Period>>
 
 namespace Pbox
 {
+/**
+ * @brief Macro-generated JSON serializers for config structs.
+ */
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(FontConfig, family, path, bold, italic);
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(EspHomeRemoteTriggerConfig, name, uri);
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(CameraLedConfig, uri);
@@ -64,7 +73,7 @@ NLOHMANN_JSON_SERIALIZE_ENUM(SessionType,
                              });
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
     CollageSettings, automatic_capture, svg_template, image_elements, time_between_capture)
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(SessionConfig, name, type, print, triggers, collage);
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(SessionConfig, id, name, type, print, triggers, collage, color_hex);
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
     ProjectConfig, name, capture_dir, initial_countdown, camera_led, remote_triggers, sessions, fonts);
 

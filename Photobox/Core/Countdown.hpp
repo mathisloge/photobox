@@ -5,8 +5,8 @@
 #pragma once
 #include <QObject>
 #include <QTimer>
-#include <QtQmlIntegration>
 #include <Pbox/DisableCopyMove.hpp>
+#include <QtQmlIntegration/qqmlintegration.h>
 
 namespace Pbox
 {

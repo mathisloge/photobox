@@ -4,6 +4,7 @@
 
 #pragma once
 #include <filesystem>
+#include <optional>
 #include <string>
 #include <vector>
 #include <CollageSettings.hpp>
@@ -11,33 +12,50 @@
 
 namespace Pbox
 {
+/**
+ * @brief Configuration for ESPHome remote trigger.
+ */
 struct EspHomeRemoteTriggerConfig
 {
     RemoteTriggerId name;
     std::string uri;
 };
 
+/**
+ * @brief Configuration for camera LED.
+ */
 struct CameraLedConfig
 {
     std::string uri;
 };
 
+/**
+ * @brief Enumeration of session types.
+ */
 enum class SessionType
 {
-    Unknown,
-    SingleCapture,
-    CollageCapture
+    Unknown,       // Unknown session type.
+    SingleCapture, // Single capture session.
+    CollageCapture // Collage capture session.
 };
 
+/**
+ * @brief Configuration for a session.
+ */
 struct SessionConfig
 {
+    std::string id;
     std::string name;
     SessionType type{};
     bool print{};
     std::vector<std::string> triggers;
     std::optional<CollageSettings> collage;
+    std::string color_hex;
 };
 
+/**
+ * @brief Configuration for fonts.
+ */
 struct FontConfig
 {
     std::string family;

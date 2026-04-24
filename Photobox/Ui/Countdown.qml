@@ -17,6 +17,10 @@ Text {
         countdownText.opacity = 1;
     }
 
+    layer.enabled: true
+    layer.effect: GlowEffect {
+    }
+
     Behavior on text {
         SequentialAnimation {
             NumberAnimation {

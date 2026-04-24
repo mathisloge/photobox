@@ -7,8 +7,13 @@ import QtQuick.Controls
 
 Page {
     property alias imageSource: previewImage.source
+    background: PageBackground {}
+
     PreviewImage {
         id: previewImage
-        anchors.fill: parent
+        anchors.centerIn: parent
+        fillMode: Image.PreserveAspectCrop
+        width: parent.width / 2
+        height: parent.height / 2
     }
 }

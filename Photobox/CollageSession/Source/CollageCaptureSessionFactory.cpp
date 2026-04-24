@@ -12,11 +12,15 @@ DEFINE_LOGGER(collage_capture_session);
 
 namespace Pbox
 {
-CollageCaptureSessionFactory::CollageCaptureSessionFactory(std::string name,
+CollageCaptureSessionFactory::CollageCaptureSessionFactory(CaptureSessionId session_id,
+                                                           std::string name,
+                                                           QColor color,
                                                            Instance<Scheduler> scheduler,
                                                            Instance<ImageStorage> image_storage,
                                                            CollageSettings collage_settings)
-    : name_{std::move(name)}
+    : session_id_{std::move(session_id)}
+    , name_{std::move(name)}
+    , color_{std::move(color)}
     , scheduler_{std::move(scheduler)}
     , image_storage_{std::move(image_storage)}
     , collage_settings_{std::move(collage_settings)}
@@ -50,6 +54,21 @@ void CollageCaptureSessionFactory::loadCollage()
 CaptureSessionPtr CollageCaptureSessionFactory::create(std::chrono::seconds initial_countdown) const
 {
     return make_unique_object_ptr_as<ICaptureSession, CollageCaptureSession>(
-        name_, initial_countdown, image_storage_, renderer_, scheduler_, collage_settings_);
+        session_id_, initial_countdown, image_storage_, renderer_, scheduler_, collage_settings_);
+}
+
+const CaptureSessionId &CollageCaptureSessionFactory::sessionId() const
+{
+    return session_id_;
+}
+
+const std::string &CollageCaptureSessionFactory::name() const
+{
+    return name_;
+}
+
+QColor CollageCaptureSessionFactory::color() const
+{
+    return color_;
 }
 } // namespace Pbox

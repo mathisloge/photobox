@@ -15,16 +15,27 @@ qt_add_qml_module(
         CaptureMainPage.qml
         CapturePage.qml
         PreviewPage.qml
-        BuzzerAnimation.qml
+        GlowEffect.qml
+        VideoBox.qml
+        PageBackground.qml
+        Buzzer.qml
     RESOURCES
-        Buzzer.svg
         Pointer.svg
         ImageBorder.svg
         Logo.svg
     DEPENDENCIES
         TARGET Photobox::Core
 )
+
+target_sources(
+    PhotoboxUi
+    PRIVATE Source/CaptureSessionList.hpp Source/CaptureSessionList.cpp
+)
 add_library(Photobox::Ui ALIAS PhotoboxUi)
 
-target_include_directories(PhotoboxUi PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
-target_link_libraries(PhotoboxUi PUBLIC Qt6::Quick)
+target_include_directories(
+    PhotoboxUi
+    PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}"
+    PRIVATE Source
+)
+target_link_libraries(PhotoboxUi PUBLIC Qt6::Quick Photobox::Core)

@@ -25,7 +25,9 @@
     },
     "sessions": [
         {
-            "name": "SingleCaptureSession",
+            "id": "SingleCaptureSession",
+            "name": "Einzelfoto",
+            "color_hex": "#FF00FF",
             "type": "SingleCapture",
             "print": false,
             "triggers": [
@@ -34,12 +36,13 @@
             "collage": null
         },
         {
-            "name": "CollageCaptureSession",
+            "id": "CollageCaptureSession",
+            "name": "Collagenfoto",
+            "color_hex": "#6200EA",
             "type": "CollageCapture",
             "print": false,
             "triggers": [
-                "CollageTrigger",
-                "Display"
+                "CollageTrigger"
             ],
             "collage": {
                 "automatic_capture": true,
@@ -48,7 +51,7 @@
                     "image-2"
                 ],
                 "time_between_capture": 2,
-                "svg_template": "/home/mlogemann/dev/photobox/Tests/assets/collage.svg"
+                "svg_template": "./collage.svg"
             }
         }
     ],

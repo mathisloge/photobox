@@ -1,13 +1,16 @@
 pragma ComponentBehavior: Bound
 import QtQuick
+import QtMultimedia
 import QtQuick.Effects
 
 Item {
     id: root
+    property alias videoSink: videoOutput.videoSink
 
-    property alias source: img.source
-    property alias fillMode: img.fillMode
     readonly property real radius: 12
+
+    implicitHeight: videoOutput.height
+    implicitWidth: videoOutput.width
 
     Rectangle {
         id: glow
@@ -36,10 +39,19 @@ Item {
             maskSource: mask
         }
 
-        Image {
-            id: img
-            anchors.fill: parent
-            fillMode: Image.PreserveAspectCrop
+        VideoOutput {
+            id: videoOutput
+
+            width: root.width
+            height: root.height
+
+            fillMode: VideoOutput.PreserveAspectCrop
+        }
+    }
+
+    Behavior on opacity {
+        NumberAnimation {
+            duration: 500
         }
     }
 }
