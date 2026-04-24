@@ -4,7 +4,7 @@
 
 #pragma once
 #include <Pbox/QStdexec.hpp>
-#include <execpools/asio/asio_thread_pool.hpp>
+#include <exec/asio/asio_thread_pool.hpp>
 #include "Pbox/DisableCopyMove.hpp"
 namespace Pbox
 {
@@ -46,6 +46,6 @@ class Scheduler final
     QThreadScheduler getQtEventLoopScheduler();
 
   private:
-    execpools::asio_thread_pool compute_thread_pool_{4};
+    exec::asio::asio_thread_pool compute_thread_pool_{4};
 };
 } // namespace Pbox
