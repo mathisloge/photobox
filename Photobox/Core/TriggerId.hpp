@@ -6,5 +6,11 @@
 #include <string>
 namespace Pbox
 {
+/**
+ * @brief Type alias for trigger identifiers.
+ *
+ * This using declaration provides type safety for distinguishing
+ * trigger IDs from regular strings.
+ */
 using TriggerId = std::string;
-}
+} // namespace Pbox

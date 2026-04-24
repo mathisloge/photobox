@@ -7,5 +7,13 @@
 #include <system_error>
 namespace Pbox
 {
+/**
+ * @brief Installs the crash handler for the application.
+ *
+ * This function sets up crash dumping functionality to collect
+ * diagnostic information when the application crashes.
+ *
+ * @return An expected result: void on success, error code on failure.
+ */
 [[nodiscard]] std::expected<void, std::error_code> install_crash_handler() noexcept;
-}
+} // namespace Pbox

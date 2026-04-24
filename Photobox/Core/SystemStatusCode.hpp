@@ -7,14 +7,22 @@
 
 namespace Pbox::SystemStatusCode
 {
+/**
+ * @brief Namespace for system status codes.
+ *
+ * This namespace defines the possible status codes for system components.
+ */
 QML_ELEMENT
 Q_NAMESPACE
 
+/**
+ * @brief Enumeration of system status codes.
+ */
 enum class Code
 {
-    Error,
-    Connecting,
-    Ok
+    Error,      // An error occurred.
+    Connecting, // The component is connecting.
+    Ok          // The component is operating normally.
 };
 Q_ENUM_NS(Code)
 

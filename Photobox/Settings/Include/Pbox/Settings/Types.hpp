@@ -12,24 +12,36 @@
 
 namespace Pbox
 {
+/**
+ * @brief Configuration for ESPHome remote trigger.
+ */
 struct EspHomeRemoteTriggerConfig
 {
     RemoteTriggerId name;
     std::string uri;
 };
 
+/**
+ * @brief Configuration for camera LED.
+ */
 struct CameraLedConfig
 {
     std::string uri;
 };
 
+/**
+ * @brief Enumeration of session types.
+ */
 enum class SessionType
 {
-    Unknown,
-    SingleCapture,
-    CollageCapture
+    Unknown,       // Unknown session type.
+    SingleCapture, // Single capture session.
+    CollageCapture // Collage capture session.
 };
 
+/**
+ * @brief Configuration for a session.
+ */
 struct SessionConfig
 {
     std::string id;
@@ -41,6 +53,9 @@ struct SessionConfig
     std::string color_hex;
 };
 
+/**
+ * @brief Configuration for fonts.
+ */
 struct FontConfig
 {
     std::string family;
