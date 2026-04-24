@@ -4,8 +4,8 @@
 
 #pragma once
 #include <QObject>
-#include <QtQmlIntegration>
 #include <ICamera.hpp>
+#include <QtQmlIntegration/qqmlintegration.h>
 #include <RemoteTrigger.hpp>
 #include "CaptureManager.hpp"
 #include "CaptureSessionManager.hpp"

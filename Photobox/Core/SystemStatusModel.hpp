@@ -4,9 +4,10 @@
 
 #pragma once
 #include <QAbstractListModel>
-#include <QtQmlIntegration>
+#include <QPointer>
 #include <vector>
 #include <Pbox/DisableCopyMove.hpp>
+#include <QtQmlIntegration/qqmlintegration.h>
 #include "SystemStatusClient.hpp"
 
 namespace Pbox

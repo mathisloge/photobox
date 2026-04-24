@@ -4,7 +4,7 @@
 
 #pragma once
 #include <QAbstractListModel>
-#include <QtQmlIntegration>
+#include <QtQmlIntegration/qqmlintegration.h>
 #include "CollageRenderer.hpp"
 
 namespace Pbox

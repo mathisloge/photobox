@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #pragma once
+#include <QObject>
 #include <QString>
 #include <Pbox/DisableCopyMove.hpp>
 #include "SystemStatusCode.hpp"

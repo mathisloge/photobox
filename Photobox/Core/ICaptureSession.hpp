@@ -4,8 +4,9 @@
 
 #pragma once
 #include <QObject>
-#include <QtQmlIntegration>
+#include <filesystem>
 #include <Pbox/DisableCopyMove.hpp>
+#include <QtQmlIntegration/qqmlintegration.h>
 #include "Countdown.hpp"
 namespace Pbox
 {
