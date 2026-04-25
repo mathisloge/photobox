@@ -1,16 +1,16 @@
-// SPDX-FileCopyrightText: 2024 - 2025 Mathis Logemann <mathis.opensource@tuta.io>
+// SPDX-FileCopyrightText: 2024 - 2026 Mathis Logemann <mathis.opensource@tuta.io>
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "CaptureManager.hpp"
 #include <ICamera.hpp>
-#include <Pbox/CleanupAsyncScope.hpp>
 #include <Pbox/Logger.hpp>
-#include <Scheduler.hpp>
 #include "CameraLed.hpp"
-#include "IdleCaptureSession.hpp"
+#include "CapturePipeline.hpp"
+#include "CaptureSessionCoordinator.hpp"
 #include "ImageProvider.hpp"
-#include "ImageStorage.hpp"
+#include "SessionEffectController.hpp"
+#include "TriggerController.hpp"
 
 DEFINE_LOGGER(capture_manager);
 
@@ -22,68 +22,56 @@ CaptureManager::CaptureManager(Instance<Scheduler> scheduler,
                                Instance<TriggerManager> trigger_manager,
                                Instance<CameraLed> camera_led,
                                Instance<CaptureSessionManager> capture_session_manager)
-    : scheduler_{std::move(scheduler)}
-    , image_storage_{std::move(image_storage)}
-    , camera_{std::move(camera)}
-    , trigger_manager_{std::move(trigger_manager)}
-    , camera_led_{std::move(camera_led)}
-    , session_{make_unique_object_ptr_as<ICaptureSession, IdleCaptureSession>()}
-    , capture_session_manager_{std::move(capture_session_manager)}
+    : camera_{std::move(camera)}
 {
-    connect(camera_.get(), &ICamera::imageCaptured, this, [this](auto &&image) {
-        //! important: first emit the signal so that all image providers have it saved, and only then set the image to
-        //! the session. otherwise qml will not reevaluate the image and the providers don't have a signal to schedule a
-        //! cache invalidation
-        const auto image_id = image_ids_++;
-        Q_EMIT imageCaptured(image, image_id);
-        session_->imageCaptured(image, image_id);
-        async_scope_.spawn(stdexec::schedule(scheduler_->getWorkScheduler()) |
-                           stdexec::then([this, image = image]() { return image_storage_->saveImage(image); }) |
-                           stdexec::continues_on(scheduler_->getQtEventLoopScheduler()) |
-                           stdexec::then([this](auto &&saved_image_path) { session_->imageSaved(saved_image_path); }) |
-                           stdexec::upon_error([](auto &&ex_ptr) {
-                               try
-                               {
-                                   std::rethrow_exception(ex_ptr);
-                               }
-                               catch (const std::exception &ex)
-                               {
-                                   LOG_ERROR(logger_capture_manager(), "Error while saving image. {}", ex.what());
-                               }
-                           }));
+    session_coordinator_ = std::make_unique<CaptureSessionCoordinator>(camera_, capture_session_manager);
+
+    trigger_controller_ = std::make_unique<TriggerController>(
+        trigger_manager,
+        capture_session_manager,
+        [this]() { return session_coordinator_->getSession(); },
+        [this](CaptureSessionPtr session) { session_coordinator_->switchToSession(std::move(session)); });
+
+    session_effect_controller_ = std::make_unique<SessionEffectController>(
+        trigger_manager, camera_led, [this]() -> const TriggerId & { return trigger_controller_->getTriggeredBy(); });
+
+    capture_pipeline_ = std::make_unique<CapturePipeline>(
+        scheduler, image_storage, [this]() { return session_coordinator_->getSession(); });
+
+    connect(camera_.get(), &ICamera::imageCaptured, capture_pipeline_.get(), &CapturePipeline::onCameraImageCaptured);
+    connect(capture_pipeline_.get(),
+            &CapturePipeline::imageCaptured,
+            this,
+            [this](const QImage &image, std::uint32_t image_id) { Q_EMIT imageCaptured(image, image_id); });
+    connect(session_coordinator_.get(), &CaptureSessionCoordinator::finished, this, &CaptureManager::sessionFinished);
+    connect(
+        session_coordinator_.get(), &CaptureSessionCoordinator::sessionChanged, this, &CaptureManager::sessionChanged);
+    connect(session_coordinator_.get(), &CaptureSessionCoordinator::statusChanged, this, [this]() {
+        if (auto *session = session_coordinator_->getSession())
+        {
+            session_effect_controller_->handleSessionStatusChanged(session->getStatus());
+        }
     });
-    connect(trigger_manager_.get(), &TriggerManager::triggerFired, this, [this](const TriggerId &trigger_id) {
-        triggerButtonPressed(QString::fromStdString(trigger_id));
+    connect(session_coordinator_.get(), &CaptureSessionCoordinator::captureStatusChanged, this, [this]() {
+        if (auto *session = session_coordinator_->getSession())
+        {
+            session_effect_controller_->handleSessionCaptureStatusChanged(session->getCaptureStatus());
+        }
     });
-    switchToSession(make_unique_object_ptr_as<ICaptureSession, IdleCaptureSession>());
+
+    session_coordinator_->initialize();
 }
 
-CaptureManager::~CaptureManager()
-{
-    cleanup_async_scope(async_scope_);
-}
+CaptureManager::~CaptureManager() = default;
 
 void CaptureManager::triggerButtonPressed(const QString &trigger_id)
 {
-    if (session_->getStatus() == ICaptureSession::Status::Idle)
-    {
-        const auto trigger = trigger_id.toStdString();
-        triggered_by_ = trigger;
-        LOG_DEBUG(logger_capture_manager(), "Got trigger {}", trigger);
-        switchToSession(capture_session_manager_->createFromTrigger(trigger));
-        session_->triggerCapture();
-    }
+    trigger_controller_->triggerButtonPressed(trigger_id);
 }
 
 void CaptureManager::sessionButtonPressed(const QString &session_id)
 {
-    if (session_->getStatus() == ICaptureSession::Status::Idle)
-    {
-        triggered_by_ = "";
-        LOG_DEBUG(logger_capture_manager(), "Got session display trigger {}", session_id.toStdString());
-        switchToSession(capture_session_manager_->createFromSessionId(session_id.toStdString()));
-        session_->triggerCapture();
-    }
+    trigger_controller_->sessionButtonPressed(session_id);
 }
 
 ImageProvider *CaptureManager::createImageProvider() const
@@ -96,7 +84,7 @@ ImageProvider *CaptureManager::createImageProvider() const
 
 Pbox::ICaptureSession *CaptureManager::getSession()
 {
-    return session_.get();
+    return session_coordinator_->getSession();
 }
 
 ICamera *CaptureManager::getCamera()
@@ -106,73 +94,6 @@ ICamera *CaptureManager::getCamera()
 
 void CaptureManager::sessionFinished()
 {
-    LOG_DEBUG(logger_capture_manager(), "Session '{}' finished", session_->sessionId());
     Q_EMIT resetImages();
-    if (session_->sessionId() != IdleCaptureSession::kName)
-    {
-        switchToSession(capture_session_manager_->createIdleSession());
-    }
-}
-
-void CaptureManager::switchToSession(CaptureSessionPtr new_session)
-{
-    const auto old_session_id = session_ != nullptr ? session_->sessionId() : "unknown";
-    session_ = std::move(new_session);
-    if (session_ != nullptr)
-    {
-        connect(session_.get(), &ICaptureSession::requestedImageCapture, camera_.get(), &ICamera::requestCapturePhoto);
-        connect(session_.get(), &ICaptureSession::finished, this, &CaptureManager::sessionFinished);
-        connect(session_.get(), &ICaptureSession::statusChanged, this, &CaptureManager::handleSessionStatusChange);
-        connect(session_.get(),
-                &ICaptureSession::captureStatusChanged,
-                this,
-                &CaptureManager::handleSessionCaptureStatusChange);
-        handleSessionStatusChange();
-        handleSessionCaptureStatusChange();
-    }
-    Q_EMIT sessionChanged();
-    LOG_INFO(logger_capture_manager(),
-             "Switched session from '{}' to '{}'",
-             old_session_id,
-             session_ != nullptr ? session_->sessionId() : "none");
-}
-
-void CaptureManager::handleSessionStatusChange()
-{
-    const auto status = session_->getStatus();
-    if (not triggered_by_.empty())
-    {
-        switch (status)
-        {
-        case ICaptureSession::Status::Idle:
-            trigger_manager_->updateTriggerEffect(triggered_by_, RemoteTrigger::Effect::Idle);
-            break;
-        case ICaptureSession::Status::Capturing:
-            trigger_manager_->updateTriggerEffect(triggered_by_, RemoteTrigger::Effect::Countdown);
-            break;
-        case ICaptureSession::Status::Busy:
-            break;
-        }
-    }
-}
-
-void CaptureManager::handleSessionCaptureStatusChange()
-{
-    const auto status = session_->getCaptureStatus();
-    switch (status)
-    {
-    case ICaptureSession::CaptureStatus::Idle:
-        LOG_DEBUG(logger_capture_manager(), "Camera LED => off");
-        camera_led_->turnOff();
-        break;
-    case ICaptureSession::CaptureStatus::BeforeCapture:
-        LOG_DEBUG(logger_capture_manager(), "Camera LED => Pulsate");
-        camera_led_->playEffect(CameraLed::Effect::Pulsate);
-        break;
-    case ICaptureSession::CaptureStatus::WaitForCapture:
-        LOG_DEBUG(logger_capture_manager(), "Camera LED => Capture");
-        camera_led_->playEffect(CameraLed::Effect::Capture);
-        break;
-    }
 }
 } // namespace Pbox
