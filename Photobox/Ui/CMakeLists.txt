@@ -20,8 +20,6 @@ qt_add_qml_module(
         PageBackground.qml
         Buzzer.qml
     RESOURCES
-        Pointer.svg
-        ImageBorder.svg
         Logo.svg
     DEPENDENCIES
         TARGET Photobox::Core
