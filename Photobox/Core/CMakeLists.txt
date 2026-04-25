@@ -38,6 +38,14 @@ qt_add_qml_module(
         IdleCaptureSession.cpp
         CaptureManager.hpp
         CaptureManager.cpp
+        CapturePipeline.hpp
+        CapturePipeline.cpp
+        CaptureSessionCoordinator.hpp
+        CaptureSessionCoordinator.cpp
+        TriggerController.hpp
+        TriggerController.cpp
+        SessionEffectController.hpp
+        SessionEffectController.cpp
         SystemStatusCode.hpp
         SystemStatusManager.hpp
         SystemStatusManager.cpp
