@@ -19,6 +19,8 @@ jobs:
       # PRs opened with GITHUB_TOKEN don't trigger PrValidation, so check here.
       - name: Build and test
         run: nix flake check -L
+      - name: Evaluate aarch64 package
+        run: nix eval .#packages.aarch64-linux.default.drvPath
       - uses: peter-evans/create-pull-request@v8
         with:
           branch: update-flake-lock

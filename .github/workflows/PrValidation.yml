@@ -3,10 +3,16 @@ on:
     branches: [main]
   pull_request:
 name: Build and test
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   nix:
     name: "Nix flake check"
     runs-on: ubuntu-latest
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v7
       - uses: cachix/install-nix-action@v31
