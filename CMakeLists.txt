@@ -14,39 +14,25 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/runtime")
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
-include(CPM)
 include(CTest)
 include(GenerateExportHeader)
 include(Options)
 
 declare_photobox_options()
 
-set(BOOST_VERSION "1.92.0")
-list(APPEND BOOST_INCLUDE_LIBRARIES asio)
-cpmaddpackage(
-  NAME Boost
-  VERSION ${BOOST_VERSION}
-  URL https://github.com/boostorg/boost/releases/download/boost-${BOOST_VERSION}/boost-${BOOST_VERSION}-cmake.tar.xz
-  URL_HASH SHA256=aca59f889f0f32028ad88ba6764582b63c916ce5f77b31289ad19421a96c555f
-  OPTIONS "BOOST_ENABLE_CMAKE ON" "BOOST_SKIP_INSTALL_RULES ${CMAKE_SKIP_INSTALL_RULES}"
-  FIND_PACKAGE_ARGUMENTS "GLOBAL CONFIG REQUIRED NAMES Boost-${BOOST_VERSION} CONFIGS BoostConfig.cmake"
-  EXCLUDE_FROM_ALL ON
-  SYSTEM ON
-)
-cpmaddpackage(URI "gh:sammycage/lunasvg@3.5.0" OPTIONS "LUNASVG_BUILD_EXAMPLES OFF")
-cpmaddpackage("gh:fmtlib/fmt#12.2.0")
-cpmaddpackage(NAME "nlohmann_json" VERSION 3.12.0 GITHUB_REPOSITORY "nlohmann/json")
-cpmaddpackage(URI "gh:jeremy-rifkin/cpptrace@1.0.4" VERSION 1.0.4 OPTIONS "CPPTRACE_UNWIND_WITH_LIBUNWIND ON" FIND_PACKAGE_ARGUMENTS "CONFIG")
-cpmaddpackage(URI "gh:NVIDIA/stdexec#362cdc77738e958f1d12fddfb55229a98df29d8a" VERSION 0.11.0 OPTIONS "CPM_LOCAL_PACKAGES ON" "STDEXEC_BUILD_TESTS OFF" "STDEXEC_BUILD_EXAMPLES OFF" "STDEXEC_ENABLE_ASIO ON" "STDEXEC_ASIO_IMPLEMENTATION boost" FIND_PACKAGE_ARGUMENTS "CONFIG"
-)
-cpmaddpackage(URI "gh:odygrd/quill@13.1.0" OPTIONS "QUILL_DISABLE_NON_PREFIXED_MACROS OFF")
+find_package(Boost 1.86 CONFIG REQUIRED)
+find_package(fmt CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
+find_package(cpptrace CONFIG REQUIRED)
+find_package(stdexec CONFIG REQUIRED)
+find_package(quill CONFIG REQUIRED)
+find_package(lunasvg CONFIG REQUIRED)
 
 if(BUILD_TESTING)
-    cpmaddpackage(URI "gh:mathisloge/quite@1.4.1-dev.2" OPTIONS "QUITE_BUILD_TEST_API ON" "QUITE_INSTALL OFF" "QUITE_BUILD_PROBE_QT OFF" "BUILD_TESTING OFF" "QUITE_BUILD_PYTHON_TEST_API OFF" "QUITE_BUILD_REMOTE_MANAGER OFF")
-    cpmaddpackage(URI "gh:catchorg/Catch2@3.16.1" FIND_PACKAGE_ARGUMENTS "CONFIG")
-    list(APPEND CMAKE_MODULE_PATH "${Catch2_SOURCE_DIR}/extras") # local builds
-    list(APPEND CMAKE_MODULE_PATH "${Catch2_DIR}") # flatpak builds
+    find_package(Catch2 3 CONFIG REQUIRED)
+    list(APPEND CMAKE_MODULE_PATH "${Catch2_DIR}")
     include(Catch)
+    find_package(quite CONFIG QUIET)
     find_package(Qt6 REQUIRED COMPONENTS Test)
 endif()
 
@@ -71,5 +57,3 @@ add_subdirectory(Photobox)
 if(BUILD_TESTING)
     #add_subdirectory(Tests)
 endif()
-
-install(PROGRAMS launcher.sh TYPE BIN)

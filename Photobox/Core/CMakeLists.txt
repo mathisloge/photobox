@@ -65,6 +65,7 @@ target_link_libraries(
         Qt6::Multimedia
         Boost::headers
         STDEXEC::stdexec
+        STDEXEC::asioexec
         cpptrace::cpptrace
         lunasvg::lunasvg
         nlohmann_json::nlohmann_json

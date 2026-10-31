@@ -2,6 +2,11 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+if(NOT TARGET quite::core)
+    message(STATUS "quite not found: skipping CollageSessionTests")
+    return()
+endif()
+
 add_executable(CollageSessionTests main.cpp TestCollageRenderer.cpp)
 target_link_libraries(
     CollageSessionTests

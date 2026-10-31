@@ -25,7 +25,32 @@
       overlays.default = import ./Nix/overlay.nix;
 
       packages = forAllSystems (pkgs: {
+        default = pkgs.callPackage ./Nix/photobox.nix { };
         inherit (pkgs) stdexec;
       });
+
+      apps = forAllSystems (pkgs: {
+        default = {
+          type = "app";
+          program = pkgs.lib.getExe self.packages.${pkgs.stdenv.hostPlatform.system}.default;
+        };
+      });
+
+      devShells = forAllSystems (pkgs: {
+        default = pkgs.callPackage ./Nix/devshell.nix {
+          photobox = self.packages.${pkgs.stdenv.hostPlatform.system}.default;
+        };
+      });
+
+      checks = forAllSystems (
+        pkgs:
+        let
+          system = pkgs.stdenv.hostPlatform.system;
+        in
+        {
+          photobox = self.packages.${system}.default;
+          devShell = self.devShells.${system}.default;
+        }
+      );
     };
 }

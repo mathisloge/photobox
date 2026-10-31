@@ -31,6 +31,7 @@ target_link_libraries(
         $<$<TARGET_EXISTS:Boost::asio>:Boost::asio>
         $<$<TARGET_EXISTS:Boost::system>:Boost::system>
         STDEXEC::stdexec
+        STDEXEC::asioexec
         Photobox::Core
         PkgConfig::gphoto2
 )
