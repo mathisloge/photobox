@@ -18,6 +18,12 @@ repos:
         exclude: ^(mkdocs|.clang-format)
       - id: check-added-large-files
 
+  - repo: https://github.com/BlankSpruce/gersemi-pre-commit
+    rev: 0.29.2
+    hooks:
+      - id: gersemi
+        name: CMake linting
+
   - repo: https://github.com/psf/black
     rev: 26.3.1
     hooks:
@@ -53,9 +59,3 @@ repos:
         entry: clang-format -i -style=file
         language: system
         types_or: [c++, c, proto]
-      - id: gersemi
-        name: CMake linting
-        entry: gersemi -i
-        language: system
-        require_serial: true
-        files: (\.cmake|CMakeLists.txt)(.in)?$
