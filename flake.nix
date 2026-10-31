@@ -32,6 +32,7 @@
       apps = forAllSystems (pkgs: {
         default = {
           type = "app";
+          meta.description = "Run PhotoboxApp";
           program = pkgs.lib.getExe self.packages.${pkgs.stdenv.hostPlatform.system}.default;
         };
       });

@@ -64,11 +64,13 @@ stdenv.mkDerivation (finalAttrs: {
   # The package build sets its own flags instead of using CMakePresets.json.
   cmakeFlags = [ (lib.cmakeBool "BUILD_TESTING" finalAttrs.doCheck) ];
 
-  doCheck = true;
+  # Tests run the built binaries, so they need a native build.
+  doCheck = stdenv.buildPlatform.canExecute stdenv.hostPlatform;
 
   preCheck = ''
     export QT_QPA_PLATFORM=offscreen
     export HOME=$TMPDIR
+    export CTEST_OUTPUT_ON_FAILURE=1
   '';
 
   meta = {
