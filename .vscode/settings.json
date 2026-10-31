@@ -26,7 +26,8 @@
         "--background-index",
         "--clang-tidy",
         "--completion-style=detailed",
-        "--pch-storage=memory"
+        "--pch-storage=memory",
+        "--query-driver=/nix/store/*-gcc-wrapper-*/bin/*"
     ],
 
     "[cpp]": {

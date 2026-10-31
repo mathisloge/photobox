@@ -1,6 +1,7 @@
 {
     "recommendations": [
         "llvm-vs-code-extensions.vscode-clangd",
+        "mkhl.direnv",
         "ms-vscode.cpptools",
         "Anthropic.claude-code",
         "ms-vscode.cmake-tools",

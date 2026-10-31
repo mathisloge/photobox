@@ -18,21 +18,10 @@ repos:
         exclude: ^(mkdocs|.clang-format)
       - id: check-added-large-files
 
-  - repo: https://github.com/BlankSpruce/gersemi
-    rev: 0.26.1
-    hooks:
-      - id: gersemi
-        name: CMake linting
-
   - repo: https://github.com/psf/black
     rev: 26.3.1
     hooks:
       - id: black
-  - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v22.1.1
-    hooks:
-      - id: clang-format
-        types_or: [c++, c, proto]
   # Check linting and style issues
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: "v0.15.8"
@@ -59,3 +48,14 @@ repos:
         pass_filenames: true
         language: system
         stages: [ manual ]
+      - id: clang-format
+        name: clang-format
+        entry: clang-format -i -style=file
+        language: system
+        types_or: [c++, c, proto]
+      - id: gersemi
+        name: CMake linting
+        entry: gersemi -i
+        language: system
+        require_serial: true
+        files: (\.cmake|CMakeLists.txt)(.in)?$
