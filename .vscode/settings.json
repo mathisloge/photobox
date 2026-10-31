@@ -48,5 +48,10 @@
         "dist": true,
         ".cache": true
     },
-    "qt-core.showWelcomePageOnActivation": false
+    "qt-core.showWelcomePageOnActivation": false,
+    // qmlls comes from the dev shell's PATH, not from a Qt installer layout
+    "qt-qml.qmlls.customExePath": "qmlls",
+
+    // Restart the extensions once direnv has loaded the dev shell
+    "direnv.restart.automatic": true
 }

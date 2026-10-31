@@ -42,7 +42,8 @@ mkShell {
 
   # pip treats packages on PYTHONPATH as installed, so pre-commit's hook
   # environments would miss dependencies. The tools above are wrapped and
-  # don't need it.
+  # don't need it. Add Python libraries as python3.withPackages, not as bare
+  # python3Packages.
   shellHook = ''
     unset PYTHONPATH
   '';

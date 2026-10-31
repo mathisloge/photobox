@@ -30,10 +30,16 @@ Add these settings to your NixOS-WSL configuration and rebuild:
 git clone https://github.com/mathisloge/photobox.git
 cd photobox
 direnv allow
+pre-commit install
 ```
 
 The first `direnv allow` builds the dev shell, which takes a while. After that
-the environment loads whenever you enter the directory.
+the environment loads whenever you enter the directory, and reloads when
+`flake.nix`, `flake.lock` or `Nix/*.nix` change.
+
+`pre-commit install` sets up the formatting and commit message hooks. Commit
+with the dev shell loaded, because the clang-format hook uses the shell's
+clang-format.
 
 ## VS Code
 
@@ -42,8 +48,10 @@ the environment loads whenever you enter the directory.
    extension (`mkhl.direnv`) loads the dev shell into VS Code, so CMake Tools,
    clangd and the Qt extensions use the tools from the flake.
 
-If CMake Tools configured the project before direnv had loaded the
-environment, run **Developer: Reload Window**.
+The direnv extension restarts the other extensions once the environment has
+loaded. If CMake Tools still configured the project without it, run
+**Developer: Reload Window**, or **CMake: Delete Cache and Reconfigure** if the
+configure used a different compiler.
 
 ## Building
 
@@ -55,10 +63,11 @@ This configures, builds and runs the tests in `build/developer`. Start the
 app from the build tree:
 
 ```bash
-build/developer/runtime/PhotoboxApp --config path/to/photobox.json
+build/developer/runtime/PhotoboxApp --config Photobox/Settings/Tests/Assets/ProjectSettings.json
 ```
 
 Without `--config` the app reads `./photobox.json` and exits if it is missing.
+`Photobox/Settings/Tests/Assets/ProjectSettings.json` is a working example.
 Add `--dev` to use a mock camera instead of a real one.
 
 A `build/` directory created outside the dev shell points at other compilers
@@ -68,7 +77,7 @@ and libraries. Delete it once, then configure again from the dev shell.
 
 ```bash
 nix build              # builds Photobox and runs its tests, result in ./result
-nix run -- --config path/to/photobox.json
+nix run . -- --config path/to/photobox.json
 ```
 
 To update the dependencies, update the lock file and check that everything
