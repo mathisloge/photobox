@@ -27,6 +27,13 @@ in
 mkShell {
   inputsFrom = [ photobox ];
 
+  # Fortify hardening makes the compiler wrapper add -O2, which would turn the
+  # Debug preset into an optimized build.
+  hardeningDisable = [
+    "fortify"
+    "fortify3"
+  ];
+
   packages = [
     # LLVM 22 matches the repo's previous clang-format pin.
     llvmPackages_22.clang-tools
