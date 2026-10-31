@@ -1,8 +1,0 @@
-[Flatpak Ref]
-Title=Photobox
-Name=de.matnel.photobox
-Branch=master
-SuggestRemoteName=de.matnel.photobox
-Homepage=https://github.com/mathisloge/photobox
-RuntimeRepo=https://dl.flathub.org/repo/flathub.flatpakrepo
-IsRuntime=false
