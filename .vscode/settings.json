@@ -1,0 +1,50 @@
+{
+    // CMake Tools: drive everything through CMakePresets.json
+    "cmake.useCMakePresets": "always",
+    "cmake.configureOnOpen": true,
+    "cmake.options.statusBarVisibility": "visible",
+    // Merged into the debug configuration CMake Tools derives from the active preset,
+    // used for debugging launch targets and tests
+    "cmake.debugConfig": {
+        "MIMode": "gdb",
+        "visualizerFile": "${command:qt-cpp.natvis6}",
+        "showDisplayString": true,
+        "setupCommands": [
+            {
+                "description": "Enable pretty-printing for gdb",
+                "text": "-enable-pretty-printing",
+                "ignoreFailures": true
+            }
+        ]
+    },
+    "cmake.ctest.neverDebugTestsWithLaunchConfiguration": true,
+
+    // clangd provides the language features, ms-vscode.cpptools is only used for debugging
+    "C_Cpp.intelliSenseEngine": "disabled",
+    "clangd.arguments": [
+        "--compile-commands-dir=${command:cmake.buildDirectory}",
+        "--background-index",
+        "--clang-tidy",
+        "--completion-style=detailed",
+        "--pch-storage=memory"
+    ],
+
+    "[cpp]": {
+        "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd",
+        "editor.formatOnSave": true
+    },
+    "[qml]": {
+        "editor.defaultFormatter": "theqtcompany.qt-qml"
+    },
+
+    "files.watcherExclude": {
+        "**/build/**": true,
+        "**/dist/**": true,
+        "**/.cache/**": true
+    },
+    "search.exclude": {
+        "build": true,
+        "dist": true,
+        ".cache": true
+    }
+}

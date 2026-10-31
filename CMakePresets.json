@@ -10,9 +10,10 @@
             "name": "default",
             "hidden": true,
             "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build",
+            "binaryDir": "${sourceDir}/build/${presetName}",
             "cacheVariables": {
-                "CMAKE_EXPORT_COMPILE_COMMANDS": true
+                "CMAKE_EXPORT_COMPILE_COMMANDS": true,
+                "CPM_SOURCE_CACHE": "${sourceDir}/.cache/CPM"
             }
         },
         {
@@ -52,11 +53,16 @@
     ],
     "testPresets": [
         {
-            "name": "developer",
-            "configurePreset": "developer",
+            "name": "default",
+            "hidden": true,
             "output": {
                 "outputOnFailure": true
-            },
+            }
+        },
+        {
+            "name": "developer",
+            "inherits": "default",
+            "configurePreset": "developer",
             "execution": {
                 "noTestsAction": "error",
                 "stopOnFailure": true
@@ -64,10 +70,8 @@
         },
         {
             "name": "ci",
+            "inherits": "default",
             "configurePreset": "ci",
-            "output": {
-                "outputOnFailure": true
-            },
             "execution": {
                 "noTestsAction": "ignore",
                 "stopOnFailure": true
@@ -75,6 +79,23 @@
         }
     ],
     "workflowPresets": [
+        {
+            "name": "developer",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "developer"
+                },
+                {
+                    "type": "build",
+                    "name": "developer"
+                },
+                {
+                    "type": "test",
+                    "name": "developer"
+                }
+            ]
+        },
         {
             "name": "ci",
             "steps": [

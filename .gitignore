@@ -10,3 +10,4 @@ flatpak-build
 flatpak-repo/
 compile_commands.json
 .qmlls.ini
+CMakeUserPresets.json

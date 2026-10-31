@@ -1,0 +1,11 @@
+{
+    "recommendations": [
+        "llvm-vs-code-extensions.vscode-clangd",
+        "ms-vscode.cpptools",
+        "Anthropic.claude-code",
+        "ms-vscode.cmake-tools",
+        "TheQtCompany.qt-core",
+        "TheQtCompany.qt-qml",
+        "TheQtCompany.qt-cpp"
+    ]
+}
