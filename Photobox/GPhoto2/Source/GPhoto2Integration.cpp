@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "GPhoto2Integration.hpp"
-#include <chrono>
 #include <QImage>
+#include <chrono>
 #include <Pbox/Logger.hpp>
 #include "GPhoto2Context.hpp"
 
