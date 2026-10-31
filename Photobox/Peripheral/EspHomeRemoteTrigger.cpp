@@ -5,7 +5,7 @@
 #include "EspHomeRemoteTrigger.hpp"
 #include <QNetworkRequest>
 #include <Pbox/Logger.hpp>
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <nlohmann/json.hpp>
 #include "IEspHomeClient.hpp"
 

@@ -4,7 +4,7 @@
 
 #include "EspHomeCameraLed.hpp"
 #include <QNetworkRequest>
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include "IEspHomeClient.hpp"
 
 namespace Pbox

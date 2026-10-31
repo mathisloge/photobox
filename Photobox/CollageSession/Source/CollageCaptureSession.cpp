@@ -5,7 +5,7 @@
 #include "CollageCaptureSession.hpp"
 #include <Pbox/CleanupAsyncScope.hpp>
 #include <Pbox/Logger.hpp>
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 DEFINE_LOGGER(collage_capture_session);
 
