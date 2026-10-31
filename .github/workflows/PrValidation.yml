@@ -4,17 +4,18 @@ on:
   pull_request:
 name: Build and test
 jobs:
-  flatpak:
-    name: "Build flatpak and run tests"
+  nix:
+    name: "Nix flake check"
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/flathub-infra/flatpak-github-actions:kde-6.10
-      options: --privileged
     steps:
       - uses: actions/checkout@v6
-      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+      - uses: cachix/install-nix-action@v31
+      - uses: nix-community/cache-nix-action@v7
         with:
-          bundle: photobox.flatpak
-          manifest-path: de.matnel.photobox.yaml
-          cache-key: flatpak-builder-${{ github.sha }}
-          run-tests: false
+          primary-key: nix-${{ runner.os }}-${{ hashFiles('flake.lock', 'flake.nix', 'Nix/**') }}
+          restore-prefixes-first-match: nix-${{ runner.os }}-
+          gc-max-store-size-linux: 5G
+      - name: Build and test
+        run: nix flake check -L
+      - name: Evaluate aarch64 package
+        run: nix eval .#packages.aarch64-linux.default.drvPath
