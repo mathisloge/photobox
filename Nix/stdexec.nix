@@ -65,17 +65,19 @@ stdenv.mkDerivation {
     (lib.cmakeBool "STDEXEC_BUILD_EXAMPLES" false)
     (lib.cmakeBool "STDEXEC_ENABLE_ASIO" true)
     (lib.cmakeFeature "STDEXEC_ASIO_IMPLEMENTATION" "boost")
-    (lib.cmakeBool "FETCHCONTENT_FULLY_DISCONNECTED" true)
     (lib.cmakeFeature "FETCHCONTENT_SOURCE_DIR_RAPIDS-CMAKE" "${rapids-cmake}")
     (lib.cmakeFeature "CPM_SOURCE_CACHE" "${cpm-cache}")
-    # Lets rapids_cpm_find(Boost ...) take nixpkgs' Boost.
+    # Unused today (rapids_cpm_find already tries find_package first, and the
+    # rapids-cmake source dir skips the download). Kept so a future fetch
+    # fails fast or prefers nixpkgs instead of downloading.
+    (lib.cmakeBool "FETCHCONTENT_FULLY_DISCONNECTED" true)
     (lib.cmakeBool "CPM_USE_LOCAL_PACKAGES" true)
   ];
 
   meta = {
     description = "NVIDIA's reference implementation of C++26 std::execution";
     homepage = "https://github.com/NVIDIA/stdexec";
-    license = lib.licenses.asl20;
+    license = with lib.licenses; WITH asl20 llvm-exception;
     platforms = lib.platforms.linux;
   };
 }
