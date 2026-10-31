@@ -9,7 +9,6 @@
   gdb,
   ccache,
   pre-commit,
-  gersemi,
   reuse,
   python3,
   photobox,
@@ -34,11 +33,17 @@ mkShell {
     gdb
     ccache
     pre-commit
-    gersemi
     reuse
     python3
   ];
 
   QT_PLUGIN_PATH = lib.makeSearchPath qt6.qtbase.qtPluginPrefix qtModules;
   QML_IMPORT_PATH = lib.makeSearchPath qt6.qtbase.qtQmlPrefix qtModules;
+
+  # pip treats packages on PYTHONPATH as installed, so pre-commit's hook
+  # environments would miss dependencies. The tools above are wrapped and
+  # don't need it.
+  shellHook = ''
+    unset PYTHONPATH
+  '';
 }
